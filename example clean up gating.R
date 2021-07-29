@@ -5,7 +5,7 @@
 # path to where the fcs files are stored
 data_path <- fs::path("F:", "Forskningsprosjekter", "PDB 2770 - EXIMIOUS - Mapping E_", "CyTOF in vitro WP4", "FCS-filer til Anja")
 outDataPath <- fs::path("F:", "Forskningsprosjekter", "PDB 2770 - EXIMIOUS - Mapping E_", "CyTOF in vitro WP4", "GatedData")
-scriptPath <- fs::path("F:", "Forskningsprosjekter", "PDB 2770 - EXIMIOUS - Mapping E_", "CyTOF cohorts WP4", "Experiment15350", "R", "Gating", "filerTilGitHub")
+scriptPath <- fs::path("H:", "git", "cytof")
 source(fs::path(scriptPath, "gating.R"))
 source(fs::path(scriptPath, "read_data.R"))
 source(fs::path(scriptPath, "transformation.R"))
