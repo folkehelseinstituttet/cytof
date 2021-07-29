@@ -72,8 +72,8 @@ random_cells <- function(numb_cells, n = 10000){
 random_cells_vector <- function(datasetvector, n = 10000){
   datasets <- unique(datasetvector)
   rand_cells <- NULL
-  for(i in datasets){
-    cells <- which(datasetvector %in% datasets)
+  for(datasets_i in datasets){
+    cells <- which(datasetvector %in% datasets_i)
     rand_cells <- c(rand_cells, sort(sample(cells, n)))
   }
   return(rand_cells)
@@ -202,6 +202,15 @@ density_plot <- function(data, channel, plot_title = NA, lower_gate = NA, upper_
 
 
 
+#' signal_signal_just_plot, scatterplot of two different signals
+#' @param data, transformed data 
+#' @param channel1, which channel to plot
+#' @param channel2, which channel to plot
+#' @param plot_title, vector with title for each plot, default NA where the plots are numbered 1, 2, 3, etc.
+#' @param xlim, xlim default NA.
+#' @param ylim, ylim default NA.
+#' @return scatterplots of two differnt signals per file. 
+
 
 signal_signal_just_plot <- function(data, random_cells, channel1, channel2, 
                                     plot_title = NA, xlim = NA, ylim = NA){
@@ -251,3 +260,78 @@ signal_signal_just_plot <- function(data, random_cells, channel1, channel2,
 
 
 
+#' density_plot_per_cluster, plot density for all markers in each cluster
+#' @param data, transformed data 
+#' @param clusters, vector of clusters
+#' @param rand_cells, which cells to plot
+#' @param plot_cluster, default NA give alle clusters, else vector of clusters to plot
+#' @param nrow_plot, tells how many rows of plots to export, default = 4,
+#' @param strip_text_size, give size of stripe text, defaut = 10, 
+#' @param legend_text_size, give size of legend text, defaut = 10, 
+#' @param axis_text_size, give size of axis text, defaut = 8
+#' @return density plots for clusters against rest of data. 
+
+
+
+density_plot_per_cluster <- function(data, cluster_per_cell, rand_cells = NA, plot_cluster = NA, nrow_plot = 4, strip_text_size = 10, legend_text_size = 10, axis_text_size = 8){
+  if(!is.na(rand_cells[1])){
+    data <- data[rand_cells,]
+    cluster_per_cell <- cluster_per_cell[rand_cells]
+  }  
+  
+  if(is.na(plot_cluster[1])){
+    unique_cluster_per_cell <- sort(unique(cluster_per_cell))
+  } else {
+    unique_cluster_per_cell <- plot_cluster
+  }
+  
+  n_cluster_per_cell <- length(unique_cluster_per_cell)
+  
+  for(i in 1:n_cluster_per_cell){
+    d2 <- as.data.frame(cbind(data, cluster_per_cell %in% unique_cluster_per_cell[i]))
+    colnames(d2) <- c(colnames(data),  "cluster")
+    d2$id <- 1:nrow(d2)
+    d3 <- reshape2::melt(d2, id.vars = c("id", "cluster"))
+    d3$cluster[d3$cluster == TRUE] <- paste("cluster", unique_cluster_per_cell[i])
+    d3$cluster[d3$cluster == FALSE] <- "the rest"
+    g <- ggplot2::ggplot(d3, ggplot2::aes(x = value, color = cluster)) + 
+      ggplot2::geom_density(size = 2) +
+      ggplot2::facet_wrap(~ variable, nrow = nrow_plot, scales = "free") +
+      ggplot2::theme_bw() +
+      ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1), 
+          strip.text = ggplot2::element_text(size = strip_text_size), 
+          axis.text = ggplot2::element_text(size = axis_text_size),
+          legend.text=ggplot2::element_text(size = legend_text_size),
+          legend.title = ggplot2::element_blank()) +
+      ggplot2::guides(color = ggplot2::guide_legend(ncol = 1)) #+
+    print(paste("cluster", unique_cluster_per_cell[i]))
+    print(g)
+  }
+
+}
+
+
+
+
+
+#' barplot_per_sample, barplot of cells in each cluster, per sample
+#' @param file_names_per_cell, transformed data 
+#' @param cluster_per_cell, vector of clusters
+#' @param rand_cells, which cells to plot
+#' @return density plots for clusters against rest of data. 
+
+
+
+barplot_per_sample <- function(file_names_per_cell, cluster_per_cell, rand_cells = NA){
+  if(!is.na(rand_cells[1])){
+    file_names_per_cell <- file_names_per_cell[rand_cells]
+    cluster_per_cell <- cluster_per_cell[rand_cells]
+  }  
+  
+  n_clusters <- length(unique(cluster_per_cell))
+  tab <- table( cluster_per_cell, file_names_per_cell) 
+
+  par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
+  barplot(tab, col = col25, las = 2)
+  legend("topright", inset=c(-0.1,0), col= col25[1:n_clusters], legend = names(col25[1:n_clusters]), pch =15)
+}

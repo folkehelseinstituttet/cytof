@@ -80,14 +80,14 @@ data <- as.matrix(arcsinhexprDataMatrix[,1:(ncol(arcsinhexprDataMatrix) -2)])
 out <- FlowSOM::ReadInput(as.matrix(data), transform = F, scale = F)
 out <- FlowSOM::BuildSOM(out, colsToUse = 1:(ncol(data)))
 out <- FlowSOM::BuildMST(out)
-labels_pre <- out$map$mapping[, 1]
+clusters_pre <- out$map$mapping[, 1]
 #Modified k for each data set,
 outk14 <-  FlowSOM::metaClustering_consensus(out$map$codes, k = 14, seed = 1) 
-labels_14 <-outk14[labels_pre]
+clusters_14 <-outk14[clusters_pre]
 
 #Modified k for each data set,
 outk28 <-  FlowSOM::metaClustering_consensus(out$map$codes, k = 28, seed = 1) 
-labels_28 <-outk28[labels_pre]
+clusters_28 <-outk28[clusters_pre]
 
 
 
@@ -98,8 +98,13 @@ set.seed(100) # to ensure same plot every time
 random_cells_for_plotting <- random_cells_vector(arcsinhexprDataMatrix$dataset)
 umapAshinfac5 <- umap::umap(data[random_cells_for_plotting,])
 
-plot(umapAshinfac5$layout, col = col25[labels_14[random_cells_for_plotting]])
-plot(umapAshinfac5$layout, col = col25[labels_14[random_cells_for_plotting]], xlim = c(-10,10), ylim = c(-15,10))
-plot(umapAshinfac5$layout, col = col25[labels_28[random_cells_for_plotting]], xlim = c(-10,10), ylim = c(-15,10))
+plot(umapAshinfac5$layout, col = col25[clusters_14[random_cells_for_plotting]])
+plot(umapAshinfac5$layout, col = col25[clusters_14[random_cells_for_plotting]], xlim = c(-10,10), ylim = c(-15,10))
+plot(umapAshinfac5$layout, col = col25[clusters_28[random_cells_for_plotting]], xlim = c(-10,10), ylim = c(-15,10))
 
 
+
+density_plot_per_cluster(data = data, cluster_per_cell = clusters_14, rand_cells = random_cells_for_plotting)
+#density_plot_per_cluster(data = data, cluster_per_cell = clusters_14, rand_cells = random_cells_for_plotting, plot_cluster = c(1,2))
+
+barplot_per_sample(file_names_per_cell = arcsinhexprDataMatrix$dataset,  cluster_per_cell = clusters_14, rand_cells = random_cells_for_plotting)
