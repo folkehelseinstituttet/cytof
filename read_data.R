@@ -25,3 +25,5 @@ get_params_fcs_data <- function(x = fcs_data[[1]]){
   params <- flowCore::pData(flowCore::parameters(x))
   return(params)
 }
+
+

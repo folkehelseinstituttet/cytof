@@ -7,6 +7,7 @@ data_path <- fs::path("F:", "Forskningsprosjekter", "PDB 2770 - EXIMIOUS - Mappi
 outDataPath <- fs::path("F:", "Forskningsprosjekter", "PDB 2770 - EXIMIOUS - Mapping E_", "CyTOF in vitro WP4", "GatedData", "Tceller")
 scriptPath <- fs::path("H:", "git", "cytof")
 source(fs::path(scriptPath, "gating.R"))
+source(fs::path(scriptPath, "ploting.R"))
 source(fs::path(scriptPath, "read_data.R"))
 source(fs::path(scriptPath, "transformation.R"))
 
