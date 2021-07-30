@@ -49,5 +49,7 @@ list_to_matrix <- function(data, file_names = NA){
       mat <- rbind(mat, mat0)
     }
   }
+  
+  mat <- as.data.frame(mat)
   return(mat)
 }

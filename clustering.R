@@ -1,8 +1,13 @@
 #' k_mean_clustering_different_ks, function that return plot of withinss for different k.
-#' @params, data, dataset that should be clustered
-#' @param , k, vector of different k values to cluster for 
+#' @params, data, matrix, dataset that should be clustered
+#' @param , k integers, vector of different k values (integers) to cluster for 
 
-k_mean_clustering_different_ks <- function(dat, k = 1:30){
+k_mean_clustering_different_ks <- function(data, k = 1:30){
+  if(is.data.frame(data))
+    data <- as.matrix(data)
+  if(!is.matrix(data))
+    stop("Wrong input data, should be a data frame of matrix!")
+  
   prop_within <- rep(NA, length(k))
   for(i in 1:length(k)){
     k_i <- k[i]

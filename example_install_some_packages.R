@@ -46,3 +46,7 @@ if(!require(pastecs)){
 }
 
 
+if(!require(devtools)){
+  install.packages("devtools") # If not already installed
+}
+devtools::install_github("JinmiaoChenLab/Rphenograph")

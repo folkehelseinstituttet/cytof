@@ -34,23 +34,38 @@ colfunc <- colorRampPalette(c("black", "purple4", "red", "yellow"))
 
 
 
-#' number of cells in each file
-#' @param data, list observations in all fcs files
+#' number_of_cells 
+#' @param data, list observations in all fcs files or vector from a data.frame/matrix with observation including sample/dataset
 #' @return vector with number of cells in each subdataset
 
 number_of_cells <- function(data){
-  number_of_files <- length(data)
-  cells <- NULL
-  for (i in 1:number_of_files){
-    cells[i] <- nrow(data[[i]])
+  if(is.data.frame(data)|| is.matrix(data)){
+    stop("data has to be either a list of datasets or a vector, if matrix only include the column with sample/file name")
   }
+  cells <- NULL
+  if(is.list(data)){
+    number_of_files <- length(data)
+    if(number_of_files > 1){
+      for (i in 1:number_of_files){
+        cells[i] <- nrow(data[[i]])
+      }
+    }
+  }
+  
+  if(is.null(cells)){
+    if(is.vector(data)){
+      cells <- as.numeric(table(data))
+    }
+  }
+
   return(cells)
 }
 
 
 #' random_cells give list of random cells for each subdataset
 #' @param numb_cells, vector with number of cells in each subdataset
-#' @param n, number of cells from wanted for each subdatasets. Default equal 10000.
+#' @param n, number of cells from wanted for each subdatasets. Default equal 10000. 
+#' If n greater than number of observation in a file then n for that file will be equal to number of observations 
 #' @return list of vectors with position for the random cells for each sub dataset
 #' 
 
@@ -64,7 +79,7 @@ random_cells <- function(numb_cells, n = 10000){
 }
 
 #' random_cells_vector give vector of random cells for the whole dataset
-#' @param 
+#' @param datasetvector, vector of filename for each observation
 #' @param n, number of cells from wanted for each subdatasets. Default equal 10000.
 #' @return list of vectors with position for the random cells for each sub dataset
 #' 
