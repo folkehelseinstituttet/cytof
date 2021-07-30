@@ -311,16 +311,11 @@ density_plot_per_cluster <- function(data, cluster_per_cell, rand_cells = NA, pl
 }
 
 
-
-
-
 #' barplot_per_sample, barplot of cells in each cluster, per sample
 #' @param file_names_per_cell, transformed data 
 #' @param cluster_per_cell, vector of clusters
 #' @param rand_cells, which cells to plot
 #' @return density plots for clusters against rest of data. 
-
-
 
 barplot_per_sample <- function(file_names_per_cell, cluster_per_cell, rand_cells = NA){
   if(!is.na(rand_cells[1])){
@@ -333,5 +328,5 @@ barplot_per_sample <- function(file_names_per_cell, cluster_per_cell, rand_cells
 
   par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
   barplot(tab, col = col25, las = 2)
-  legend("topright", inset=c(-0.1,0), col= col25[1:n_clusters], legend = names(col25[1:n_clusters]), pch =15)
+  legend("topright", inset=c(-0.1,0), col= col25[n_clusters:1], legend = names(col25[n_clusters:1]), pch =15)
 }
