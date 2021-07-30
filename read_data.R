@@ -27,3 +27,27 @@ get_params_fcs_data <- function(x = fcs_data[[1]]){
 }
 
 
+
+
+list_to_matrix <- function(data, file_names = NA){
+  n <- length(data)
+  if(is.na(file_names[1])){
+    file_names <- 1:n
+  }
+  
+  if(!length(file_names) == n){
+    print("There has to be equal amount of file_names and datasets")
+    stop()
+  }
+  
+  mat <- data[[1]]
+  mat$dataset <- file_names[1]
+  if(n > 1){
+    for(i in 2:n){
+      mat0 <- data[[i]]
+      mat0$dataset <- file_names[i]
+      mat <- rbind(mat, mat0)
+    }
+  }
+  return(mat)
+}
