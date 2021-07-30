@@ -62,18 +62,8 @@ for(i in 1:length(arcsinhexprData)){
 }
 
 
-arcsinhexprDataMatrix <- rbind(arcsinhexprData[[1]], arcsinhexprData[[2]],arcsinhexprData[[3]],
-                               arcsinhexprData[[4]], arcsinhexprData[[5]],arcsinhexprData[[6]],
-                               arcsinhexprData[[7]], arcsinhexprData[[8]])
 
-arcsinhexprDataMatrix$dataset <- c(rep(file_names[1], nrow(arcsinhexprData[[1]])), 
-                                   rep(file_names[2], nrow(arcsinhexprData[[2]])),
-                                   rep(file_names[3], nrow(arcsinhexprData[[3]])),
-                                   rep(file_names[4], nrow(arcsinhexprData[[4]])),
-                                   rep(file_names[5], nrow(arcsinhexprData[[5]])),
-                                   rep(file_names[6], nrow(arcsinhexprData[[6]])),
-                                   rep(file_names[7], nrow(arcsinhexprData[[7]])),
-                                   rep(file_names[8], nrow(arcsinhexprData[[8]])))
+arcsinhexprDataMatrix <- list_to_matrix(data = arcsinhexprData, file_names = file_names)
 
 
 data <- as.matrix(arcsinhexprDataMatrix[,1:(ncol(arcsinhexprDataMatrix) -2)])
