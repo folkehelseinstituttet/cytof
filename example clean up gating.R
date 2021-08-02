@@ -6,10 +6,10 @@
 data_path <- fs::path("F:", "Forskningsprosjekter", "PDB 2770 - EXIMIOUS - Mapping E_", "CyTOF in vitro WP4", "FCS-filer til Anja")
 outDataPath <- fs::path("F:", "Forskningsprosjekter", "PDB 2770 - EXIMIOUS - Mapping E_", "CyTOF in vitro WP4", "GatedData")
 scriptPath <- fs::path("H:", "git", "cytof")
-source(fs::path(scriptPath, "gating.R"))
-source(fs::path(scriptPath, "ploting.R"))
-source(fs::path(scriptPath, "read_data.R"))
-source(fs::path(scriptPath, "transformation.R"))
+source(fs::path(scriptPath, "gating_functions.R"))
+source(fs::path(scriptPath, "ploting_functions.R"))
+source(fs::path(scriptPath, "read_data_functions.R"))
+source(fs::path(scriptPath, "transformation_functions.R"))
 
 
 # read all files in data_path into one dataset fcs_data
