@@ -69,6 +69,7 @@ arcsinhexprDataMatrix <- list_to_matrix(data = arcsinhexprData, file_names = fil
 # data here only include those column used for clustering (not time and dataset, could also exclude more)
 data <- as.matrix(arcsinhexprDataMatrix[,1:(ncol(arcsinhexprDataMatrix) -2)])
 #clustering using FlowSOM.
+library(tidyverse)
 out <- FlowSOM::ReadInput(as.matrix(data), transform = F, scale = F)
 out <- FlowSOM::BuildSOM(out, colsToUse = 1:(ncol(data)))
 out <- FlowSOM::BuildMST(out)

@@ -45,6 +45,11 @@ if(!require(pastecs)){
 #  library(pastecs)
 }
 
+if(!require(glue)){ 
+  install.packages("glue", dependencies = TRUE)
+  #  library(glue)
+}
+
 
 if(!require(devtools)){
   install.packages("devtools") # If not already installed
