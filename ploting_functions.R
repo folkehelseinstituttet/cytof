@@ -35,26 +35,15 @@ colfunc <- colorRampPalette(c("black", "purple4", "red", "yellow"))
 
 
 #' number_of_cells 
-#' @param data, list observations in all fcs files or vector from a data.frame/matrix with observation including sample/dataset
+#' @param data, list observations in all fcs files 
 #' @return vector with number of cells in each subdataset
 
 number_of_cells <- function(data){
-  if(is.data.frame(data)|| is.matrix(data)){
-    stop("data has to be either a list of datasets or a vector, if matrix only include the column with sample/file name")
-  }
   cells <- NULL
-  if(is.list(data)){
-    number_of_files <- length(data)
-    if(number_of_files > 1){
-      for (i in 1:number_of_files){
+  number_of_files <- length(data)
+  if(number_of_files > 1){
+    for (i in 1:number_of_files){
         cells[i] <- nrow(data[[i]])
-      }
-    }
-  }
-  
-  if(is.null(cells)){
-    if(is.vector(data)){
-      cells <- as.numeric(table(data))
     }
   }
 
