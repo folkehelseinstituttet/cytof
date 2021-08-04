@@ -15,7 +15,7 @@ rm(fcs_data_with_info)
 params <- get_params_fcs_data(fcs_data[[1]])
 
 ####
-# functional cells
+# functional events
 ####
 
 params$desc[grepl("CD3", params$desc)]
@@ -102,16 +102,16 @@ table(Cluster_kmean15, cluster_FlowSOM_28)
 #Choose to plot only N observations per data set, and repeat 3 times with different seeding to see differences.
 
 set.seed(100) # to ensure same plot every time
-random_cells_for_plotting <- random_cells_vector(arcsinhexprDataMatrix$dataset)
-umapAshinfac5 <- umap::umap(data[random_cells_for_plotting,])
+random_events_for_plotting <- random_events_vector(arcsinhexprDataMatrix$dataset)
+umapAshinfac5 <- umap::umap(data[random_events_for_plotting,])
 
-plot(umapAshinfac5$layout, col = col25[cluster_FlowSOM_15[random_cells_for_plotting]])
-plot(umapAshinfac5$layout, col = col25[cluster_FlowSOM_15[random_cells_for_plotting]], xlim = c(-10,10), ylim = c(-14,10))
-plot(umapAshinfac5$layout, col = col25[cluster_FlowSOM_28[random_cells_for_plotting]], xlim = c(-10,10), ylim = c(-14,10))
+plot(umapAshinfac5$layout, col = col25[cluster_FlowSOM_15[random_events_for_plotting]])
+plot(umapAshinfac5$layout, col = col25[cluster_FlowSOM_15[random_events_for_plotting]], xlim = c(-10,10), ylim = c(-14,10))
+plot(umapAshinfac5$layout, col = col25[cluster_FlowSOM_28[random_events_for_plotting]], xlim = c(-10,10), ylim = c(-14,10))
 
 
 
-density_plot_per_cluster(data = data, cluster_per_cell = cluster_FlowSOM_15, rand_cells = random_cells_for_plotting)
-#density_plot_per_cluster(data = data, cluster_per_cell = cluster_FlowSOM_15, rand_cells = random_cells_for_plotting, plot_cluster = c(1,2))
+density_plot_per_cluster(data = data, cluster_per_event = cluster_FlowSOM_15, rand_events = random_events_for_plotting)
+#density_plot_per_cluster(data = data, cluster_per_event = cluster_FlowSOM_15, rand_events = random_events_for_plotting, plot_cluster = c(1,2))
 
-barplot_per_sample(file_names_per_cell = arcsinhexprDataMatrix$dataset,  cluster_per_cell = cluster_FlowSOM_15, rand_cells = random_cells_for_plotting)
+barplot_per_sample(file_names_per_event = arcsinhexprDataMatrix$dataset,  cluster_per_event = cluster_FlowSOM_15, rand_events = random_events_for_plotting)

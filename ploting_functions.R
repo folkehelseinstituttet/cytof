@@ -34,79 +34,79 @@ colfunc <- colorRampPalette(c("black", "purple4", "red", "yellow"))
 
 
 
-#' number_of_cells 
+#' number_of_events 
 #' @param data, list observations in all fcs files 
-#' @return vector with number of cells in each subdataset
+#' @return vector with number of events in each subdataset
 
-number_of_cells <- function(data){
-  cells <- NULL
+number_of_events <- function(data){
+  events <- NULL
   number_of_files <- length(data)
   if(number_of_files > 1){
     for (i in 1:number_of_files){
-        cells[i] <- nrow(data[[i]])
+        events[i] <- nrow(data[[i]])
     }
   }
 
-  return(cells)
+  return(events)
 }
 
 
-#' random_cells give list of random cells for each subdataset
-#' @param numb_cells, vector with number of cells in each subdataset
-#' @param n, number of cells from wanted for each subdatasets. Default equal 10000. 
+#' random_events give list of random events for each subdataset
+#' @param numb_events, vector with number of events in each subdataset
+#' @param n, number of events from wanted for each subdatasets. Default equal 10000. 
 #' If n greater than number of observation in a file then n for that file will be equal to number of observations 
-#' @return list of vectors with position for the random cells for each sub dataset
+#' @return list of vectors with position for the random events for each sub dataset
 #' 
 
-random_cells <- function(numb_cells, n = 10000){
-  number_of_files <- length(numb_cells)
-  rand_cells <- NULL
+random_events <- function(numb_events, n = 10000){
+  number_of_files <- length(numb_events)
+  rand_events <- NULL
   for (i in 1:number_of_files){
-    rand_cells[i] <- list(sort(sample(1:numb_cells[i], min(numb_cells[i], n))))
+    rand_events[i] <- list(sort(sample(1:numb_events[i], min(numb_events[i], n))))
   }
-  return(rand_cells)
+  return(rand_events)
 }
 
-#' random_cells_vector give vector of random cells for the whole dataset
+#' random_events_vector give vector of random events for the whole dataset
 #' @param datasetvector, vector of filename for each observation
-#' @param n, number of cells from wanted for each subdatasets. Default equal 10000.
-#' @return list of vectors with position for the random cells for each sub dataset
+#' @param n, number of events from wanted for each subdatasets. Default equal 10000.
+#' @return list of vectors with position for the random events for each sub dataset
 #' 
 
-random_cells_vector <- function(datasetvector, n = 10000){
+random_events_vector <- function(datasetvector, n = 10000){
   datasets <- unique(datasetvector)
-  rand_cells <- NULL
+  rand_events <- NULL
   for(datasets_i in datasets){
-    cells <- which(datasetvector %in% datasets_i)
-    rand_cells <- c(rand_cells, sort(sample(cells, n)))
+    events <- which(datasetvector %in% datasets_i)
+    rand_events <- c(rand_events, sort(sample(events, n)))
   }
-  return(rand_cells)
+  return(rand_events)
 }
 
 
 
 
-#' time_signal_plot, plot x = time and y = signal of channel in random_cells for each subdataset
+#' time_signal_plot, plot x = time and y = signal of channel in random_events for each subdataset
 #' @param data, transformed data 
-#' @param random_cells, list of which cells to plot for each subdataset
+#' @param random_events, list of which events to plot for each subdataset
 #' @param channel, which channel to plot
 #' @param plot_title, vector with title for each plot, typical file names
-#' @param prop_after_this_gating, proportion of cells remaining after this gating
-#' @param prop_final_event, propotion of cells remaining in total
+#' @param prop_after_this_gating, proportion of events remaining after this gating
+#' @param prop_final_event, propotion of events remaining in total
 #' @param lower_gate, vector with values for lower gate or NA (no lower gating)
 #' @param upper_gate,  vector with values for uppe gate or NA (no upper gating)
 #' @param time_div, value to divide time with, to get better values on x-axis, default 60*1000 which gives time in min_utes.
 #' @param ylim
 #' @return a list of time signal plots, one for each subdataset. 
 
-time_signal_plot <- function(data, random_cells, channel,  plot_title, 
+time_signal_plot <- function(data, random_events, channel,  plot_title, 
                              prop_after_this_gating = NA, prop_final_event = NA, 
                              lower_gate = NA, upper_gate = NA, time_div = 60 * 1000, ylim = NA){
   channel <- ggplot2::sym(channel)
   plot_list <- list()
   for (i in 1:length(plot_title)){
-    max_time <- max(data[[i]][random_cells[[i]],"Time"]/time_div)
-    gg <- ggplot2::ggplot(data[[i]][random_cells[[i]],], ggplot2::aes(x=Time/time_div, y=!!channel)) +
+    max_time <- max(data[[i]][random_events[[i]],"Time"]/time_div)
+    gg <- ggplot2::ggplot(data[[i]][random_events[[i]],], ggplot2::aes(x=Time/time_div, y=!!channel)) +
       #scale on x axis 
       ggplot2::scale_x_continuous(breaks=seq(0,round(max_time ,1),round(max_time /2,1))) + 
       # Plot all points
@@ -162,7 +162,7 @@ time_signal_plot <- function(data, random_cells, channel,  plot_title,
 
 
 
-#' density_plot, plot density for all cells in each subdataset
+#' density_plot, plot density for all events in each subdataset
 #' @param data, transformed data 
 #' @param channel, which channel to plot
 #' @param plot_title, vector with title for each plot, default NA where the plots are numbered 1, 2, 3, etc.
@@ -172,10 +172,12 @@ time_signal_plot <- function(data, random_cells, channel,  plot_title,
 #' @return density plots
 
 density_plot <- function(data, channel, plot_title = NA, lower_gate = NA, upper_gate = NA, xlim = NA){
-  number_of_files <- length(data)
+
+   number_of_files <- length(data)
   if(is.na(plot_title[1])){
     plot_title <- as.character(1:number_of_files)
   }
+  plot_title_nr <- 1:number_of_files
   column <- which(colnames(data[[1]]) == channel)
   df <- data.frame(Values = data[[1]][,column], Sample = rep(plot_title[1], nrow(data[[1]])))
   for(i in 2:number_of_files){
@@ -189,12 +191,14 @@ density_plot <- function(data, channel, plot_title = NA, lower_gate = NA, upper_
     ggjoy::theme_joy()
   
   if(!is.na(lower_gate[1]) ){
-    gate_line <- data.frame(Sample = plot_title, x0 = lower_gate)
+    gate_line <- data.frame(Sample = plot_title_nr, x0 = lower_gate)
     gg <- gg + ggplot2::geom_segment(data = gate_line, ggplot2::aes(x = x0, xend = x0, y = as.numeric(Sample), yend = as.numeric(Sample) + 0.9), color = "black") 
+   # gg <- gg + ggplot2::geom_vline(data = gate_line, xintercept = x0, col = Sample)
   }
   if(!is.na(upper_gate[1])){
     gate_line <- data.frame(Sample = plot_title,  x1 = upper_gate)
     gg <- gg + ggplot2::geom_segment(data = gate_line, ggplot2::aes(x = x1, xend = x1, y = as.numeric(Sample), yend = as.numeric(Sample) + 0.9), color = "black") 
+  #  gg <- gg + ggplot2::geom_vline(data = gate_line, ggplot2::aes(xintercept = x1, color = Sample))
   }
   
   if(!is.na(xlim)[1]){
@@ -216,7 +220,7 @@ density_plot <- function(data, channel, plot_title = NA, lower_gate = NA, upper_
 #' @return scatterplots of two differnt signals per file. 
 
 
-signal_signal_just_plot <- function(data, random_cells, channel1, channel2, 
+signal_signal_just_plot <- function(data, random_events, channel1, channel2, 
                                     plot_title = NA, xlim = NA, ylim = NA){
   channel1 <- ggplot2::sym(channel1)
   channel2 <- ggplot2::sym(channel2)
@@ -241,7 +245,7 @@ signal_signal_just_plot <- function(data, random_cells, channel1, channel2,
       ylim <- c(min(var2_i), max(var2_i))
     }
     
-    gg <- ggplot2::ggplot(data[[i]][random_cells[[i]],], ggplot2::aes(x=!!channel1, y=!!channel2)) +
+    gg <- ggplot2::ggplot(data[[i]][random_events[[i]],], ggplot2::aes(x=!!channel1, y=!!channel2)) +
       ggplot2::coord_cartesian(xlim = xlim, ylim = ylim) +      
       # Plot all points
       ggplot2::geom_point(shape=".",alpha=0.5)+
@@ -267,7 +271,7 @@ signal_signal_just_plot <- function(data, random_cells, channel1, channel2,
 #' density_plot_per_cluster, plot density for all markers in each cluster
 #' @param data, transformed data 
 #' @param clusters, vector of clusters
-#' @param rand_cells, which cells to plot
+#' @param rand_events, which events to plot
 #' @param plot_cluster, default NA give alle clusters, else vector of clusters to plot
 #' @param nrow_plot, tells how many rows of plots to export, default = 4,
 #' @param strip_text_size, give size of stripe text, defaut = 10, 
@@ -277,10 +281,10 @@ signal_signal_just_plot <- function(data, random_cells, channel1, channel2,
 
 
 
-density_plot_per_cluster <- function(data, cluster_per_cell, rand_cells = NA, plot_cluster = NA, nrow_plot = 4, strip_text_size = 10, legend_text_size = 10, axis_text_size = 8){
-  if(!is.na(rand_cells[1])){
-    data <- data[rand_cells,]
-    cluster_per_cell <- cluster_per_cell[rand_cells]
+density_plot_per_cluster <- function(data, cluster_per_cell, rand_events = NA, plot_cluster = NA, nrow_plot = 4, strip_text_size = 10, legend_text_size = 10, axis_text_size = 8){
+  if(!is.na(rand_events[1])){
+    data <- data[rand_events,]
+    cluster_per_cell <- cluster_per_cell[rand_events]
   }  
   
   if(is.na(plot_cluster[1])){
@@ -315,16 +319,16 @@ density_plot_per_cluster <- function(data, cluster_per_cell, rand_cells = NA, pl
 }
 
 
-#' barplot_per_sample, barplot of cells in each cluster, per sample
+#' barplot_per_sample, barplot of events in each cluster, per sample
 #' @param file_names_per_cell, transformed data 
 #' @param cluster_per_cell, vector of clusters
-#' @param rand_cells, which cells to plot
+#' @param rand_events, which events to plot
 #' @return density plots for clusters against rest of data. 
 
-barplot_per_sample <- function(file_names_per_cell, cluster_per_cell, rand_cells = NA){
-  if(!is.na(rand_cells[1])){
-    file_names_per_cell <- file_names_per_cell[rand_cells]
-    cluster_per_cell <- cluster_per_cell[rand_cells]
+barplot_per_sample <- function(file_names_per_cell, cluster_per_cell, rand_events = NA){
+  if(!is.na(rand_events[1])){
+    file_names_per_cell <- file_names_per_cell[rand_events]
+    cluster_per_cell <- cluster_per_cell[rand_events]
   }  
   
   n_clusters <- length(unique(cluster_per_cell))

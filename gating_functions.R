@@ -72,15 +72,15 @@ find_gate_gaussian_first_top <- function(data, channel, perc_included = 0.9995){
 
 
 
-#' cells_to_keep, find which cells to keep in each subdataset based on lower and/or upper gate.
+#' events_to_keep, find which events to keep in each subdataset based on lower and/or upper gate.
 #' @param data, transformed data 
 #' @param channel, which channel to plot
 #' @param lower_gate, vector with values for lower gate, a number (same lower gate for all subset) or NA (no lower gating)
 #' @param upper_gate,  vector with values for uppe gate, a number (same upper gate for all subset)  or NA (no upper gating)
-#' @return list of vectors of true/false for each cells (true means keep), one vector for each subdataset. 
+#' @return list of vectors of true/false for each events (true means keep), one vector for each subdataset. 
 
 
-cells_to_keep <- function(data, channel, lower_gate = NA, upper_gate = NA){
+events_to_keep <- function(data, channel, lower_gate = NA, upper_gate = NA){
   number_of_files <- length(data)
   column <- which(colnames(data[[1]]) == channel)
   if(length(lower_gate) == 1){
@@ -89,35 +89,35 @@ cells_to_keep <- function(data, channel, lower_gate = NA, upper_gate = NA){
   if(length(upper_gate) == 1){
     upper_gate <- rep(upper_gate, number_of_files)
   }
-  kept_cells <- NULL
+  kept_events <- NULL
   if(is.na(lower_gate[1])){
     for (i in 1:number_of_files){
-      kept_cells[[i]] <- data[[i]][,column] < upper_gate[i]
+      kept_events[[i]] <- data[[i]][,column] < upper_gate[i]
     }
   } else { 
     if(is.na(upper_gate[1])){
       for (i in 1:number_of_files){
-        kept_cells[[i]] <- data[[i]][,column] > lower_gate[i]
+        kept_events[[i]] <- data[[i]][,column] > lower_gate[i]
       }
     } else {     
       for (i in 1:number_of_files){
-        kept_cells[[i]] <- data[[i]][,column] < upper_gate[i] & data[[i]][,column] > lower_gate[i]
+        kept_events[[i]] <- data[[i]][,column] < upper_gate[i] & data[[i]][,column] > lower_gate[i]
       }
     }
   }  
-  return(kept_cells)
+  return(kept_events)
 }
 
 
-#' update_data_based_on_cells_to_keep
+#' update_data_based_on_events_to_keep
 #' @param data, data 
-#' @param kept_cells, list of vectors of true/false for alle cells in each subdataset. Those cells that are true will be kept
-#' @return new dataset with only those cells that we want to keep. 
+#' @param kept_events, list of vectors of true/false for alle events in each subdataset. Those events that are true will be kept
+#' @return new dataset with only those events that we want to keep. 
 
-update_data_based_on_cells_to_keep <- function(data, kept_cells){
+update_data_based_on_events_to_keep <- function(data, kept_events){
   number_of_files <- length(data)
   for (i in 1:number_of_files){
-    data[[i]] <- data[[i]][kept_cells[[i]],]
+    data[[i]] <- data[[i]][kept_events[[i]],]
   }
   return(data)
 }
