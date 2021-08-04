@@ -273,7 +273,7 @@ random_events_for_plotting <- random_events(number_of_events_before_cis_gating)
 #update lower_gate_percent, upper_gate_percent
 
 
-cis_gates <- find_gaussian_gates_first_top(data = clean_up_data, channel = "Pt195Di", lower_gate_percent = 15, upper_gate_percent = 10, minupper_gate = 2)
+cis_gates <- find_gaussian_gates_first_top(data = clean_up_data, channel = "Pt195Di", lower_gate_percent = 15, upper_gate_percent = 10, min_upper_gate = 2)
 density_plots <- density_plot(data = clean_up_data, "Pt195Di", plot_title = file_names, lower_gate = cis_gates$lower_gate, upper_gate = cis_gates$upper_gate)
 #density_plots
 time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = random_events_for_plotting, channel = "Pt195Di", plot_title = file_names, lower_gate = cis_gates$lower_gate, upper_gate = cis_gates$upper_gate)
