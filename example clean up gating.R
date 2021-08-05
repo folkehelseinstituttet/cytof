@@ -15,7 +15,7 @@ source(fs::path(scriptPath, "transformation_functions.R"))
 # read all files in data_path into one dataset fcs_data
 fcs_data_with_info <- read_data_from_folder(data_path)
 fcs_data <- fcs_data_with_info$fcs_data
-file_names <- fcs_data_with_info$file_names
+file_names <- factor(fcs_data_with_info$file_names, levels = fcs_data_with_info$file_names)
 rm(fcs_data_with_info)
 
 # get the parameters of fcs_data and store them in params.
