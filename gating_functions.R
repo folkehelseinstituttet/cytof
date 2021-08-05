@@ -109,6 +109,28 @@ events_to_keep <- function(data, channel, lower_gate = NA, upper_gate = NA){
 }
 
 
+
+#' percent_to_keep_this_gating
+#' @param data, data 
+#' @param kept_events, list of vectors of true/false for alle events in each subdataset. Those events that are true will be kept
+#' @param file_names, default NA will give the name 1,2,3 etc.
+#' @return percentage kept this gating
+#' 
+percent_to_keep_this_gating <- function(kept_events, file_names = NA){
+  number_of_files <- length(kept_events)
+  if(is.na(file_names[1])){
+    file_names <- 1:number_of_files
+  }
+  file_names <- as.character(file_names)
+  percent <- rep(NA, number_of_files)
+  for (i in 1:number_of_files){
+    percent[i] <- table(kept_events[[i]])["TRUE"]/length(kept_events[[i]])
+  }
+  names(percent) <- file_names
+  return(percent)
+}
+
+
 #' update_data_based_on_events_to_keep
 #' @param data, data 
 #' @param kept_events, list of vectors of true/false for alle events in each subdataset. Those events that are true will be kept

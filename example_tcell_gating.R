@@ -71,7 +71,7 @@ for(i in 1:length(arcsinhexprData)){
 
 
 
-number_of_events_after_clean_up <-  number_of_events(arcsinhexprData)
+number_of_events_after_clean_up <-  number_of_events(arcsinhexprData, file_names = file_names)
 random_events_for_plotting <- random_events(number_of_events_after_clean_up)
 
 
@@ -92,6 +92,7 @@ CD3_neg_gate <- CD3_pos_gate$lower_gates
 density_plots <- density_plot(data = arcsinhexprData, "CD3", plot_title = file_names, lower_gate = NA, upper_gate = CD3_neg_gate)
 events_to_keep_after_CD3neg_gating <- events_to_keep(data = arcsinhexprData, channel = "CD3", lower_gate = NA, 
                                                    upper_gate = CD3_neg_gate)
+percent_to_keep_this_gating(kept_events = events_to_keep_after_CD3neg_gating, file_names = file_names)
 
 #density_plots
 
@@ -110,6 +111,7 @@ time_signal_plots <- time_signal_plot(data = arcsinhexprData, random_events = ra
 
 events_to_keep_after_CD19neg_gating <- events_to_keep(data = arcsinhexprData, channel = "CD19", lower_gate = NA, 
                                                    upper_gate = CD19_neg_gate)
+percent_to_keep_this_gating(kept_events = events_to_keep_after_CD19neg_gating, file_names = file_names)
 # for(i in 1:length(events_to_keep_after_CD19neg_gating)){
 #   print(table(events_to_keep_after_CD19neg_gating[[i]]))
 # }
@@ -167,14 +169,14 @@ density_plots <- density_plot(data = arcsinhexprData, "CD19", plot_title = file_
 density_plots
 events_to_keep_after_CD19neg_gating <- events_to_keep(data = arcsinhexprData, channel = "CD19", lower_gate = NA, 
                                                     upper_gate = CD19gates)
-
+percent_to_keep_this_gating(kept_events = events_to_keep_after_CD19neg_gating, file_names = file_names)
 
 CD45RAgates <-  find_gate_gaussian_first_top(data = arcsinhexprData, channel = "CD45RA", perc_included = 0.995)
 density_plots <- density_plot(data = arcsinhexprData, "CD45RA", plot_title = file_names, lower_gate = CD45RAgates)
 density_plots
 events_to_keep_after_CD45RAneg_gating <- events_to_keep(data = arcsinhexprData, channel = "CD45RA", lower_gate = NA, 
                                                     upper_gate = CD45RAgates)
-
+percent_to_keep_this_gating(kept_events = events_to_keep_after_CD45RAneg_gating, file_names = file_names)
 
 
 CD127gates <-  find_gate_gaussian_first_top(data = arcsinhexprData, channel = "CD127", perc_included = 0.995)
@@ -182,7 +184,7 @@ density_plots <- density_plot(data = arcsinhexprData, "CD127", plot_title = file
 density_plots
 events_to_keep_after_CD127neg_gating <- events_to_keep(data = arcsinhexprData, channel = "CD127", lower_gate = NA, 
                                                     upper_gate = CD127gates)
-
+percent_to_keep_this_gating(kept_events = events_to_keep_after_CD127neg_gating, file_names = file_names)
 
 
 CD11cgates <-  find_gate_gaussian_first_top(data = arcsinhexprData, channel = "CD11c", perc_included = 0.995)
@@ -190,7 +192,7 @@ density_plots <- density_plot(data = arcsinhexprData, "CD11c", plot_title = file
 density_plots
 events_to_keep_after_CD11cneg_gating <- events_to_keep(data = arcsinhexprData, channel = "CD11c", lower_gate = NA, 
                                                      upper_gate = CD11cgates)
-
+percent_to_keep_this_gating(kept_events = events_to_keep_after_CD11cneg_gating, file_names = file_names)
 
 CCR7gates2 <-  find_split_first_second_top(data = arcsinhexprData, channel = "CCR7")
 density_plots <- density_plot(data = arcsinhexprData, "CCR7", plot_title = file_names, lower_gate = CCR7gates)

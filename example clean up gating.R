@@ -31,7 +31,7 @@ bead_channels <- as.character(params$name[grepl("140|151|153|165|175", params$na
 
 beads_data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = bead_channels)
 
-number_of_events_raw_data <-  number_of_events(data = fcs_data)
+number_of_events_raw_data <-  number_of_events(data = fcs_data, file_names = file_names)
 random_events_for_plotting <- random_events(number_of_events_raw_data)
 
 
@@ -84,50 +84,65 @@ density_plots <- density_plot(data = beads_data, channel = "Lu175Di", plot_title
 ## use the upper_gates found for gating. Either on one of the beads or why not all. 
 #"Ce140Di"
 events_to_keep_after_gating <- events_to_keep(data = beads_data, channel = "Ce140Di",  upper_gate = upper_gate_Ce140Di)
+percent_to_keep_this_gating(kept_events = events_to_keep_after_gating, file_names = file_names)
+
+
 #overwrite the raw  and Beads datasett (will take lot of space if we make one new each time, and do not need it)
 fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_gating)
 beads_data <- update_data_based_on_events_to_keep(data = beads_data, kept_events = events_to_keep_after_gating)
-number_of_events_after_gating <-  number_of_events(data = fcs_data)
+number_of_events_after_gating <-  number_of_events(data = fcs_data, file_names = file_names)
 random_events_for_plotting <- random_events(number_of_events_after_gating)
 percent_remaining_from_total <- number_of_events_after_gating/number_of_events_raw_data * 100 
 percent_remaining_from_total
 
 #"Eu151Di"
 events_to_keep_after_gating <- events_to_keep(data = beads_data, channel = "Eu151Di",  upper_gate = upper_gate_Eu151Di)
+percent_to_keep_this_gating(kept_events = events_to_keep_after_gating, file_names = file_names)
+
+
 #overwrite the raw  and Beads datasett (will take lot of space if we make one new each time, and do not need it)
 fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_gating)
 beads_data <- update_data_based_on_events_to_keep(data = beads_data, kept_events = events_to_keep_after_gating)
-number_of_events_after_gating <-  number_of_events(data = fcs_data)
+number_of_events_after_gating <-  number_of_events(data = fcs_data, file_names = file_names)
 random_events_for_plotting <- random_events(number_of_events_after_gating)
 percent_remaining_from_total <- number_of_events_after_gating/number_of_events_raw_data * 100 
 percent_remaining_from_total
 
 #"Eu153Di"
 events_to_keep_after_gating <- events_to_keep(data = beads_data, channel = "Eu153Di",  upper_gate = upper_gate_Eu153Di)
+percent_to_keep_this_gating(kept_events = events_to_keep_after_gating, file_names = file_names)
+
+
 #overwrite the raw  and Beads datasett (will take lot of space if we make one new each time, and do not need it)
 fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_gating)
 beads_data <- update_data_based_on_events_to_keep(data = beads_data, kept_events = events_to_keep_after_gating)
-number_of_events_after_gating <-  number_of_events(data = fcs_data)
+number_of_events_after_gating <-  number_of_events(data = fcs_data, file_names = file_names)
 random_events_for_plotting <- random_events(number_of_events_after_gating)
 percent_remaining_from_total <- number_of_events_after_gating/number_of_events_raw_data * 100 
 percent_remaining_from_total
 
 #"Ho165Di"
 events_to_keep_after_gating <- events_to_keep(data = beads_data, channel = "Ho165Di",  upper_gate = upper_gate_Ho165Di)
+percent_to_keep_this_gating(kept_events = events_to_keep_after_gating, file_names = file_names)
+
+
 #overwrite the raw  and Beads datasett (will take lot of space if we make one new each time, and do not need it)
 fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_gating)
 beads_data <- update_data_based_on_events_to_keep(data = beads_data, kept_events = events_to_keep_after_gating)
-number_of_events_after_gating <-  number_of_events(data = fcs_data)
+number_of_events_after_gating <-  number_of_events(data = fcs_data, file_names = file_names)
 random_events_for_plotting <- random_events(number_of_events_after_gating)
 percent_remaining_from_total <- number_of_events_after_gating/number_of_events_raw_data * 100 
 percent_remaining_from_total
 
 #"Lu175Di"
 events_to_keep_after_gating <- events_to_keep(data = beads_data, channel = "Lu175Di",  upper_gate = upper_gate_Lu175Di)
+percent_to_keep_this_gating(kept_events = events_to_keep_after_gating, file_names = file_names)
+
+
 #overwrite the raw  and Beads datasett (will take lot of space if we make one new each time, and do not need it)
 fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_gating)
 beads_data <- update_data_based_on_events_to_keep(data = beads_data, kept_events = events_to_keep_after_gating)
-number_of_events_after_gating <-  number_of_events(data = fcs_data)
+number_of_events_after_gating <-  number_of_events(data = fcs_data, file_names = file_names)
 random_events_for_plotting <- random_events(number_of_events_after_gating)
 percent_remaining_from_total <- number_of_events_after_gating/number_of_events_raw_data * 100 
 percent_remaining_from_total
@@ -144,13 +159,13 @@ rm(beads_data)
 #clean_up_data
 #************************************************
 clean_up_channels <- as.character(params$name[grep("Center|Offset|Width|Residual|Event|Ir191|Ir193|Pt195Di", params$name)])  #Pt195Di tilsvarer Cis
-number_of_events_before_clean_up_gating <-  number_of_events(data = fcs_data)
+number_of_events_before_clean_up_gating <-  number_of_events(data = fcs_data, file_names = file_names)
 clean_up_data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = clean_up_channels)
 
 #************************************************
 #gating on Residual+ ----
 #************************************************
-number_of_events_before_residual_gating <-  number_of_events(data = fcs_data)
+number_of_events_before_residual_gating <-  number_of_events(data = fcs_data, file_names = file_names)
 random_events_for_plotting <- random_events(number_of_events_before_residual_gating)
 
 
@@ -164,9 +179,12 @@ time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = rand
 
 events_to_keep_after_gating <- events_to_keep(data = clean_up_data, channel = "Residual", lower_gate = residual_gates$lower_gates, 
                                                   upper_gate = residual_gates$upper_gate)
+percent_to_keep_this_gating(kept_events = events_to_keep_after_gating, file_names = file_names)
+
+
 fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_gating)
 clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_gating)
-number_of_events_after_residual_gating <-  number_of_events(data = fcs_data)
+number_of_events_after_residual_gating <-  number_of_events(data = fcs_data, file_names = file_names)
 number_of_events_after_residual_gating/number_of_events_raw_data * 100 #percent remaining from total
 number_of_events_after_residual_gating/number_of_events_after_beads_gating * 100 #percent remaining from bead gating
 
@@ -186,9 +204,12 @@ time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = rand
 #time_signal_plots[1] # to see first plot
 
 events_to_keep_after_center_gating <- events_to_keep(data = clean_up_data, channel = "Center", lower_gate = center_gates$lower_gate, upper_gate = center_gates$upper_gate)
+percent_to_keep_this_gating(kept_events = events_to_keep_after_gating, file_names = file_names)
+
+
 fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_center_gating)
 clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_center_gating)
-number_of_events_after_center_gating <-  number_of_events(data = fcs_data)
+number_of_events_after_center_gating <-  number_of_events(data = fcs_data, file_names = file_names)
 number_of_events_after_center_gating/number_of_events_raw_data * 100 #percent remaining from total
 number_of_events_after_center_gating/number_of_events_after_residual_gating * 100 #percent remaining from residual gating
 
@@ -208,16 +229,19 @@ time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = rand
 #time_signal_plots[1] # to see first plot
 
 events_to_keep_after_offset_gating <- events_to_keep(data = clean_up_data, channel = "Offset",  lower_gate = offset_gates$lower_gate, upper_gate = offset_gates$upper_gate)
+percent_to_keep_this_gating(kept_events = events_to_keep_after_offset_gating, file_names = file_names)
+
+
 fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_offset_gating)
 clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_offset_gating)
-number_of_events_after_offset_gating <- number_of_events(data = fcs_data)
+number_of_events_after_offset_gating <- number_of_events(data = fcs_data, file_names = file_names)
 number_of_events_after_offset_gating/number_of_events_raw_data * 100 #percent remaining from total
 number_of_events_after_offset_gating/number_of_events_after_center_gating * 100 #percent remaining from  center gating
 
 #************************************************
 #gating on Width+ ----
 #************************************************
-number_of_events_before_width_gating <-  number_of_events(data = fcs_data)
+number_of_events_before_width_gating <-  number_of_events(data = fcs_data, file_names = file_names)
 random_events_for_plotting <- random_events(number_of_events_before_width_gating)
 
 
@@ -235,6 +259,9 @@ width_gates$lower_gate
 #lower_gate failed for three datasets. Put it manually to 2.8 for all datasets.
 width_gates$lower_gate <- 2.8
 events_to_keep_after_width_gating <- events_to_keep(data = clean_up_data, channel = "Width", lower_gate = width_gates$lower_gate, upper_gate = width_gates$upper_gate)
+percent_to_keep_this_gating(kept_events = events_to_keep_after_width_gating, file_names = file_names)
+
+
 fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_width_gating)
 clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_width_gating)
 number_of_events_after_width_gating <- number_of_events(data = fcs_data)
@@ -244,7 +271,7 @@ number_of_events_after_width_gating/number_of_events_after_offset_gating * 100 #
 #************************************************
 #gating on Event+ ----
 #************************************************
-number_of_events_before_event_gating <-  number_of_events(data = fcs_data)
+number_of_events_before_event_gating <-  number_of_events(data = fcs_data, file_names = file_names)
 random_events_for_plotting <- random_events(number_of_events_before_event_gating)
 
 #update lower_gate_percent, upper_gate_percent
@@ -256,6 +283,9 @@ time_signal_plots <- time_signal_plot(data =  clean_up_data, random_events = ran
 #time_signal_plots[1] # to see first plot
 
 events_to_keep_after_event_gating <- events_to_keep(data = clean_up_data, channel = "Event_length",  upper_gate = EventGates$upper_gate)
+percent_to_keep_this_gating(kept_events = events_to_keep_after_event_gating, file_names = file_names)
+
+
 fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_event_gating)
 clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_event_gating)
 number_of_events_after_event_gating <-  number_of_events(data = fcs_data)
@@ -266,7 +296,7 @@ number_of_events_after_event_gating/number_of_events_after_width_gating * 100 #p
 #************************************************
 #gating on Live Dead----  Cis, 
 #************************************************
-number_of_events_before_cis_gating <-  number_of_events(data = fcs_data)
+number_of_events_before_cis_gating <-  number_of_events(data = fcs_data, file_names = file_names)
 random_events_for_plotting <- random_events(number_of_events_before_cis_gating)
 
 #NB Her har jeg overstyrt algoritmen og sier at jeg vil ha minste upper gate på 2.
@@ -281,6 +311,9 @@ time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = rand
 #time_signal_plots[1] # to see first plot
 
 events_to_keep_after_cis_gating <- events_to_keep(data = clean_up_data, channel = "Pt195Di",  lower_gate = cis_gates$lower_gate,  upper_gate = cis_gates$upper_gate)
+percent_to_keep_this_gating(kept_events = events_to_keep_after_cis_gating, file_names = file_names)
+
+
 fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_cis_gating)
 clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_cis_gating)
 number_of_events_after_cis_gating <-  number_of_events(data = fcs_data)
@@ -291,7 +324,7 @@ number_of_events_after_cis_gating/number_of_events_after_event_gating * 100 #per
 #************************************************
 #gating on DNA1, Ir191Di+ ----
 #************************************************
-number_of_events_before_Ir191Di_gating <-  number_of_events(fcs_data)
+number_of_events_before_Ir191Di_gating <-  number_of_events(fcs_data, file_names = file_names)
 random_events_for_plotting <- random_events(number_of_events_before_Ir191Di_gating)
 
 #update lower_gate_percent, upper_gate_percent
@@ -304,6 +337,9 @@ time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = rand
 #time_signal_plots[1] # to see first plot
 
 events_to_keep_after_Ir191Di_gating <- events_to_keep(data = clean_up_data, channel = "Ir191Di",  lower_gate = Ir191di_gates$lower_gate,  upper_gate = Ir191di_gates$upper_gate)
+percent_to_keep_this_gating(kept_events = events_to_keep_after_Ir191Di_gating, file_names = file_names)
+
+
 fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_Ir191Di_gating)
 clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_Ir191Di_gating)
 number_of_events_after_Ir191Di_gating <-  number_of_events(data = fcs_data)
@@ -315,7 +351,7 @@ number_of_events_after_Ir191Di_gating/number_of_events_after_cis_gating * 100 #p
 #************************************************
 #gating on DNA1, Ir193Di+ ----
 #************************************************
-number_of_events_before_Ir193Di_gating <-  number_of_events(fcs_data)
+number_of_events_before_Ir193Di_gating <-  number_of_events(fcs_data, file_names = file_names)
 random_events_for_plotting <- random_events(number_of_events_before_Ir193Di_gating)
 
 #update lower_gate_percent, upper_gate_percent
@@ -328,9 +364,12 @@ time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = rand
 #time_signal_plots[1] # to see first plot
 
 events_to_keep_after_Ir193Di_gating <- events_to_keep(data = clean_up_data, channel = "Ir193Di",  lower_gate = Ir193di_gates$lower_gate,  upper_gate = Ir193di_gates$upper_gate)
+percent_to_keep_this_gating(kept_events = events_to_keep_after_Ir193Di_gating, file_names = file_names)
+
+
 fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_Ir193Di_gating)
 clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_Ir193Di_gating)
-number_of_events_after_Ir193Di_gating <-  number_of_events(data = fcs_data)
+number_of_events_after_Ir193Di_gating <-  number_of_events(data = fcs_data, file_names = file_names)
 number_of_events_after_Ir193Di_gating/number_of_events_raw_data * 100 #percent remaining from total
 number_of_events_after_Ir193Di_gating/number_of_events_after_cis_gating * 100 #percent remaining from cis gating
 

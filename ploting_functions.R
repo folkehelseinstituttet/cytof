@@ -33,22 +33,30 @@ col25 <- c(
 colfunc <- colorRampPalette(c("black", "purple4", "red", "yellow"))
 
 
-
 #' number_of_events 
 #' @param data, list observations in all fcs files 
+#' @param file_names, default NA will give the name 1,2,3 etc.
 #' @return vector with number of events in each subdataset
 
-number_of_events <- function(data){
+number_of_events <- function(data, file_names = NA){
   events <- NULL
   number_of_files <- length(data)
+  if(is.na(file_names[1])){
+    file_names <- 1:number_of_files
+  }
+  file_names <- as.character(file_names)
+  
+  
   if(number_of_files > 1){
     for (i in 1:number_of_files){
-        events[i] <- nrow(data[[i]])
+      events[i] <- nrow(data[[i]])
     }
   }
-
+  names(events) <- file_names
+  
   return(events)
 }
+
 
 
 #' random_events give list of random events for each subdataset
