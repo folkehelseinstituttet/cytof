@@ -279,3 +279,56 @@ find_gaussian_gates_first_top <- function(data, channel, lower_gate_percent, upp
 
 
 
+
+#' find_gate_highest_top, find the gaussian gates of the main top for a vector xx
+#' @param xx, vector of numbers 
+#' @param lower_gate_prop, propotions for lower gate
+#' @param upper_gate_prop, propotions for upper gate
+#' @return list of lower and upper gates 
+
+find_gate_highest_top <- function(xx, lower_gate_prop, upper_gate_prop, min_upper_gate = NA){
+  dens <- density(xx)
+  ts_y <- ts(smooth(dens$y))
+  temp <- which(ts_y == max(ts_y))[1]
+  lower_gate <- max(min(dens$x[dens$y > max(dens$y) * lower_gate_prop]))
+  upper_gate <- max(c(dens$x[dens$y > max(dens$y) * upper_gate_prop], min_upper_gate), na.rm = T)
+  return(list(lower_gate = lower_gate, upper_gate = upper_gate ))
+}
+
+
+
+
+#' find_gaussian_gates_highest_top, find the gaussian gates of the highest top for all subsets
+#' @param data, data 
+#' @param channel, which channel to plot
+#' @param lower_gate_percent, vector with percentage for lower gate, a number (same percentage for all subset) 
+#' @param upper_gate_percent,  vector with percentage for uppe gate, a number (same percentage for all subset)  
+#' @return list of vectors with lower and upper gates for each subset.
+
+find_gaussian_gates_highest_top <- function(data, channel, lower_gate_percent, upper_gate_percent, min_upper_gate = NA){
+  column <- which(colnames(data[[1]]) == channel)
+  if(lower_gate_percent > 1){
+    lower_gate_prop <- lower_gate_percent/100
+  } else {
+    lower_gate_prop <- lower_gate_percent
+  }
+  if(upper_gate_percent > 1){
+    upper_gate_prop <- upper_gate_percent/100
+  } else {
+    upper_gate_prop <- upper_gate_percent
+  }
+  lower_gates <- rep(NA, length(data))
+  upper_gates <- rep(NA, length(data))
+  for(i in 1:length(data)){
+    res <-  find_gate_highest_top(data[[i]][, column], lower_gate_prop = lower_gate_prop, upper_gate_prop = upper_gate_prop, min_upper_gate = min_upper_gate)
+    lower_gates[i] <- res[[1]]
+    upper_gates[i] <- res[[2]]
+  }
+  return(list(lower_gates = lower_gates, upper_gates = upper_gates ))
+}
+
+
+
+
+
+
