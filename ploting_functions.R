@@ -53,6 +53,9 @@ number_of_events <- function(data, file_names = NA){
     }
   }
   names(events) <- file_names
+  if(number_of_files > 1){
+    names(events) <- file_names
+  }
   
   return(events)
 }
