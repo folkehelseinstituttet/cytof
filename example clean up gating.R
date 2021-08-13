@@ -42,44 +42,44 @@ time_signal_plots <- time_signal_plot(data = beads_data, random_events = random_
 #time_signal_plots # to see all plots
 #time_signal_plots[1] # to see first plot
 density_plots <- density_plot(data = beads_data, channel = "Ce140Di", plot_title = file_names, upper_gate = upper_gate_Ce140Di)
-#density_plots # to see the plots
+density_plots # to see the plots
 
-#find upper_gate for noise gating based on Eu151Di
-upper_gate_Eu151Di <- find_gate_perc_height_upper_noise(data = beads_data, channel =  "Eu151Di", upper_perc_height = 0.001)
-time_signal_plots <- time_signal_plot(data = beads_data, random_events = random_events_for_plotting, 
-                                      channel = "Eu151Di",  plot_title = file_names, upper_gate = upper_gate_Eu151Di)
-#time_signal_plots # to see all plots
-#time_signal_plots[1] # to see first plot
-density_plots <- density_plot(data = beads_data, channel = "Eu151Di", plot_title = file_names, upper_gate = upper_gate_Eu151Di)
-#density_plots # to see the plots
-
-#find upper_gate for noise gating based on Eu153Di
-upper_gate_Eu153Di <- find_gate_perc_height_upper_noise(data = beads_data, channel =  "Eu153Di", upper_perc_height = 0.001)
-time_signal_plots <- time_signal_plot(data = beads_data, random_events = random_events_for_plotting, 
-                                      channel = "Eu153Di",  plot_title = file_names, upper_gate = upper_gate_Eu153Di)
-#time_signal_plots # to see all plots
-#time_signal_plots[1] # to see first plot
-density_plots <- density_plot(data = beads_data, channel = "Eu153Di", plot_title = file_names, upper_gate = upper_gate_Eu153Di)
-#density_plots # to see the plots
-
-#find upper_gate for noise gating based on Ho165Di
-upper_gate_Ho165Di <- find_gate_perc_height_upper_noise(data = beads_data, channel =  "Ho165Di", upper_perc_height = 0.001)
-time_signal_plots <- time_signal_plot(data = beads_data, random_events = random_events_for_plotting, 
-                                      channel = "Ho165Di",  plot_title = file_names, upper_gate = upper_gate_Ho165Di)
-#time_signal_plots # to see all plots
-#time_signal_plots[1] # to see first plot
-density_plots <- density_plot(data = beads_data, channel = "Ho165Di", plot_title = file_names, upper_gate = upper_gate_Ho165Di)
-#density_plots # to see the plots
-
-#find upper_gate for noise gating based on Lu175Di
-upper_gate_Lu175Di <- find_gate_perc_height_upper_noise(data = beads_data, channel =  "Lu175Di", upper_perc_height = 0.001)
-time_signal_plots <- time_signal_plot(data = beads_data, random_events = random_events_for_plotting, 
-                                      channel = "Lu175Di",  plot_title = file_names, upper_gate = upper_gate_Lu175Di)
-#time_signal_plots # to see all plots
-#time_signal_plots[1] # to see first plot
-density_plots <- density_plot(data = beads_data, channel = "Lu175Di", plot_title = file_names, upper_gate = upper_gate_Lu175Di)
-#density_plots # to see the plots
-
+# #find upper_gate for noise gating based on Eu151Di
+# upper_gate_Eu151Di <- find_gate_perc_height_upper_noise(data = beads_data, channel =  "Eu151Di", upper_perc_height = 0.001)
+# time_signal_plots <- time_signal_plot(data = beads_data, random_events = random_events_for_plotting, 
+#                                       channel = "Eu151Di",  plot_title = file_names, upper_gate = upper_gate_Eu151Di)
+# #time_signal_plots # to see all plots
+# #time_signal_plots[1] # to see first plot
+# density_plots <- density_plot(data = beads_data, channel = "Eu151Di", plot_title = file_names, upper_gate = upper_gate_Eu151Di)
+# #density_plots # to see the plots
+# 
+# #find upper_gate for noise gating based on Eu153Di
+# upper_gate_Eu153Di <- find_gate_perc_height_upper_noise(data = beads_data, channel =  "Eu153Di", upper_perc_height = 0.001)
+# time_signal_plots <- time_signal_plot(data = beads_data, random_events = random_events_for_plotting, 
+#                                       channel = "Eu153Di",  plot_title = file_names, upper_gate = upper_gate_Eu153Di)
+# #time_signal_plots # to see all plots
+# #time_signal_plots[1] # to see first plot
+# density_plots <- density_plot(data = beads_data, channel = "Eu153Di", plot_title = file_names, upper_gate = upper_gate_Eu153Di)
+# #density_plots # to see the plots
+# 
+# #find upper_gate for noise gating based on Ho165Di
+# upper_gate_Ho165Di <- find_gate_perc_height_upper_noise(data = beads_data, channel =  "Ho165Di", upper_perc_height = 0.001)
+# time_signal_plots <- time_signal_plot(data = beads_data, random_events = random_events_for_plotting, 
+#                                       channel = "Ho165Di",  plot_title = file_names, upper_gate = upper_gate_Ho165Di)
+# #time_signal_plots # to see all plots
+# #time_signal_plots[1] # to see first plot
+# density_plots <- density_plot(data = beads_data, channel = "Ho165Di", plot_title = file_names, upper_gate = upper_gate_Ho165Di)
+# #density_plots # to see the plots
+# 
+# #find upper_gate for noise gating based on Lu175Di
+# upper_gate_Lu175Di <- find_gate_perc_height_upper_noise(data = beads_data, channel =  "Lu175Di", upper_perc_height = 0.001)
+# time_signal_plots <- time_signal_plot(data = beads_data, random_events = random_events_for_plotting, 
+#                                       channel = "Lu175Di",  plot_title = file_names, upper_gate = upper_gate_Lu175Di)
+# #time_signal_plots # to see all plots
+# #time_signal_plots[1] # to see first plot
+# density_plots <- density_plot(data = beads_data, channel = "Lu175Di", plot_title = file_names, upper_gate = upper_gate_Lu175Di)
+# #density_plots # to see the plots
+# 
 
 ## use the upper_gates found for gating. Either on one of the beads or why not all. 
 #"Ce140Di"
@@ -95,64 +95,64 @@ random_events_for_plotting <- random_events(number_of_events_after_gating)
 percent_remaining_from_total <- number_of_events_after_gating/number_of_events_raw_data * 100 
 percent_remaining_from_total
 
-#"Eu151Di"
-events_to_keep_after_gating <- events_to_keep(data = beads_data, channel = "Eu151Di",  upper_gate = upper_gate_Eu151Di)
-percent_to_keep_this_gating(kept_events = events_to_keep_after_gating, file_names = file_names)
-
-
-#overwrite the raw  and Beads datasett (will take lot of space if we make one new each time, and do not need it)
-fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_gating)
-beads_data <- update_data_based_on_events_to_keep(data = beads_data, kept_events = events_to_keep_after_gating)
-number_of_events_after_gating <-  number_of_events(data = fcs_data, file_names = file_names)
-random_events_for_plotting <- random_events(number_of_events_after_gating)
-percent_remaining_from_total <- number_of_events_after_gating/number_of_events_raw_data * 100 
-percent_remaining_from_total
-
-#"Eu153Di"
-events_to_keep_after_gating <- events_to_keep(data = beads_data, channel = "Eu153Di",  upper_gate = upper_gate_Eu153Di)
-percent_to_keep_this_gating(kept_events = events_to_keep_after_gating, file_names = file_names)
-
-
-#overwrite the raw  and Beads datasett (will take lot of space if we make one new each time, and do not need it)
-fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_gating)
-beads_data <- update_data_based_on_events_to_keep(data = beads_data, kept_events = events_to_keep_after_gating)
-number_of_events_after_gating <-  number_of_events(data = fcs_data, file_names = file_names)
-random_events_for_plotting <- random_events(number_of_events_after_gating)
-percent_remaining_from_total <- number_of_events_after_gating/number_of_events_raw_data * 100 
-percent_remaining_from_total
-
-#"Ho165Di"
-events_to_keep_after_gating <- events_to_keep(data = beads_data, channel = "Ho165Di",  upper_gate = upper_gate_Ho165Di)
-percent_to_keep_this_gating(kept_events = events_to_keep_after_gating, file_names = file_names)
-
-
-#overwrite the raw  and Beads datasett (will take lot of space if we make one new each time, and do not need it)
-fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_gating)
-beads_data <- update_data_based_on_events_to_keep(data = beads_data, kept_events = events_to_keep_after_gating)
-number_of_events_after_gating <-  number_of_events(data = fcs_data, file_names = file_names)
-random_events_for_plotting <- random_events(number_of_events_after_gating)
-percent_remaining_from_total <- number_of_events_after_gating/number_of_events_raw_data * 100 
-percent_remaining_from_total
-
-#"Lu175Di"
-events_to_keep_after_gating <- events_to_keep(data = beads_data, channel = "Lu175Di",  upper_gate = upper_gate_Lu175Di)
-percent_to_keep_this_gating(kept_events = events_to_keep_after_gating, file_names = file_names)
-
-
-#overwrite the raw  and Beads datasett (will take lot of space if we make one new each time, and do not need it)
-fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_gating)
-beads_data <- update_data_based_on_events_to_keep(data = beads_data, kept_events = events_to_keep_after_gating)
-number_of_events_after_gating <-  number_of_events(data = fcs_data, file_names = file_names)
-random_events_for_plotting <- random_events(number_of_events_after_gating)
-percent_remaining_from_total <- number_of_events_after_gating/number_of_events_raw_data * 100 
-percent_remaining_from_total
-
-
-number_of_events_after_beads_gating <- number_of_events_after_gating
-#finished working with beads_data, remove to keep space in memory
-rm(beads_data)
-
-
+# #"Eu151Di"
+# events_to_keep_after_gating <- events_to_keep(data = beads_data, channel = "Eu151Di",  upper_gate = upper_gate_Eu151Di)
+# percent_to_keep_this_gating(kept_events = events_to_keep_after_gating, file_names = file_names)
+# 
+# 
+# #overwrite the raw  and Beads datasett (will take lot of space if we make one new each time, and do not need it)
+# fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_gating)
+# beads_data <- update_data_based_on_events_to_keep(data = beads_data, kept_events = events_to_keep_after_gating)
+# number_of_events_after_gating <-  number_of_events(data = fcs_data, file_names = file_names)
+# random_events_for_plotting <- random_events(number_of_events_after_gating)
+# percent_remaining_from_total <- number_of_events_after_gating/number_of_events_raw_data * 100 
+# percent_remaining_from_total
+# 
+# #"Eu153Di"
+# events_to_keep_after_gating <- events_to_keep(data = beads_data, channel = "Eu153Di",  upper_gate = upper_gate_Eu153Di)
+# percent_to_keep_this_gating(kept_events = events_to_keep_after_gating, file_names = file_names)
+# 
+# 
+# #overwrite the raw  and Beads datasett (will take lot of space if we make one new each time, and do not need it)
+# fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_gating)
+# beads_data <- update_data_based_on_events_to_keep(data = beads_data, kept_events = events_to_keep_after_gating)
+# number_of_events_after_gating <-  number_of_events(data = fcs_data, file_names = file_names)
+# random_events_for_plotting <- random_events(number_of_events_after_gating)
+# percent_remaining_from_total <- number_of_events_after_gating/number_of_events_raw_data * 100 
+# percent_remaining_from_total
+# 
+# #"Ho165Di"
+# events_to_keep_after_gating <- events_to_keep(data = beads_data, channel = "Ho165Di",  upper_gate = upper_gate_Ho165Di)
+# percent_to_keep_this_gating(kept_events = events_to_keep_after_gating, file_names = file_names)
+# 
+# 
+# #overwrite the raw  and Beads datasett (will take lot of space if we make one new each time, and do not need it)
+# fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_gating)
+# beads_data <- update_data_based_on_events_to_keep(data = beads_data, kept_events = events_to_keep_after_gating)
+# number_of_events_after_gating <-  number_of_events(data = fcs_data, file_names = file_names)
+# random_events_for_plotting <- random_events(number_of_events_after_gating)
+# percent_remaining_from_total <- number_of_events_after_gating/number_of_events_raw_data * 100 
+# percent_remaining_from_total
+# 
+# #"Lu175Di"
+# events_to_keep_after_gating <- events_to_keep(data = beads_data, channel = "Lu175Di",  upper_gate = upper_gate_Lu175Di)
+# percent_to_keep_this_gating(kept_events = events_to_keep_after_gating, file_names = file_names)
+# 
+# 
+# #overwrite the raw  and Beads datasett (will take lot of space if we make one new each time, and do not need it)
+# fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_gating)
+# beads_data <- update_data_based_on_events_to_keep(data = beads_data, kept_events = events_to_keep_after_gating)
+# number_of_events_after_gating <-  number_of_events(data = fcs_data, file_names = file_names)
+# random_events_for_plotting <- random_events(number_of_events_after_gating)
+# percent_remaining_from_total <- number_of_events_after_gating/number_of_events_raw_data * 100 
+# percent_remaining_from_total
+# 
+# 
+# number_of_events_after_beads_gating <- number_of_events_after_gating
+# #finished working with beads_data, remove to keep space in memory
+ rm(beads_data)
+ 
+ 
 
 
 #************************************************

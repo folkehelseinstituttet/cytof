@@ -188,6 +188,7 @@ density_plot <- function(data, channel, plot_title = NA, lower_gate = NA, upper_
   if(is.na(plot_title[1])){
     plot_title <- as.character(1:number_of_files)
   }
+   plot_title <- factor(plot_title,levels = plot_title)
   plot_title_nr <- 1:number_of_files
   column <- which(colnames(data[[1]]) == channel)
   df <- data.frame(Values = data[[1]][,column], Sample = rep(plot_title[1], nrow(data[[1]])))
@@ -202,7 +203,7 @@ density_plot <- function(data, channel, plot_title = NA, lower_gate = NA, upper_
     ggjoy::theme_joy()
   
   if(!is.na(lower_gate[1]) ){
-    gate_line <- data.frame(Sample = plot_title_nr, x0 = lower_gate)
+    gate_line <- data.frame(Sample = plot_title, x0 = lower_gate)
     gg <- gg + ggplot2::geom_segment(data = gate_line, ggplot2::aes(x = x0, xend = x0, y = as.numeric(Sample), yend = as.numeric(Sample) + 0.9), color = "black") 
    # gg <- gg + ggplot2::geom_vline(data = gate_line, xintercept = x0, col = Sample)
   }
