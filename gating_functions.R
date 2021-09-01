@@ -147,56 +147,6 @@ update_data_based_on_events_to_keep <- function(data, kept_events){
 
 
 
-#' find_gate_second_top, find the gaussian gates of the second top for a vector xx
-#' @param xx, vector of numbers 
-#' @param lower_gate_prop, propotions for lower gate
-#' @param upper_gate_prop, propotions for upper gate
-#' @return list of lower and upper gates 
-
-find_gate_second_top <- function(xx, lower_gate_prop, upper_gate_prop){
-  dens <- density(xx)
-  ts_y<-ts(smooth(dens$y))
-  tp <- pastecs::turnpoints(ts_y)
-  bunn1 <- dens$x[tp$pits][1]
-  xx[xx < bunn1] <- NA
-  dens <- density(xx[!is.na(xx)])  
-  lower_gate <- min(dens$x[dens$y > max(dens$y) * lower_gate_prop])
-  upper_gate <- max(dens$x[dens$y > max(dens$y) * upper_gate_prop])
-  return(list(lower_gate = lower_gate, upper_gate = upper_gate ))
-}
-
-
-#' find_gaussian_gates_second_top, find the gaussian gates of the second top for all subsets
-#' @param data, data 
-#' @param channel, which channel to plot
-#' @param lower_gate_percent, vector with percentage for lower gate, a number (same percentage for all subset) 
-#' @param upper_gate_percent,  vector with percentage for uppe gate, a number (same percentage for all subset)  
-#' @return list of vectors with lower and upper gates for each subset.
-
-find_gaussian_gates_second_top <- function(data, channel, lower_gate_percent, upper_gate_percent){
-  column <- which(colnames(data[[1]]) == channel)
-  if(lower_gate_percent > 1){
-    lower_gate_prop <- lower_gate_percent/100
-  } else {
-    lower_gate_prop <- lower_gate_percent
-  }
-  if(upper_gate_percent > 1){
-    upper_gate_prop <- upper_gate_percent/100
-  } else {
-    upper_gate_prop <- upper_gate_percent
-  }
-  lower_gates <- rep(NA, length(data))
-  upper_gates <- rep(NA, length(data))
-  for(i in 1:length(data)){
-    res <-  find_gate_second_top(xx = data[[i]][, column], lower_gate_prop = lower_gate_prop, upper_gate_prop = upper_gate_prop)
-    lower_gates[i] <- res[[1]]
-    upper_gates[i] <- res[[2]]
-  }
-  return(list(lower_gates = lower_gates, upper_gates = upper_gates))
-}
-
-
-
 
 #' find_split_first_second_top, find the first bottom
 #' @param xx, vector of numbers 
@@ -222,6 +172,129 @@ find_split_first_second_top <- function(data, channel){
     splits[[i]] <-  find_split(data[[i]][, column])
   }
   return(splits)
+}
+
+
+
+vgam_gates <- function(xx, lower_gate_prop, upper_gate_prop, perc_included, main_top_to_left){
+  xx <- xx[!is.na(xx)]
+  dens <- density(xx)
+  x_max_dens <- dens$x[dens$y == max(dens$y)]
+  x.new <- rnorm(10000, sample(xx, size = 10000, replace = TRUE), dens$bw)
+  fit <- try(VGAM::vglm(x.new ~ 1,
+                        VGAM::mix2normal(eq.sd = F), iphi=0.5, imu= 0, isd1=2, imu2=5,
+                        isd2=1, epsilon = 1e-5))
+  # Calculated parameters
+  pars <- as.vector(coef(fit))
+  w <- VGAM::logitlink(pars[1], inverse=TRUE)
+  m1 <- pars[2]
+  sd1 <- exp(pars[3])
+  m2 <- pars[4]
+  sd2 <- exp(pars[5])
+  if(main_top_to_left == TRUE){
+    lower_gate <- m1 - qnorm(perc_included) * sd1
+    upper_gate <- m1 + qnorm(perc_included) * sd1
+    if(lower_gate > x_max_dens | upper_gate < x_max_dens){
+      lower_gate <- m2 - qnorm(perc_included) * sd2
+      upper_gate <- m2 + qnorm(perc_included) * sd2
+    }
+  } else {
+    lower_gate <- m2 - qnorm(perc_included) * sd2
+    upper_gate <- m2 + qnorm(perc_included) * sd2
+    if(lower_gate > x_max_dens | upper_gate < x_max_dens){
+      lower_gate <- m1 - qnorm(perc_included) * sd1
+      upper_gate <- m1 + qnorm(perc_included) * sd1
+    }
+  }
+  if(lower_gate < 0 & upper_gate > 10 * x_max_dens){ #if only one normal dist. 
+    temp <- find_gate_highest_top(xx, lower_gate_prop = 0.06, upper_gate_prop = 0.06)
+    lower_gate <- temp$lower_gate
+    upper_gate <- temp$upper_gate
+  }
+  
+  return(list(lower_gate = lower_gate, upper_gate = upper_gate))
+}
+
+
+gaus_gates <- function(dens,  lower_gate_prop, upper_gate_prop){
+  lower_gate <- min(dens$x[dens$y > max(dens$y) * lower_gate_prop])
+  upper_gate <- max(dens$x[dens$y > max(dens$y) * upper_gate_prop])
+  return(list(lower_gate = lower_gate, upper_gate = upper_gate))
+  
+}
+
+
+
+
+find_gate_second_top <- function(xx, lower_gate_prop, upper_gate_prop, perc_included, main_top_to_left = F){
+  #  browser()
+  dens <- density(xx)
+  ts_y<-ts(smooth(dens$y))
+  tp <- pastecs::turnpoints(ts_y)
+  bunn1 <- dens$x[tp$pits][1]
+  xx[xx < bunn1] <- NA
+  dens <- density(xx[!is.na(xx)])
+  if(!is.na(lower_gate_prop[1])){
+    lower_gate <- min(dens$x[dens$y > max(dens$y) * lower_gate_prop])
+    upper_gate <- max(dens$x[dens$y > max(dens$y) * upper_gate_prop])
+  } else{
+    # temp <- try(vgam_gates(xx, perc_included = perc_included, main_top_to_left = main_top_to_left))
+    # if(inherits(temp, "try-error")){
+    #   temp <- gaus_gates(xx = xx, lower_gate_prop = lower_gate_prop, upper_gate_prop =  upper_gate_prop)
+    # }
+    
+    temp <- vgam_gates(xx, lower_gate_prop = lower_gate_prop, upper_gate_prop =  upper_gate_prop, perc_included = perc_included, main_top_to_left = main_top_to_left)
+    lower_gate <- temp$lower_gate
+    upper_gate <- temp$upper_gate
+    
+  }
+  return(list(lower_gate = lower_gate, upper_gate = upper_gate ))
+}
+
+
+
+
+
+
+
+
+
+
+#' find_gaussian_gates_second_top, find the gaussian gates of the second top for all subsets
+#' @param data, data 
+#' @param channel, which channel to plot
+#' @param lower_gate_percent, vector with percentage for lower gate, a number (same percentage for all subset) 
+#' @param upper_gate_percent,  vector with percentage for uppe gate, a number (same percentage for all subset)  
+#' @return list of vectors with lower and upper gates for each subset.
+
+find_gaussian_gates_second_top <- function(data, channel, lower_gate_percent = NA, upper_gate_percent = NA, perc_included, main_top_to_left ){
+  
+  column <- which(colnames(data[[1]]) == channel)
+  if(!is.na(lower_gate_percent[[1]])){
+    if(lower_gate_percent > 1){
+      lower_gate_prop <- lower_gate_percent/100
+    } else {
+      lower_gate_prop <- lower_gate_percent
+    }
+    if(upper_gate_percent > 1){
+      upper_gate_prop <- upper_gate_percent/100
+    } else {
+      upper_gate_prop <- upper_gate_percent
+    }
+  } else {
+    lower_gate_prop <- NA
+    upper_gate_prop <- NA
+  }
+  lower_gates <- rep(NA, length(data))
+  upper_gates <- rep(NA, length(data))
+  for(i in 1:length(data)){
+    res <-  find_gate_second_top(xx = data[[i]][, column], lower_gate_prop = lower_gate_prop, upper_gate_prop = upper_gate_prop, perc_included = perc_included, main_top_to_left = main_top_to_left)
+    
+    
+    lower_gates[i] <- res[[1]]
+    upper_gates[i] <- res[[2]]
+  }
+  return(list(lower_gates = lower_gates, upper_gates = upper_gates))
 }
 
 

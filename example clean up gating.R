@@ -328,7 +328,7 @@ number_of_events_before_Ir191Di_gating <-  number_of_events(fcs_data, file_names
 random_events_for_plotting <- random_events(number_of_events_before_Ir191Di_gating)
 
 #update lower_gate_percent, upper_gate_percent
-Ir191di_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Ir191Di", lower_gate_percent = 15, upper_gate_percent = 15)
+Ir191di_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Ir191Di", lower_gate_percent = NA, upper_gate_percent = NA, perc_included = 0.99, main_top_to_left = F)
 
 density_plots <- density_plot(data = clean_up_data, "Ir191Di", plot_title = file_names, lower_gate = Ir191di_gates$lower_gate, upper_gate = Ir191di_gates$upper_gate)
 #density_plots
