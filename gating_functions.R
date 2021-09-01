@@ -148,31 +148,6 @@ update_data_based_on_events_to_keep <- function(data, kept_events){
 
 
 
-#' find_split_first_second_top, find the first bottom
-#' @param xx, vector of numbers 
-#' @return vector of splits
-
-find_split <- function(xx){
-  dens <- density(xx)
-  ts_y <- ts(smooth(dens$y))
-  tp <- pastecs::turnpoints(ts_y)
-  bunn1 <- dens$x[tp$pits][1]
-  return(bunn1)
-}
-
-#' find_gaussian_gates_first_top, find the gaussian gates of the first top for all subsets
-#' @param data, data 
-#' @param channel, which channel to plot
-#' @return vector of splits
-
-find_split_first_second_top <- function(data, channel){
-  column <- which(colnames(data[[1]]) == channel)
-  splits <- rep(NA, length(data))
-  for(i in 1:length(data)){
-    splits[[i]] <-  find_split(data[[i]][, column])
-  }
-  return(splits)
-}
 
 
 
@@ -295,6 +270,34 @@ find_gaussian_gates_second_top <- function(data, channel, lower_gate_percent = N
     upper_gates[i] <- res[[2]]
   }
   return(list(lower_gates = lower_gates, upper_gates = upper_gates))
+}
+
+
+
+#' find_split_first_second_top, find the first bottom
+#' @param xx, vector of numbers 
+#' @return vector of splits
+
+find_split <- function(xx){
+  dens <- density(xx)
+  ts_y <- ts(smooth(dens$y))
+  tp <- pastecs::turnpoints(ts_y)
+  bunn1 <- dens$x[tp$pits][1]
+  return(bunn1)
+}
+
+#' find_gaussian_gates_first_top, find the gaussian gates of the first top for all subsets
+#' @param data, data 
+#' @param channel, which channel to plot
+#' @return vector of splits
+
+find_split_first_second_top <- function(data, channel){
+  column <- which(colnames(data[[1]]) == channel)
+  splits <- rep(NA, length(data))
+  for(i in 1:length(data)){
+    splits[[i]] <-  find_split(data[[i]][, column])
+  }
+  return(splits)
 }
 
 
