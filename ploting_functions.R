@@ -33,6 +33,7 @@ col25 <- c(
 colfunc <- colorRampPalette(c("black", "purple4", "red", "yellow"))
 
 
+
 #' number_of_events 
 #' @param data, list observations in all fcs files 
 #' @param file_names, default NA will give the name 1,2,3 etc.
@@ -52,14 +53,12 @@ number_of_events <- function(data, file_names = NA){
       events[i] <- nrow(data[[i]])
     }
   }
-  names(events) <- file_names
+  
   if(number_of_files > 1){
     names(events) <- file_names
   }
-  
   return(events)
 }
-
 
 
 #' random_events give list of random events for each subdataset
@@ -182,13 +181,12 @@ time_signal_plot <- function(data, random_events, channel,  plot_title,
 #' @param xlim, xlim default NA.
 #' @return density plots
 
-density_plot <- function(data, channel, plot_title = NA, lower_gate = NA, upper_gate = NA, xlim = NA){
-
-   number_of_files <- length(data)
+density_plot <- function(data, channel, plot_title = NA, lower_gate = NA, upper_gate = NA, xlim = NA, main_title = ""){
+  
+  number_of_files <- length(data)
   if(is.na(plot_title[1])){
     plot_title <- as.character(1:number_of_files)
   }
-   plot_title <- factor(plot_title,levels = plot_title)
   plot_title_nr <- 1:number_of_files
   column <- which(colnames(data[[1]]) == channel)
   df <- data.frame(Values = data[[1]][,column], Sample = rep(plot_title[1], nrow(data[[1]])))
@@ -200,17 +198,18 @@ density_plot <- function(data, channel, plot_title = NA, lower_gate = NA, upper_
     ggplot2::scale_y_discrete(expand=c(0.01, 0)) +
     ggplot2::scale_x_continuous(expand=c(0.01, 0)) +
     ggplot2::ggtitle(channel) +
+    ggplot2::ggtitle(main_title)+
     ggjoy::theme_joy()
   
   if(!is.na(lower_gate[1]) ){
     gate_line <- data.frame(Sample = plot_title, x0 = lower_gate)
     gg <- gg + ggplot2::geom_segment(data = gate_line, ggplot2::aes(x = x0, xend = x0, y = as.numeric(Sample), yend = as.numeric(Sample) + 0.9), color = "black") 
-   # gg <- gg + ggplot2::geom_vline(data = gate_line, xintercept = x0, col = Sample)
+    # gg <- gg + ggplot2::geom_vline(data = gate_line, xintercept = x0, col = Sample)
   }
   if(!is.na(upper_gate[1])){
     gate_line <- data.frame(Sample = plot_title,  x1 = upper_gate)
     gg <- gg + ggplot2::geom_segment(data = gate_line, ggplot2::aes(x = x1, xend = x1, y = as.numeric(Sample), yend = as.numeric(Sample) + 0.9), color = "black") 
-  #  gg <- gg + ggplot2::geom_vline(data = gate_line, ggplot2::aes(xintercept = x1, color = Sample))
+    #  gg <- gg + ggplot2::geom_vline(data = gate_line, ggplot2::aes(xintercept = x1, color = Sample))
   }
   
   if(!is.na(xlim)[1]){
@@ -219,6 +218,106 @@ density_plot <- function(data, channel, plot_title = NA, lower_gate = NA, upper_
   
   return(gg)
 }
+
+
+
+
+
+#' density_plot_without_neg, plot density for positive events in each subdataset
+#' @param data, transformed data 
+#' @param channel, which channel to plot
+#' @param plot_title, vector with title for each plot, default NA where the plots are numbered 1, 2, 3, etc.
+#' @param lower_gate, vector with values for lower gate or NA (no lower gating)
+#' @param upper_gate,  vector with values for uppe gate or NA (no upper gating)
+#' @param xlim, xlim default NA.
+#' @return density plots
+
+density_plot_without_neg <- function(data, channel, plot_title = NA, lower_gate = NA, upper_gate = NA, xlim = NA, main_title = ""){
+  
+  number_of_files <- length(data)
+  if(is.na(plot_title[1])){
+    plot_title <- as.character(1:number_of_files)
+  }
+  plot_title_nr <- 1:number_of_files
+  column <- which(colnames(data[[1]]) == channel)
+  df <- data.frame(Values = data[[1]][,column], Sample = rep(plot_title[1], nrow(data[[1]])))
+  for(i in 2:number_of_files){
+    xx <- data[[i]][,column]
+    xx <- xx[xx > lower_gate]
+    df <- rbind(df, data.frame(Values = xx, Sample = rep(plot_title[i], length(xx))))
+  }
+  gg <- ggplot2::ggplot(df, ggplot2::aes(x = Values, y = Sample, col = Sample, fill = Sample))+
+    ggjoy::geom_joy(scale = 2, alpha=0.5, show.legend= F) +
+    ggplot2::scale_y_discrete(expand=c(0.01, 0)) +
+    ggplot2::ggtitle(main_title)+
+    ggplot2::scale_x_continuous(expand=c(0.01, 0)) +
+    ggplot2::ggtitle(channel) +
+    ggjoy::theme_joy()
+  
+  if(!is.na(lower_gate[1]) ){
+    gate_line <- data.frame(Sample = plot_title, x0 = lower_gate)
+    gg <- gg + ggplot2::geom_segment(data = gate_line, ggplot2::aes(x = x0, xend = x0, y = as.numeric(Sample), yend = as.numeric(Sample) + 0.9), color = "black") 
+    # gg <- gg + ggplot2::geom_vline(data = gate_line, xintercept = x0, col = Sample)
+  }
+  if(!is.na(upper_gate[1])){
+    gate_line <- data.frame(Sample = plot_title,  x1 = upper_gate)
+    gg <- gg + ggplot2::geom_segment(data = gate_line, ggplot2::aes(x = x1, xend = x1, y = as.numeric(Sample), yend = as.numeric(Sample) + 0.9), color = "black") 
+    #  gg <- gg + ggplot2::geom_vline(data = gate_line, ggplot2::aes(xintercept = x1, color = Sample))
+  }
+  
+  if(!is.na(xlim)[1]){
+    gg <- gg + ggplot2::coord_cartesian(xlim = xlim) 
+  }
+  
+  return(gg)
+}
+
+
+
+density_plot_selected_cells <- function(data, channel, include, mark, plot_title = NA, lower_gate = NA, upper_gate = NA, xlim = NA, main_title = ""){
+  
+  if(main_title == ""){
+    main_title <- channel
+  }
+  number_of_files <- length(data)
+  if(is.na(plot_title[1])){
+    plot_title <- as.character(1:number_of_files)
+  }
+  plot_title_nr <- 1:number_of_files
+  column <- which(colnames(data[[1]]) == channel)
+  df <- data.frame(Values = data[[1]][,column], Sample = rep(plot_title[1], nrow(data[[1]])))
+  for(i in 2:number_of_files){
+    xx <- data[[i]][include[[i]][,mark],column]
+    # xx <- xx[xx > lower_gate]
+    df <- rbind(df, data.frame(Values = xx, Sample = rep(plot_title[i], length(xx))))
+  }
+  gg <- ggplot2::ggplot(df, ggplot2::aes(x = Values, y = Sample, col = Sample, fill = Sample))+
+    ggjoy::geom_joy(scale = 2, alpha=0.5, show.legend= F) +
+    ggplot2::scale_y_discrete(expand=c(0.01, 0)) +
+    ggplot2::ggtitle(main_title) +
+    ggplot2::scale_x_continuous(expand=c(0.01, 0)) +
+    ggjoy::theme_joy()
+  
+  if(!is.na(lower_gate[1]) ){
+    gate_line <- data.frame(Sample = plot_title, x0 = lower_gate)
+    gg <- gg + ggplot2::geom_segment(data = gate_line, ggplot2::aes(x = x0, xend = x0, y = as.numeric(Sample), yend = as.numeric(Sample) + 0.9), color = "black") 
+    # gg <- gg + ggplot2::geom_vline(data = gate_line, xintercept = x0, col = Sample)
+  }
+  if(!is.na(upper_gate[1])){
+    gate_line <- data.frame(Sample = plot_title,  x1 = upper_gate)
+    gg <- gg + ggplot2::geom_segment(data = gate_line, ggplot2::aes(x = x1, xend = x1, y = as.numeric(Sample), yend = as.numeric(Sample) + 0.9), color = "black") 
+    #  gg <- gg + ggplot2::geom_vline(data = gate_line, ggplot2::aes(xintercept = x1, color = Sample))
+  }
+  
+  if(!is.na(xlim)[1]){
+    gg <- gg + ggplot2::coord_cartesian(xlim = xlim) 
+  }
+  
+  return(gg)
+}
+
+
+
 
 
 
@@ -238,6 +337,7 @@ signal_signal_just_plot <- function(data, random_events, channel1, channel2,
   channel2 <- ggplot2::sym(channel2)
   columnVar1 <- which(colnames(data[[1]]) == channel1)
   columnVar2 <- which(colnames(data[[1]]) == channel2)
+  
   
   
   if(is.na(plot_title[1])){
@@ -282,7 +382,7 @@ signal_signal_just_plot <- function(data, random_events, channel1, channel2,
 
 #' density_plot_per_cluster, plot density for all markers in each cluster
 #' @param data, transformed data 
-#' @param clusters, vector of clusters
+#' @param cluster_per_cell, vector of clusters
 #' @param rand_events, which events to plot
 #' @param plot_cluster, default NA give alle clusters, else vector of clusters to plot
 #' @param nrow_plot, tells how many rows of plots to export, default = 4,
@@ -316,18 +416,19 @@ density_plot_per_cluster <- function(data, cluster_per_cell, rand_events = NA, p
     d3$cluster[d3$cluster == FALSE] <- "the rest"
     g <- ggplot2::ggplot(d3, ggplot2::aes(x = value, color = cluster)) + 
       ggplot2::geom_density(size = 2) +
+      
       ggplot2::facet_wrap(~ variable, nrow = nrow_plot, scales = "free") +
       ggplot2::theme_bw() +
       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, hjust = 1), 
-          strip.text = ggplot2::element_text(size = strip_text_size), 
-          axis.text = ggplot2::element_text(size = axis_text_size),
-          legend.text=ggplot2::element_text(size = legend_text_size),
-          legend.title = ggplot2::element_blank()) +
+                     strip.text = ggplot2::element_text(size = strip_text_size), 
+                     axis.text = ggplot2::element_text(size = axis_text_size),
+                     legend.text=ggplot2::element_text(size = legend_text_size),
+                     legend.title = ggplot2::element_blank()) +
       ggplot2::guides(color = ggplot2::guide_legend(ncol = 1)) #+
     print(paste("cluster", unique_cluster_per_cell[i]))
     print(g)
   }
-
+  
 }
 
 
@@ -345,7 +446,7 @@ barplot_per_sample <- function(file_names_per_cell, cluster_per_cell, rand_event
   
   n_clusters <- length(unique(cluster_per_cell))
   tab <- table( cluster_per_cell, file_names_per_cell) 
-
+  
   par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
   barplot(tab, col = col25, las = 2)
   legend("topright", inset=c(-0.1,0), col= col25[n_clusters:1], legend = names(col25[n_clusters:1]), pch =15)
