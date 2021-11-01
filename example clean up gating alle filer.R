@@ -1,3 +1,8 @@
+# inspiration:
+# https://www.fluidigm.com/binaries/content/documents/fluidigm/search/hippo%3Aresultset/approach-to-bivariate-analysis-of-data-acquired-using-the-maxpar-direct-immune-profiling-assay-technical-note/fluidigm%3Afile
+
+
+
 # Example
 # 
 # 
@@ -391,7 +396,7 @@ for(ii in 1:floor(n_files/6)){
   print(".")
 }
 
-write.csv2(percent_loss_each_gating, fs::path(out_result, "percent_loss_each_gatingnr2.csv"))
-write.csv2(percent_loss_from_full_dataset, fs::path(out_result, "percent_loss_from_full_datasetnr2.csv"))
+write.csv2(percent_loss_each_gating, fs::path(out_result, "percent_kept_each_gatingnr2.csv"))
+write.csv2(percent_loss_from_full_dataset, fs::path(out_result, "percent_kept_from_full_datasetnr2.csv"))
 
 proc.time() - ptm

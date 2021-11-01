@@ -367,6 +367,8 @@ signal_signal_just_plot <- function(data, random_events, channel1, channel2,
       # Produces a colour scale based on the colours in the colfunc list
       ggplot2::scale_fill_gradientn(colours=colfunc(128)) +
       ggplot2::theme(legend.position = "none")  
+      ggplot2::ggtitle(plot_title[[i]]) + ggplot2::theme(plot.title = ggplot2::element_text(size=8))
+    
     #   stat_ellipse(level = 0.8)
     plotList[[i]] <- gg
   }
