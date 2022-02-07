@@ -234,16 +234,21 @@ density_plot <- function(data, channel, plot_title = NA, lower_gate = NA, upper_
 
 density_plot_without_neg <- function(data, channel, plot_title = NA, lower_gate = NA, upper_gate = NA, xlim = NA, main_title = ""){
   
+  if(length(lower_gate) == 1){
+    lower_gate <- rep(lower_gate, length(data))
+  }
   number_of_files <- length(data)
   if(is.na(plot_title[1])){
     plot_title <- as.character(1:number_of_files)
   }
   plot_title_nr <- 1:number_of_files
   column <- which(colnames(data[[1]]) == channel)
-  df <- data.frame(Values = data[[1]][,column], Sample = rep(plot_title[1], nrow(data[[1]])))
+  xx <- data[[1]][,column]
+  xx <- xx[xx > lower_gate[1]]
+  df <- data.frame(Values = xx, Sample = rep(plot_title[1], length(xx)))
   for(i in 2:number_of_files){
     xx <- data[[i]][,column]
-    xx <- xx[xx > lower_gate]
+    xx <- xx[xx > lower_gate[i]]
     df <- rbind(df, data.frame(Values = xx, Sample = rep(plot_title[i], length(xx))))
   }
   gg <- ggplot2::ggplot(df, ggplot2::aes(x = Values, y = Sample, col = Sample, fill = Sample))+
@@ -271,7 +276,6 @@ density_plot_without_neg <- function(data, channel, plot_title = NA, lower_gate 
   
   return(gg)
 }
-
 
 
 density_plot_selected_cells <- function(data, channel, include, mark, plot_title = NA, lower_gate = NA, upper_gate = NA, xlim = NA, main_title = ""){

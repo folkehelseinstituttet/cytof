@@ -398,26 +398,28 @@ find_split_first_second_top_selected_cells <- function(data, channel, minimum = 
 #' @param channel, which channel to plot
 #' @return vector of splits
 
-find_split_neg_low_high <- function(data, channel, neg = 0.05, minLowHig = 0.1){
-  column <- which(colnames(data[[1]]) == channel)
-  splits <- rep(NA, length(data))
-  lower_gates <- splits
-  upper_gates <- splits
-  for(i in 1:length(data)){
-    xx <- data[[i]][,column]
-    splits[[i]] <-  find_split(xx[xx > neg], minimum = minLowHig)
+find_split_neg_low_high <- function(data, channel, neg = 0.05, minLowHigh = 0.1){
+  ind_split_neg_low_high <- function(data, channel, negProp = 0.05, minLowHigh = 0.1){
+    column <- which(colnames(data[[1]]) == channel)
+    splits <- rep(NA, length(data))
+    neg <- rep(NA, length(data))
+    lower_gates <- splits
+    upper_gates <- splits
+    for(i in 1:length(data)){
+      xx <- data[[i]][,column]
+      neg[[i]] <- find_split(xx, minimum = 0)
+      #     neg[[i]] <- find_gate_first_top(xx, lower_gate_prop = negProp, upper_gate_prop = negProp)$upper_gate
+      splits[[i]] <-  find_split(xx[xx > neg[[i]]], minimum = minLowHigh)
+      
+    }
+    
+    return(list(neg_splits = neg, low_high_splits = splits))
+    
+    
     
   }
   
-  return(list(neg_splits = neg, low_high_splits = splits))
   
-  
-  
-}
-
-
-
-
 
 
 #' find_split_first_second_top, find the split between the first and secound top for all subsets
@@ -425,21 +427,19 @@ find_split_neg_low_high <- function(data, channel, neg = 0.05, minLowHig = 0.1){
 #' @param channel, which channel to plot
 #' @return vector of splits
 
-find_split_neg_low_high_selected_cells <- function(data, channel, include, mark, neg = 0.05, minLowHig = 0.1){
+find_split_neg_low_high_selected_cells <- function(data, channel, include, mark, neg = 0.05, minLowHigh = 0.1){
   column <- which(colnames(data[[1]]) == channel)
   splits <- rep(NA, length(data))
+  neg <- rep(NA, length(data))
   lower_gates <- splits
   upper_gates <- splits
   for(i in 1:length(data)){
     xx <- data[[i]][include[[i]][,mark],column]
-    splits[[i]] <-  find_split(xx[xx > neg], minimum = minLowHig)
-    
+    neg[[i]] <- find_split(xx, minimum = 0)
+    #    neg[[i]] <- find_gate_first_top(xx, lower_gate_prop = negProp, upper_gate_prop = negProp)$upper_gate
+    splits[[i]] <-  find_split(xx[xx > neg[[i]]], minimum = minLowHigh)
   }
-  
   return(list(neg_splits = neg, low_high_splits = splits))
-  
-  
-  
 }
 
 
