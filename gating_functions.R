@@ -285,11 +285,18 @@ find_gate_second_top <- function(xx, lower_gate_prop, upper_gate_prop, perc_incl
   dens <- density(xx)
   ts_y<-ts(smooth(dens$y))
   tp <- pastecs::turnpoints(ts_y)
-  bunn1 <- dens$x[tp$pits][1]
-  xx[xx < bunn1] <- NA
-  dens <- density(xx[!is.na(xx)])
+  #bunn1 <- dens$x[tp$pits][1]
+  # xx[xx < bunn1] <- NA
+  # dens <- density(xx[!is.na(xx)])
+  bunn_n <- which(tp$pits)[1]
+  top_n <-  bunn_n + which(tp$peaks[bunn_n:length(dens$y)])[1] - 1
+  #tp$peaks[top]
+  h <- dens$y[top_n] - dens$y[bunn_n]
+
   if(!is.na(lower_gate_prop[1])){
-    lower_gate <- min(dens$x[dens$y > max(dens$y) * lower_gate_prop])
+    cutoff_h_lower <- dens$y[bunn_n] + lower_gate_prop*h
+    cutoff_n_lower <- bunn_n + which(dens$y[bunn_n:length(dens$y)] > cutoff_h_lower)[1] - 1
+    lower_gate <- min(dens$x[cutoff_n_lower])
     upper_gate <- max(dens$x[dens$y > max(dens$y) * upper_gate_prop])
   } else{
     # temp <- try(vgam_gates(xx, perc_included = perc_included, main_top_to_left = main_top_to_left))
@@ -399,7 +406,6 @@ find_split_first_second_top_selected_cells <- function(data, channel, minimum = 
 #' @return vector of splits
 
 find_split_neg_low_high <- function(data, channel, neg = 0.05, minLowHigh = 0.1){
-  ind_split_neg_low_high <- function(data, channel, negProp = 0.05, minLowHigh = 0.1){
     column <- which(colnames(data[[1]]) == channel)
     splits <- rep(NA, length(data))
     neg <- rep(NA, length(data))
