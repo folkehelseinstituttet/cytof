@@ -29,6 +29,145 @@ col25 <- c(
 )
 
 
+
+
+col40 <- c(
+  "1" = "dodgerblue2", 
+  "2" = "#E31A1C", # red
+  "3" = "green4",
+  "4" = "#6A3D9A", # purple
+  "5" = "#FF7F00", # orange
+  "6" = "black", 
+  "7" = "skyblue2", 
+  "8" = "#FB9A99", # lt pink
+  "9" = "palegreen2",
+  "10" = "#CAB2D6", # lt purple
+  "11" = "#FDBF6F", # lt orange
+  "12" = "gray70", 
+  "13" = "khaki2",
+  "14" = "maroon", 
+  "15" = "orchid1", 
+  "16" = "deeppink1", 
+  "17" = "blue1", 
+  "18" = "steelblue4",
+  "19" = "darkturquoise", 
+  "20" = "green1", 
+  "21" = "yellow4", 
+  "22" = "yellow3",
+  "23" = "darkorange4", 
+  "24" = "brown", 
+  "25" = "gold1",
+  "26" = "cyan2",
+  "27" = "darkMagenta",
+  "28" = "darkorange",
+  "29" = "deeppink3", 
+  "30" = "blueviolet", 
+  "31" = "cornflowerblue",
+  "32" = "darkslategrey", 
+  "33" = "darkseagreen1", 
+  "34" = "darkolivegreen4", 
+  "35" = "azure3", 
+  "36" = "brown", 
+  "37" = "chocolate", 
+  "38" = "darkgoldenrod2", 
+  "39" = "chartreuse4", 
+  "40" = "cadetblue4"
+  
+)
+
+
+
+
+
+
+col50 <- c(
+  "1" = "dodgerblue2", 
+  "2" = "#E31A1C", # red
+  "3" = "green4",
+  "4" = "#6A3D9A", # purple
+  "5" = "#FF7F00", # orange
+  "6" = "black", 
+  "7" = "skyblue2", 
+  "8" = "#FB9A99", # lt pink
+  "9" = "palegreen2",
+  "10" = "#CAB2D6", # lt purple
+  "11" = "#FDBF6F", # lt orange
+  "12" = "gray70", 
+  "13" = "khaki2",
+  "14" = "maroon", 
+  "15" = "orchid1", 
+  "16" = "deeppink1", 
+  "17" = "blue1", 
+  "18" = "steelblue4",
+  "19" = "darkturquoise", 
+  "20" = "green1", 
+  "21" = "yellow4", 
+  "22" = "yellow3",
+  "23" = "darkorange4", 
+  "24" = "brown", 
+  "25" = "gold1",
+  "26" = "cyan2",
+  "27" = "darkMagenta",
+  "28" = "darkorange",
+  "29" = "deeppink3", 
+  "30" = "blueviolet", 
+  "31" = "cornflowerblue",
+  "32" = "darkslategrey", 
+  "33" = "darkseagreen1", 
+  "34" = "darkolivegreen4", 
+  "35" = "azure3", 
+  "36" = "brown", 
+  "37" = "chocolate", 
+  "38" = "darkgoldenrod2", 
+  "39" = "chartreuse4", 
+  "40" = "cadetblue4", 
+  "41" = "darkorchid1", 
+  "42" = "deeppink4",
+  "43" = "darkgoldenrod4",
+  "44" = "cornsilk4",
+  "45" = "cyan4",
+  "46" = "darkolivegreen1", 
+  "47" = "deepskyblue4",
+  "48" = "deepskyblue2",
+  "49" = "coral",
+  "50" = "coral3"
+  
+  
+)
+
+
+
+
+pch25 <- c(
+  "1" = 0, 
+  "2" = 1,
+  "3" = 2,
+  "4" = 6,
+  "5" = 0,
+  "6" = 1,
+  "7" = 2,
+  "8" = 6,
+  "9" = 0,
+  "10" = 1,
+  "11" = 2,
+  "12" = 6,
+  "13" = 0,
+  "14" = 1,
+  "15" = 2,
+  "16" = 6,
+  "17" = 0,
+  "18" = 1,
+  "19" = 2,
+  "20" = 6,
+  "21" = 0,
+  "22" = 1,
+  "23" = 2,
+  "24" = 6,
+  "25" = 0,
+  "26" = 1
+)
+
+
 #' colfunc, give 4 different colors for time-signal plots. 
 colfunc <- colorRampPalette(c("black", "purple4", "red", "yellow"))
 
@@ -59,6 +198,8 @@ number_of_events <- function(data, file_names = NA){
   }
   return(events)
 }
+
+
 
 
 #' random_events give list of random events for each subdataset
@@ -278,6 +419,7 @@ density_plot_without_neg <- function(data, channel, plot_title = NA, lower_gate 
 }
 
 
+
 density_plot_selected_cells <- function(data, channel, include, mark, plot_title = NA, lower_gate = NA, upper_gate = NA, xlim = NA, main_title = ""){
   
   if(main_title == ""){
@@ -371,8 +513,6 @@ signal_signal_just_plot <- function(data, random_events, channel1, channel2,
       # Produces a colour scale based on the colours in the colfunc list
       ggplot2::scale_fill_gradientn(colours=colfunc(128)) +
       ggplot2::theme(legend.position = "none")  
-      ggplot2::ggtitle(plot_title[[i]]) + ggplot2::theme(plot.title = ggplot2::element_text(size=8))
-    
     #   stat_ellipse(level = 0.8)
     plotList[[i]] <- gg
   }
@@ -381,6 +521,91 @@ signal_signal_just_plot <- function(data, random_events, channel1, channel2,
   
 }
 
+
+
+
+#' signal_signal_plot, scatterplot of two different signals
+#' @param data, transformed data 
+#' @param channel1, which channel to plot
+#' @param channel2, which channel to plot
+#' @param plot_title, vector with title for each plot, default NA where the plots are numbered 1, 2, 3, etc.
+#' @param xlim, xlim default NA.
+#' @param ylim, ylim default NA.
+#' @return scatterplots of two differnt signals per file. 
+
+
+signal_signal_plot <- function(data, random_events, channel1, channel2, xname = channel1, yname = channel2, 
+                               xlow = NA, ylow = NA, xhigh = NA, yhigh = NA, 
+                               plot_title = NA, xlim = NA, ylim = NA){
+  channel1 <- ggplot2::sym(channel1)
+  channel2 <- ggplot2::sym(channel2)
+  columnVar1 <- which(colnames(data[[1]]) == channel1)
+  columnVar2 <- which(colnames(data[[1]]) == channel2)
+  
+  
+  
+  if(is.na(plot_title[1])){
+    plot_title <- paste0("file ", 1:length(data))
+  }
+  
+  plotList <- list()
+  
+  for (i in 1:length(data)){
+    var1_i <- data[[i]][, columnVar1]
+    if(is.na(xlim[1])){
+      xlim <- c(min(var1_i), max(var1_i))
+    }
+    
+    var2_i <- data[[i]][, columnVar2]
+    if(is.na(ylim[1])){
+      ylim <- c(min(var2_i), max(var2_i))
+    }
+    
+    gg <- ggplot2::ggplot(data[[i]][random_events[[i]],], ggplot2::aes(x=!!channel1, y=!!channel2)) +
+      ggplot2::coord_cartesian(xlim = xlim, ylim = ylim) +      
+      # Plot all points
+      ggplot2::geom_point(shape=".",alpha=0.5)+
+      # Fill with transparent colour fill using density stats
+      # ndensity scales each graph to its own min/max values
+      ggplot2::stat_density2d(geom="raster", ggplot2::aes(fill=..ndensity.., alpha = ..ndensity..), contour = FALSE) +
+      # Produces a colour scale based on the colours in the colfunc list
+      ggplot2::scale_fill_gradientn(colours=colfunc(128)) +
+      ggplot2::theme(legend.position = "none")  +
+      ggplot2::xlab(xname) +
+      ggplot2::ylab(yname) +
+      ggplot2::ggtitle(plot_title[i])
+    
+    if(!is.na(xlow[1]) ){
+      gate_line <- data.frame(x0 = xlow[i], ymax = ylim[2], ymin = ylim[1] )
+      gg <- gg + ggplot2::geom_segment(data = gate_line, 
+                                       ggplot2::aes(x = x0, xend = x0, y = ymin, yend = ymax), 
+                                       color = "black") 
+    }
+    if(!is.na(xhigh[1]) ){
+      gate_line <- data.frame(x0 = xhigh[i], ymax = ylim[2], ymin = ylim[1] )
+      gg <- gg + ggplot2::geom_segment(data = gate_line, 
+                                       ggplot2::aes(x = x0, xend = x0, y = ymin, yend = ymax), 
+                                       color = "black") 
+    }    
+    if(!is.na(ylow[1]) ){
+      gate_line <- data.frame(y0 = ylow[i], xmax = xlim[2], xmin = xlim[1] )
+      gg <- gg + ggplot2::geom_segment(data = gate_line, 
+                                       ggplot2::aes(x = xmin, xend = xmax, y = y0, yend = y0), 
+                                       color = "black") 
+    }
+    if(!is.na(yhigh[1]) ){
+      gate_line <- data.frame(y0 = yhigh[i], xmax = xlim[2], xmin = xlim[1] )
+      gg <- gg + ggplot2::geom_segment(data = gate_line, 
+                                       ggplot2::aes(x = xmin, xend = xmax, y = y0, yend = y0), 
+                                       color = "black") 
+    }    
+    #   stat_ellipse(level = 0.8)
+    plotList[[i]] <- gg
+  }
+  return(list(plotList = plotList))
+  
+  
+}
 
 
 
@@ -444,7 +669,7 @@ density_plot_per_cluster <- function(data, cluster_per_cell, rand_events = NA, p
 #' @param rand_events, which events to plot
 #' @return density plots for clusters against rest of data. 
 
-barplot_per_sample <- function(file_names_per_cell, cluster_per_cell, rand_events = NA){
+barplot_per_sample <- function(file_names_per_cell, cluster_per_cell, rand_events = NA, mar = c(5.1, 4.1, 4.1, 8.1)){
   if(!is.na(rand_events[1])){
     file_names_per_cell <- file_names_per_cell[rand_events]
     cluster_per_cell <- cluster_per_cell[rand_events]
@@ -453,7 +678,7 @@ barplot_per_sample <- function(file_names_per_cell, cluster_per_cell, rand_event
   n_clusters <- length(unique(cluster_per_cell))
   tab <- table( cluster_per_cell, file_names_per_cell) 
   
-  par(mar=c(5.1, 4.1, 4.1, 8.1), xpd=TRUE)
+  par(mar=mar, xpd=TRUE)
   barplot(tab, col = col25, las = 2)
-  legend("topright", inset=c(-0.1,0), col= col25[n_clusters:1], legend = names(col25[n_clusters:1]), pch =15)
+  legend("topright", inset=c(-0.1,0), col= c(col40, col40)[n_clusters:1], legend = names(c(col50, col50)[n_clusters:1]), pch =15)
 }
