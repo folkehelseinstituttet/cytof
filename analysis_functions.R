@@ -29,10 +29,57 @@ prosent_senario <- function(posneg, channels, values){
       }  
       xx <- x & xx
     }
-    res[i] <- table(xx)["TRUE"]/length(xx) * 100
+    xTrue <- max(c(table(xx)["TRUE"],0), na.rm = T)
+    res[i] <- xTrue/length(xx) * 100
   }
   return(res)
 }
+
+
+
+
+#' prosent_senario_with_atleat_one_of_some_channels
+#' @param posneg, result per senario from channel gating 
+#' @param channels, which channels to select
+#' @param values, the values for the channels in the same order, 0 = neg, 1 = pos (or low), 2 = high, 3 = pos (high and low), -1 = neg og low  
+#' @return vector with prosent that have the asked combination.
+
+
+prosent_senario_with_atleat_one_of_some_channels <- function(posneg, channels, values, atleast_one_of, value_atleast_one_of = 1){
+  if(length(values) == 1){
+    values <- rep(values, length(channels))
+  }
+  res <- rep(NA, length(posneg))
+  for(i in 1:length(posneg)){
+    columns <-  which(colnames(posneg[[i]]) %in% atleast_one_of)
+    if(value_atleast_one_of == 1){
+      xx <- apply(posneg[[i]][, columns], 1, max)
+    } else {
+      xx <- apply(posneg[[i]][, columns], 1, min)
+    }
+    for(j in 1:length(channels)){
+      column_j <- which(colnames(posneg[[i]]) == channels[j]) 
+      if(!(values[j] == 3 | values[j] == -1)){
+        if(values[j] %in% c(0,1,2)){
+          x <- posneg[[i]][, column_j] == values[j]
+        } else {
+          print("ugyldig valg av verdi, gyldige verdier er: -1 = c(0,1), 0 = 0, 1 = 1, 2 = 2, 3 = c(1,2")
+        }
+      } else{
+        if(values[j] == 3){
+          x <- posneg[[i]][, column_j] %in% c(1,2)
+        } else {
+          x <- posneg[[i]][, column_j] %in% c(0,1)
+        }
+      }  
+      xx <- x & xx
+    }
+    xTrue <- max(c(table(xx)["TRUE"],0), na.rm = T)
+    res[i] <- xTrue/length(xx) * 100
+  }
+  return(res)
+}
+
 
 
 #' prosent_per_channel
@@ -51,8 +98,7 @@ prosent_per_channel <- function(posneg, channels = "all", values = 0){
   mat <- matrix(NA, ncol = length(channels), nrow = length(posneg))
   colnames(mat) <- channels
   rownames(mat) <- names(posneg)
-  
-  
+  #browser()
   for(i in 1:length(channels)){
     column_i <- which(colnames(posneg[[1]]) == channels[i]) 
     
@@ -66,18 +112,50 @@ prosent_per_channel <- function(posneg, channels = "all", values = 0){
           print("ugyldig valg av verdi, gyldige verdier er: -1 = c(0,1), 0 = 0, 1 = 1, 2 = 2, 3 = c(1,2")
         }
       } else{
-        if(values[j] == 3){
+        if(values[i] == 3){
           xx <- posneg[[j]][, column_i] %in% c(1,2)
+          
         } else {
           xx <- posneg[[j]][, column_i] %in% c(0,1)
         }
       } 
       mat[j,i] <- table(xx)["TRUE"]/length(xx) * 100
+      
+      #   print(j)
     }
+    
   }
+  
   return(mat)
 }
 
+
+
+senario_kolonne <- function(data, senario_channels, senario_values){
+  if(length(senario_values) == 1){
+    senario_values <- rep(senario_values, length(senario_channels))
+  }
+  d <- data
+  xx <- rep(1, nrow(d))
+  for(senario_j in 1:length(senario_channels)){
+    column_j <- which(colnames(data) == senario_channels[senario_j]) 
+    if(!(senario_values[senario_j] == 3 | senario_values[senario_j] == -1)){
+      if(senario_values[senario_j] %in% c(0,1,2)){
+        x <- d[, column_j] == senario_values[senario_j]
+      } else {
+        print("ugyldig valg av verdi, gyldige verdier er: -1 = c(0,1), 0 = 0, 1 = 1, 2 = 2, 3 = c(1,2")
+      }
+    } else{
+      if(senario_values[senario_j] == 3){
+        x <- d[, column_j] %in% c(1,2)
+      } else {
+        x <- d[, column_j] %in% c(0,1)
+      }
+    }  
+    xx <- x & xx
+  }
+  return(xx)
+}	
 
 
 #' prosent_per_channel_senario
@@ -103,7 +181,7 @@ prosent_per_channel_senario <- function(posneg, channels = "all", values = 0, se
     
     xx <- rep(1, nrow(d))
     for(senario_j in 1:length(senario_channels)){
-      column_j <- which(colnames(data) == senario_channels[senario_j]) 
+      column_j <- which(colnames(posneg) == senario_channels[senario_j]) 
       if(!(senario_values[senario_j] == 3 | senario_values[senario_j] == -1)){
         if(senario_values[senario_j] %in% c(0,1,2)){
           x <- d[, column_j] == senario_values[senario_j]
@@ -144,4 +222,64 @@ prosent_per_channel_senario <- function(posneg, channels = "all", values = 0, se
     }
   }
   return(mat)
+}
+
+
+
+
+cells_to_select_from <- function(file_names, posNeg, senario_channels, senario_values){
+  result <- NULL
+  if(length(file_names) != length(posNeg)){
+    stop("Need same length of filnames and posNeg")
+  }
+  
+  for(i in 1:length(file_names)){
+    
+    d <- posNeg[[i]]
+    xx <- rep(TRUE, nrow(d))
+    # browser()    
+    for(senario_j in 1:length(senario_channels)){
+      column_j <- which(colnames(posNeg[[i]]) == senario_channels[senario_j]) 
+      if(!(senario_values[senario_j] == 3 | senario_values[senario_j] == -1)){
+        if(senario_values[senario_j] %in% c(0,1,2)){
+          x <- d[, column_j] == senario_values[senario_j]
+        } else {
+          print("ugyldig valg av verdi, gyldige verdier er: -1 = c(0,1), 0 = 0, 1 = 1, 2 = 2, 3 = c(1,2")
+        }
+      } else{
+        if(senario_values[senario_j] == 3){
+          x <- d[, column_j] %in% c(1,2)
+        } else {
+          x <- d[, column_j] %in% c(0,1)
+        }
+      }  
+      xx <- x & xx
+    }
+    result[[i]] <- which(xx)
+  }
+  
+  return(result)
+}
+
+
+# må lages
+random_events_from_selected_cells <- function(mulige_celler, n = 25000){
+  result <- NULL
+  for(i in 1:length(mulige_celler)){
+    result[[i]] <- sample(mulige_celler[[i]], size = min(n, length(mulige_celler[[i]])), replace = FALSE)
+  }
+  return(result)
+}
+
+
+
+
+median_per_cluster_marker<- function(data, kluster){
+  result <- as.data.frame(matrix(NA, ncol = ncol(data), nrow = length(unique(kluster))))
+  colnames(result) <- colnames(data)
+  rownames(result) <- sort(unique(kluster))
+  for(i in rownames(result)){
+    result[i,] <- apply(data[as.character(kluster) %in% i,], 2, median)
+  }
+  return(result)
 }
