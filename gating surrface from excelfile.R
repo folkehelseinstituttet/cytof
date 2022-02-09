@@ -52,7 +52,7 @@ for(i in 1:nrow(surrface)){
     if(length(either_or_i) == 0){
       result[,i] <- prosent_senario(posneg = posNeg, channels = markers_i, values = markersPosNeg_i)
     } else {
-      result[,i] <- prosent_senario_with_atleat_one_of_some_channels(posneg = posNeg, channels = marker_i, 
+      result[,i] <- prosent_senario_with_atleat_one_of_some_channels(posneg = posNeg, channels = markers_i, 
                                                                      values = markersPosNeg_i, atleast_one_of = either_or_i, value_atleast_one_of = 1)		
     }
   }
