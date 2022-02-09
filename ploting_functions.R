@@ -536,7 +536,7 @@ signal_signal_just_plot <- function(data, random_events, channel1, channel2,
 
 signal_signal_plot <- function(data, random_events, channel1, channel2, xname = channel1, yname = channel2, 
                                xlow = NA, ylow = NA, xhigh = NA, yhigh = NA, 
-                               plot_title = NA, xlim = NA, ylim = NA){
+                               plot_title = NA, xlim = NA, ylim = NA, title_size = 10){
   channel1 <- ggplot2::sym(channel1)
   channel2 <- ggplot2::sym(channel2)
   columnVar1 <- which(colnames(data[[1]]) == channel1)
@@ -573,7 +573,8 @@ signal_signal_plot <- function(data, random_events, channel1, channel2, xname = 
       ggplot2::theme(legend.position = "none")  +
       ggplot2::xlab(xname) +
       ggplot2::ylab(yname) +
-      ggplot2::ggtitle(plot_title[i])
+      ggplot2::ggtitle(plot_title[i]) + 
+      ggplot2::theme(plot.title = ggplot2::element_text(size = title_size, face = "bold"))
     
     if(!is.na(xlow[1]) ){
       gate_line <- data.frame(x0 = xlow[i], ymax = ylim[2], ymin = ylim[1] )
