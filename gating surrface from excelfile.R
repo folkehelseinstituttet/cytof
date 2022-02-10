@@ -1,6 +1,9 @@
 posNegPath <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF","Analyse i R OUS", "Resultat_Panel_1", "Data")
 posNeg <- readRDS(fs::path(posNegPath, "posNeg.rds"))
 posNegFileName <- readRDS(fs::path(posNegPath, "posNegFilnavn.rds"))
+
+outPath <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF","Analyse i R OUS", "Resultat_Panel_1")
+
 scriptPath <- fs::path("H:", "git", "cytof")
 
 source(fs::path(scriptPath, "analysis_functions.R"))
@@ -59,3 +62,5 @@ for(i in 1:nrow(surrface)){
   
 }
 
+
+writexl::write_xlsx(result, path = fs::path(outPath, "Prosent_Gating_Surrface_Panel1.xlsx"))
