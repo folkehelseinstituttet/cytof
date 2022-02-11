@@ -44,7 +44,7 @@ if(length(extra_col) > 0){
 
 result <- matrix(NA, nrow = length(posNeg), ncol = nrow(surrface))
 rownames(result) <- posNegFileName
-colnames(result) <- surrface$Population
+colnames(result) <- rownames(surrface)
 for(i in 1:nrow(surrface)){
   pos_i <- colnames(surrface)[which(surrface[i,] == 1)]
   neg_i <- colnames(surrface)[which(surrface[i,] == 0)]
@@ -63,4 +63,5 @@ for(i in 1:nrow(surrface)){
 }
 
 
-writexl::write_xlsx(result, path = fs::path(outPath, "Prosent_Gating_Surrface_Panel1.xlsx"))
+write.csv2(as.data.frame(result), fs::path(outPath, "Prosent_Gating_Surrface_Panel1.csv"))
+
