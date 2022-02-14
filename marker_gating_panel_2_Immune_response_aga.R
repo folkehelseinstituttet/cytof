@@ -36,8 +36,7 @@ plotTiff <- function(signal, filnavn){
                           signal$plotList[[51]], signal$plotList[[52]], signal$plotList[[53]], signal$plotList[[54]], signal$plotList[[55]],
                           signal$plotList[[56]],  signal$plotList[[57]], signal$plotList[[58]], signal$plotList[[59]], signal$plotList[[60]],
                           signal$plotList[[61]], signal$plotList[[62]], signal$plotList[[63]], signal$plotList[[64]], signal$plotList[[65]],
-                          signal$plotList[[66]],  signal$plotList[[67]], signal$plotList[[68]], signal$plotList[[69]], signal$plotList[[70]],
-                          signal$plotList[[71]], signal$plotList[[72]],  ncol = 11, nrow = 7)
+                          signal$plotList[[66]],  ncol = 11, nrow = 6)
   #print(signal$plotList[[i]])
   dev.off()
 }
@@ -228,31 +227,6 @@ kanal <- params$name[grep(x, params$desc)][1]
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
 split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 2)
 split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
-
-kanal_max <- max(data[[1]][,kanal])
-for(i in 1:n_files){
-  kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
-}
-signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
-plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
-
-for(j in filene){
-  result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
-}
-
-split <- NA
-
-
-#***************************************************
-#pos/neg CD3 ----  
-#***************************************************
-x <- "CD3"
-kanal <- params$name[grep(x, params$desc)][1] 
-
-data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
-split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 0.5)
-split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
-split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
 
 kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
@@ -799,17 +773,19 @@ split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(spl
 split$lower_gates[split$lower_gates > 1] <- mean(split$lower_gates[split$lower_gates < 1])
 #split$lower_gates <- rep(1.5, length(split$lower_gates))
 
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
+
+kanal_max <- max(data[[1]][,kanal])
+for(i in 1:n_files){
+  kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
+}
+
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x, xlim = c(0, kanal_max))
 #density_plots # to see the plots
 
 tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
 print(density_plots)
 dev.off()
 
-kanal_max <- max(data[[1]][,kanal])
-for(i in 1:n_files){
-  kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
-}
 signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
@@ -838,14 +814,16 @@ for(i in 1:n_files){
   kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
 }
 
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
+
+kanal_max <- 2
+
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x, xlim = c(0, kanal_max))
 #density_plots # to see the plots
 
 tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
 print(density_plots)
 dev.off()
 
-kanal_max <- 2
 signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
@@ -868,19 +846,20 @@ split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(spl
 #split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
 #split$lower_gates <- rep(1.5, length(split$lower_gates))
 
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
+kanal_max <- max(data[[1]][,kanal])
+for(i in 1:n_files){
+  kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
+}
+kanal_max <- 4
+
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x, xlim = c(0, kanal_max))
 #density_plots # to see the plots
 
 tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
 print(density_plots)
 dev.off()
 
-kanal_max <- max(data[[1]][,kanal])
-for(i in 1:n_files){
-  kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
-}
 
-kanal_max <- 4
 signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
@@ -957,13 +936,6 @@ split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(spl
 #split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
 #split$lower_gates <- rep(1.5, length(split$lower_gates))
 
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
-#density_plots # to see the plots
-
-tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
-print(density_plots)
-dev.off()
-
 
 kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
@@ -971,6 +943,15 @@ for(i in 1:n_files){
 }
 
 kanal_max <- 2
+
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x, xlim = c(0, kanal_max))
+#density_plots # to see the plots
+
+tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
+print(density_plots)
+dev.off()
+
+
 signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
@@ -993,12 +974,6 @@ split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(spl
 split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
 #split$lower_gates <- rep(1.5, length(split$lower_gates))
 
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
-#density_plots # to see the plots
-
-tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
-print(density_plots)
-dev.off()
 
 
 kanal_max <- max(data[[1]][,kanal])
@@ -1006,6 +981,14 @@ for(i in 1:n_files){
   kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
 }
 kanal_max <- 5
+
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x, xlim = c(0, kanal_max))
+#density_plots # to see the plots
+
+tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
+print(density_plots)
+dev.off()
+
 signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
@@ -1028,18 +1011,20 @@ split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(spl
 #split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
 #split$lower_gates <- rep(1.5, length(split$lower_gates))
 
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
-#density_plots # to see the plots
-
-tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
-print(density_plots)
-dev.off()
 
 kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
   kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
 }
 kanal_max <- 4
+
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x, xlim = c(0, kanal_max))
+#density_plots # to see the plots
+
+tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
+print(density_plots)
+dev.off()
+
 signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
@@ -1116,18 +1101,20 @@ split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(spl
 #split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
 #split$lower_gates <- rep(1.5, length(split$lower_gates))
 
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
-#density_plots # to see the plots
-
-tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
-print(density_plots)
-dev.off()
 
 kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
   kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
 }
 kanal_max <- 5
+
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x, xlim = c(0, kanal_max))
+#density_plots # to see the plots
+
+tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
+print(density_plots)
+dev.off()
+
 signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
@@ -1150,12 +1137,6 @@ split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(spl
 #split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
 #split$lower_gates <- rep(1.5, length(split$lower_gates))
 
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
-#density_plots # to see the plots
-
-tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
-print(density_plots)
-dev.off()
 
 kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
@@ -1163,6 +1144,14 @@ for(i in 1:n_files){
 }
 
 kanal_max <- 4
+
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x, xlim = c(0, kanal_max))
+#density_plots # to see the plots
+
+tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
+print(density_plots)
+dev.off()
+
 signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
@@ -1185,17 +1174,19 @@ split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(spl
 #split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
 #split$lower_gates <- rep(1.5, length(split$lower_gates))
 
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
+
+kanal_max <- max(data[[1]][,kanal])
+for(i in 1:n_files){
+  kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
+}
+
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x, xlim = c(0, kanal_max))
 #density_plots # to see the plots
 
 tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
 print(density_plots)
 dev.off()
 
-kanal_max <- max(data[[1]][,kanal])
-for(i in 1:n_files){
-  kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
-}
 signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
@@ -1218,18 +1209,20 @@ split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(spl
 #split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
 #split$lower_gates <- rep(1.5, length(split$lower_gates))
 
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
-#density_plots # to see the plots
-
-tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
-print(density_plots)
-dev.off()
 
 
 kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
   kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
 }
+
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x, xlim = c(0, kanal_max))
+#density_plots # to see the plots
+
+tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
+print(density_plots)
+dev.off()
+
 signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
@@ -1252,18 +1245,20 @@ split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(spl
 #split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
 #split$lower_gates <- rep(1.5, length(split$lower_gates))
 
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
-#density_plots # to see the plots
-
-tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
-print(density_plots)
-dev.off()
 
 kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
   kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
 }
 kanal_max <- 5
+
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x, xlim = c(0, kanal_max))
+#density_plots # to see the plots
+
+tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
+print(density_plots)
+dev.off()
+
 signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
@@ -1286,17 +1281,19 @@ split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(spl
 #split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
 #split$lower_gates <- rep(1.5, length(split$lower_gates))
 
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
+
+kanal_max <- max(data[[1]][,kanal])
+for(i in 1:n_files){
+  kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
+}
+
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x, xlim = c(0, kanal_max))
 #density_plots # to see the plots
 
 tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
 print(density_plots)
 dev.off()
 
-kanal_max <- max(data[[1]][,kanal])
-for(i in 1:n_files){
-  kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
-}
 signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
@@ -1319,18 +1316,20 @@ split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(spl
 split$lower_gates[split$lower_gates > 4] <- mean(split$lower_gates[split$lower_gates < 4])
 #split$lower_gates <- rep(1.5, length(split$lower_gates))
 
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
-#density_plots # to see the plots
-
-tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
-print(density_plots)
-dev.off()
 
 
 kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
   kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
 }
+
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x, xlim = c(0, kanal_max))
+#density_plots # to see the plots
+
+tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
+print(density_plots)
+dev.off()
+
 signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
@@ -1380,18 +1379,20 @@ split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(spl
 #split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
 #split$lower_gates <- rep(1.5, length(split$lower_gates))
 
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
-#density_plots # to see the plots
-
-tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
-print(density_plots)
-dev.off()
 
 kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
   kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
 }
 kanal_max <- 4
+
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x, xlim = c(0, kanal_max))
+#density_plots # to see the plots
+
+tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
+print(density_plots)
+dev.off()
+
 signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
