@@ -79,7 +79,7 @@ params <- get_params_fcs_data(fcs_data[[1]])
 kanaler <- c("CD45", "CD57",  "CD19", "CD8", "HLADR", "CD3", "CD4", "TCRgd", "CXCR5",
              "CD45RA",  "CD27", "CD28", "CCR7", "CD25", "CD38", "PD1", "CD14", "CD56",
               "CD16",  #de før dette var også på Plate 1.
-             "CD107a", "CD44", "CD223", "IL-1b", "IL7Ra", "IL-2", "TNFa", "TIM-3",
+             "CD107a", "CD44", "CD223", "IL-1b", "CD127", "IL-2", "TNFa", "TIM-3",
              "PD-L1", "IL-12p70", "MIP-1b", "CD137", "CD272", "IL-6", "GM-CSF", 
              "IL-17A", "FoxP3", "CD33", "Perforin", "IFNg", "IL-10",  "CD154", "CTLA-4",
              "GranzymeB", "PD-L2") 
@@ -489,7 +489,7 @@ split <- NA
 
 
 #***************************************************
-#pos/neg PD1 ----  
+#pos/neg PD1 ----  15 feb fix 1
 #***************************************************
 x <- "PD1"
 params$desc[grep(x, params$desc)]
@@ -499,7 +499,7 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(
 split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1)
 #split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
 #split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
-split$lower_gates <- rep(0.8, length(split$lower_gates))
+split$lower_gates <- rep(1, length(split$lower_gates))
 
 
 kanal_max <- max(data[[1]][,kanal])
@@ -720,16 +720,18 @@ for(j in filene){
 split <- NA
 
 #***************************************************
-#pos/neg IL7Ra ----  
+#pos/neg CD127 ----  #legg inn upper ... 15 feb
 #***************************************************
-x <- "IL7Ra"
+x <- "CD127"
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
-split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001)#, minimum = 1.4)
+split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 0.25)
 split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
-split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
+split$lower_gates[split$lower_gates > 1] <- mean(split$lower_gates[split$lower_gates < 1])
+split$upper_gates[is.na(split$lupper_gates)] <- mean(split$upper_gates[!is.na(split$upper_gates)])
+split$upper_gates[split$upper_gates > 3] <- mean(split$upper_gates[split$upper_gates < 3])
 #split$lower_gates <- rep(1.5, length(split$lower_gates))
 
 
@@ -737,11 +739,12 @@ kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
   kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
 }
-signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
+signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates,  yhigh = split$upper_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
+  result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]+ data[[j]][, kanal] > split$upper_gates[j]
 }
 
 split <- NA
@@ -776,7 +779,7 @@ for(j in filene){
 split <- NA
 
 #***************************************************
-#pos/neg TNFa ----  
+#pos/neg TNFa ----  15 feb fix 2
 #***************************************************
 x <- "TNFa"
 params$desc[grep(x, params$desc)]
@@ -786,7 +789,7 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(
 split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001)#, minimum = 1.4)
 split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
 split$lower_gates[split$lower_gates > 1] <- mean(split$lower_gates[split$lower_gates < 1])
-#split$lower_gates <- rep(1.5, length(split$lower_gates))
+split$lower_gates <- rep(2, length(split$lower_gates))
 
 
 kanal_max <- max(data[[1]][,kanal])
@@ -811,7 +814,7 @@ for(j in filene){
 split <- NA
 
 #***************************************************
-#pos/neg TIM-3 ----  
+#pos/neg TIM-3 ----  15 feb fix 0.25
 #***************************************************
 x <- "TIM-3"
 params$desc[grep(x, params$desc)]
@@ -821,7 +824,7 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(
 split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001)#, minimum = 1.4)
 split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
 #split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
-#split$lower_gates <- rep(1.5, length(split$lower_gates))
+split$lower_gates <- rep(0.25, length(split$lower_gates))
 
 
 kanal_max <- max(data[[1]][,kanal])
@@ -849,7 +852,7 @@ for(j in filene){
 split <- NA
 
 #***************************************************
-#pos/neg PD-L1 ----  
+#pos/neg PD-L1 ----  15 feb fix 1
 #***************************************************
 x <- "PD-L1"
 params$desc[grep(x, params$desc)]
@@ -859,7 +862,7 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(
 split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001)#, minimum = 1.4)
 split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
 #split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
-#split$lower_gates <- rep(1.5, length(split$lower_gates))
+split$lower_gates <- rep(1, length(split$lower_gates))
 
 kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
@@ -885,7 +888,7 @@ for(j in filene){
 split <- NA
 
 #***************************************************
-#pos/neg IL-12p70 ----  
+#pos/neg IL-12p70 ----  15 feb fix grense på 2.4
 #***************************************************
 x <- "IL-12p70"
 params$desc[grep(x, params$desc)]
@@ -895,7 +898,7 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(
 split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001)#, minimum = 1.4)
 split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
 #split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
-#split$lower_gates <- rep(1.5, length(split$lower_gates))
+split$lower_gates <- rep(2.4, length(split$lower_gates))
 
 
 kanal_max <- max(data[[1]][,kanal])
@@ -1077,7 +1080,7 @@ for(j in filene){
 split <- NA
 
 #***************************************************
-#pos/neg IL-17A ----  
+#pos/neg IL-17A ----  15 feb fix på 1-6
 #***************************************************
 x <- "IL-17A"
 params$desc[grep(x, params$desc)]
@@ -1087,7 +1090,7 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(
 split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 0.9)
 split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
 #split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
-#split$lower_gates <- rep(1.5, length(split$lower_gates))
+split$lower_gates <- rep(1.7, length(split$lower_gates))
 
 
 kanal_max <- max(data[[1]][,kanal])
@@ -1176,7 +1179,7 @@ for(j in filene){
 split <- NA
 
 #***************************************************
-#pos/neg Perforin ----  
+#pos/neg Perforin ----  15 feb fix 2.3
 #***************************************************
 x <- "Perforin"
 params$desc[grep(x, params$desc)]
@@ -1186,7 +1189,7 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(
 split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1.8)
 split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
 #split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
-#split$lower_gates <- rep(1.5, length(split$lower_gates))
+split$lower_gates <- rep(2.3, length(split$lower_gates))
 
 
 kanal_max <- max(data[[1]][,kanal])
@@ -1247,7 +1250,7 @@ for(j in filene){
 split <- NA
 
 #***************************************************
-#pos/neg IL-10 ----  
+#pos/neg IL-10 ----  15 feb fix grense på 2
 #***************************************************
 x <- "IL-10"
 params$desc[grep(x, params$desc)]
@@ -1257,7 +1260,7 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(
 split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001)#, minimum = 1.4)
 split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
 #split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
-#split$lower_gates <- rep(1.5, length(split$lower_gates))
+split$lower_gates <- rep(2, length(split$lower_gates))
 
 
 kanal_max <- max(data[[1]][,kanal])
