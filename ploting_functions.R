@@ -235,6 +235,29 @@ random_events_vector <- function(datasetvector, n = 10000){
 }
 
 
+#' random_events_from_selected_events give list of random events for each subdataset
+#' @param numb_events, vector with number of events in each subdataset
+#' @param n, number of events from wanted for each subdatasets. Default equal 10000. 
+#' If n greater than number of observation in a file then n for that file will be equal to number of observations 
+#' @return list of vectors with position for the random events for each sub dataset
+#' 
+
+random_events_from_selected_events <- function(posNeg, marker, n = 10000){
+#browser()
+    number_of_files <- length(posNeg)
+  rand_events <- NULL
+  for (i in 1:number_of_files){
+    possible <- which(posNeg[[i]][,marker])
+    rand_events[i] <- list(sort(sample(possible, min(length(possible), n))))
+  }
+  return(rand_events)
+}
+
+#' random_events_vector give vector of random events for the whole dataset
+#' @param datasetvector, vector of filename for each observation
+#' @param n, number of events from wanted for each subdatasets. Default equal 10000.
+#' @return list of vectors with position for the random events for each sub dataset
+#' 
 
 
 #' time_signal_plot, plot x = time and y = signal of channel in random_events for each subdataset
@@ -364,6 +387,7 @@ density_plot <- function(data, channel, plot_title = NA, lower_gate = NA, upper_
 
 
 
+
 #' density_plot_without_neg, plot density for positive events in each subdataset
 #' @param data, transformed data 
 #' @param channel, which channel to plot
@@ -420,7 +444,7 @@ density_plot_without_neg <- function(data, channel, plot_title = NA, lower_gate 
 
 
 
-density_plot_selected_cells <- function(data, channel, include, mark, plot_title = NA, lower_gate = NA, upper_gate = NA, xlim = NA, main_title = ""){
+density_plot_selected_cells <- function(data, channel, include, mark, positiv = TRUE, plot_title = NA, lower_gate = NA, upper_gate = NA, xlim = NA, main_title = ""){
   
   if(main_title == ""){
     main_title <- channel
@@ -433,7 +457,11 @@ density_plot_selected_cells <- function(data, channel, include, mark, plot_title
   column <- which(colnames(data[[1]]) == channel)
   df <- data.frame(Values = data[[1]][,column], Sample = rep(plot_title[1], nrow(data[[1]])))
   for(i in 2:number_of_files){
-    xx <- data[[i]][include[[i]][,mark],column]
+    if(positiv){
+      xx <- data[[i]][include[[i]][,mark],column]
+    } else {
+      xx <- data[[i]][!include[[i]][,mark],column]
+    }
     # xx <- xx[xx > lower_gate]
     df <- rbind(df, data.frame(Values = xx, Sample = rep(plot_title[i], length(xx))))
   }
@@ -551,17 +579,120 @@ signal_signal_plot <- function(data, random_events, channel1, channel2, xname = 
   plotList <- list()
   
   for (i in 1:length(data)){
-    var1_i <- data[[i]][, columnVar1]
+    var1_i <- data[[i]][random_events[[i]], columnVar1]
     if(is.na(xlim[1])){
       xlim <- c(min(var1_i), max(var1_i))
     }
     
-    var2_i <- data[[i]][, columnVar2]
+    var2_i <- data[[i]][random_events[[i]], columnVar2]
     if(is.na(ylim[1])){
       ylim <- c(min(var2_i), max(var2_i))
     }
     
     gg <- ggplot2::ggplot(data[[i]][random_events[[i]],], ggplot2::aes(x=!!channel1, y=!!channel2)) +
+      ggplot2::coord_cartesian(xlim = xlim, ylim = ylim) +      
+      # Plot all points
+      ggplot2::geom_point(shape=".",alpha=0.5)+
+      # Fill with transparent colour fill using density stats
+      # ndensity scales each graph to its own min/max values
+      ggplot2::stat_density2d(geom="raster", ggplot2::aes(fill=..ndensity.., alpha = ..ndensity..), contour = FALSE) +
+      # Produces a colour scale based on the colours in the colfunc list
+      ggplot2::scale_fill_gradientn(colours=colfunc(128)) +
+      ggplot2::theme(legend.position = "none")  +
+      ggplot2::xlab(xname) +
+      ggplot2::ylab(yname) +
+      ggplot2::ggtitle(plot_title[i]) + 
+      ggplot2::theme(plot.title = ggplot2::element_text(size = title_size, face = "bold"))
+    
+    if(!is.na(xlow[1]) ){
+      gate_line <- data.frame(x0 = xlow[i], ymax = ylim[2], ymin = ylim[1] )
+      gg <- gg + ggplot2::geom_segment(data = gate_line, 
+                                       ggplot2::aes(x = x0, xend = x0, y = ymin, yend = ymax), 
+                                       color = "black") 
+    }
+    if(!is.na(xhigh[1]) ){
+      gate_line <- data.frame(x0 = xhigh[i], ymax = ylim[2], ymin = ylim[1] )
+      gg <- gg + ggplot2::geom_segment(data = gate_line, 
+                                       ggplot2::aes(x = x0, xend = x0, y = ymin, yend = ymax), 
+                                       color = "black") 
+    }    
+    if(!is.na(ylow[1]) ){
+      gate_line <- data.frame(y0 = ylow[i], xmax = xlim[2], xmin = xlim[1] )
+      gg <- gg + ggplot2::geom_segment(data = gate_line, 
+                                       ggplot2::aes(x = xmin, xend = xmax, y = y0, yend = y0), 
+                                       color = "black") 
+    }
+    if(!is.na(yhigh[1]) ){
+      gate_line <- data.frame(y0 = yhigh[i], xmax = xlim[2], xmin = xlim[1] )
+      gg <- gg + ggplot2::geom_segment(data = gate_line, 
+                                       ggplot2::aes(x = xmin, xend = xmax, y = y0, yend = y0), 
+                                       color = "black") 
+    }    
+    #   stat_ellipse(level = 0.8)
+    plotList[[i]] <- gg
+  }
+  return(list(plotList = plotList))
+  
+  
+}
+
+
+
+
+#' signal_signal_plot_selected_cells, scatterplot of two different signals
+#' @param data, transformed data 
+#' @param channel1, which channel to plot
+#' @param channel2, which channel to plot
+#' @param plot_title, vector with title for each plot, default NA where the plots are numbered 1, 2, 3, etc.
+#' @param xlim, xlim default NA.
+#' @param ylim, ylim default NA.
+#' @param include, list with matrices over which cells to include'
+#' @param positiv, default equal TRUE, include those cells that are positiv for mark in include list
+#' @param mark, which column from include to use
+#' @return scatterplots of two differnt signals per file. 
+
+
+signal_signal_plot_selected_cells <- function(data, number_random_events = 10000,  channel1, channel2, xname = channel1, yname = channel2, 
+                               xlow = NA, ylow = NA, xhigh = NA, yhigh = NA, 
+                               plot_title = NA, xlim = NA, ylim = NA, title_size = 10, include, mark, positiv = TRUE){
+  channel1 <- ggplot2::sym(channel1)
+  channel2 <- ggplot2::sym(channel2)
+  columnVar1 <- which(colnames(data[[1]]) == channel1)
+  columnVar2 <- which(colnames(data[[1]]) == channel2)
+  
+  
+  
+  if(is.na(plot_title[1])){
+    plot_title <- paste0("file ", 1:length(data))
+  }
+  
+  plotList <- list()
+  
+  for (i in 1:length(data)){
+    if(positiv){
+      var1_i <- data[[i]][include[[i]][,mark], columnVar1]
+      var2_i <- data[[i]][include[[i]][,mark], columnVar2]
+      data_i <- data[[i]][include[[i]][,mark],]
+    } else {
+      var1_i <- data[[i]][!include[[i]][,mark], columnVar1]
+      var2_i <- data[[i]][!include[[i]][,mark], columnVar2]
+      data_i <- data[[i]][!include[[i]][,mark],]
+    }
+    
+    if(nrow(data_i) > number_random_events){
+      data_i <- data_i[sample(1:nrow(data_i), number_random_events),]
+    }
+    
+    if(is.na(xlim[1])){
+      xlim <- c(min(var1_i), max(var1_i))
+    }
+    
+    var2_i <- data[[i]][include[[i]][,mark], columnVar2]
+    if(is.na(ylim[1])){
+      ylim <- c(min(var2_i), max(var2_i))
+    }
+    
+    gg <- ggplot2::ggplot(data_i, ggplot2::aes(x=!!channel1, y=!!channel2)) +
       ggplot2::coord_cartesian(xlim = xlim, ylim = ylim) +      
       # Plot all points
       ggplot2::geom_point(shape=".",alpha=0.5)+
@@ -682,4 +813,21 @@ barplot_per_sample <- function(file_names_per_cell, cluster_per_cell, rand_event
   par(mar=mar, xpd=TRUE)
   barplot(tab, col = col25, las = 2)
   legend("topright", inset=c(-0.1,0), col= c(col40, col40)[n_clusters:1], legend = names(c(col50, col50)[n_clusters:1]), pch =15)
+}
+
+
+violin_per_sample <- function(data_mat, x, y, line = NA){
+  xcol <- which(colnames(data_mat) == x)
+  ycol <- which(colnames(data_mat) == y)
+  d2 <- d[, c(xcol, ycol)]
+  colnames(d2) <- c("x", "y")
+  g <-  ggplot(d2, aes( x = x, y = y)) + 
+    geom_violin()
+  if(!is.na(line[1])){
+    for(i in 1:length(line)){
+      g <- g + geom_vline(aes(xintercept = line[i]))  #nb lager kun siste. Sjekk hvorfor
+    }
+  }
+  
+  return(g)
 }
