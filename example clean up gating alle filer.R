@@ -36,17 +36,17 @@ file_names <- gsub(".fcs", "", files_to_open)
 n_files <- length(file_names)
 filenumber <- 1:n_files
 
-percent_loss_each_gating <- as.data.frame(matrix(NA, ncol = 9, nrow = n_files))
-percent_loss_from_full_dataset <-   as.data.frame(matrix(NA, ncol = 9, nrow = n_files))
+percent_lost_each_gating <- as.data.frame(matrix(NA, ncol = 9, nrow = n_files))
+percent_lost_from_full_dataset <-   as.data.frame(matrix(NA, ncol = 9, nrow = n_files))
 
-colnames(percent_loss_each_gating) <- c("Ce140Di", "Residual", "Center", "Offset", "Width",
+colnames(percent_lost_each_gating) <- c("Ce140Di", "Residual", "Center", "Offset", "Width",
                                         "Event_length", "Pt194Di", "Ir191Di", "Ir193Di")
 
-colnames(percent_loss_from_full_dataset) <- c("Ce140Di", "Residual", "Center", "Offset", "Width",
+colnames(percent_lost_from_full_dataset) <- c("Ce140Di", "Residual", "Center", "Offset", "Width",
                                               "Event_length", "Pt194Di", "Ir191Di", "Ir193Di")
 
-rownames(percent_loss_each_gating) <- file_names
-rownames(percent_loss_from_full_dataset) <- file_names
+rownames(percent_lost_each_gating) <- file_names
+rownames(percent_lost_from_full_dataset) <- file_names
 
 for(ii in 1:floor(n_files/6)){
   
@@ -103,8 +103,8 @@ for(ii in 1:floor(n_files/6)){
   beads_data <- update_data_based_on_events_to_keep(data = beads_data, kept_events = events_to_keep_after_gating)
   number_of_events_after_gating <-  number_of_events(data = fcs_data, file_names = file_names)
   random_events_for_plotting <- random_events(number_of_events_after_gating)
-  percent_loss_each_gating[as.character(file_names),"Ce140Di"] <- number_of_events_after_gating/number_of_events_raw_data * 100 
-  percent_loss_from_full_dataset[as.character(file_names),"Ce140Di"] <- number_of_events_after_gating/number_of_events_raw_data * 100 
+  percent_lost_each_gating[as.character(file_names),"Ce140Di"] <- number_of_events_after_gating/number_of_events_raw_data * 100 
+  percent_lost_from_full_dataset[as.character(file_names),"Ce140Di"] <- number_of_events_after_gating/number_of_events_raw_data * 100 
   
   
   number_of_events_after_beads_gating <- number_of_events_after_gating
@@ -148,8 +148,8 @@ for(ii in 1:floor(n_files/6)){
   fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_gating)
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_gating)
   number_of_events_after_residual_gating <-  number_of_events(data = fcs_data, file_names = file_names)
-  percent_loss_from_full_dataset[as.character(file_names),"Residual"] <- number_of_events_after_residual_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_loss_each_gating[as.character(file_names),"Residual"] <- number_of_events_after_residual_gating/number_of_events_after_beads_gating * 100 #percent remaining from bead gating
+  percent_lost_from_full_dataset[as.character(file_names),"Residual"] <- number_of_events_after_residual_gating/number_of_events_raw_data * 100 #percent remaining from total
+  percent_lost_each_gating[as.character(file_names),"Residual"] <- number_of_events_after_residual_gating/number_of_events_after_beads_gating * 100 #percent remaining from bead gating
   
   
   
@@ -178,8 +178,8 @@ for(ii in 1:floor(n_files/6)){
   fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_center_gating)
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_center_gating)
   number_of_events_after_center_gating <-  number_of_events(data = fcs_data, file_names = file_names)
-  percent_loss_from_full_dataset[as.character(file_names),"Center"] <- number_of_events_after_center_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_loss_each_gating[as.character(file_names),"Center"] <-number_of_events_after_center_gating/number_of_events_after_residual_gating * 100 #percent remaining from residual gating
+  percent_lost_from_full_dataset[as.character(file_names),"Center"] <- number_of_events_after_center_gating/number_of_events_raw_data * 100 #percent remaining from total
+  percent_lost_each_gating[as.character(file_names),"Center"] <-number_of_events_after_center_gating/number_of_events_after_residual_gating * 100 #percent remaining from residual gating
   
   
   
@@ -210,8 +210,8 @@ for(ii in 1:floor(n_files/6)){
   fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_offset_gating)
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_offset_gating)
   number_of_events_after_offset_gating <- number_of_events(data = fcs_data, file_names = file_names)
-  percent_loss_from_full_dataset[as.character(file_names),"Offset"] <- number_of_events_after_offset_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_loss_each_gating[as.character(file_names),"Offset"] <- number_of_events_after_offset_gating/number_of_events_after_center_gating * 100 #percent remaining from  center gating
+  percent_lost_from_full_dataset[as.character(file_names),"Offset"] <- number_of_events_after_offset_gating/number_of_events_raw_data * 100 #percent remaining from total
+  percent_lost_each_gating[as.character(file_names),"Offset"] <- number_of_events_after_offset_gating/number_of_events_after_center_gating * 100 #percent remaining from  center gating
   
   #************************************************
   #gating on Width+ ----
@@ -243,8 +243,8 @@ for(ii in 1:floor(n_files/6)){
   fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_width_gating)
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_width_gating)
   number_of_events_after_width_gating <- number_of_events(data = fcs_data, file_names = file_names)
-  percent_loss_from_full_dataset[as.character(file_names),"Width"] <- number_of_events_after_width_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_loss_each_gating[as.character(file_names),"Width"] <- number_of_events_after_width_gating/number_of_events_after_offset_gating * 100 #percent remaining from offset gating
+  percent_lost_from_full_dataset[as.character(file_names),"Width"] <- number_of_events_after_width_gating/number_of_events_raw_data * 100 #percent remaining from total
+  percent_lost_each_gating[as.character(file_names),"Width"] <- number_of_events_after_width_gating/number_of_events_after_offset_gating * 100 #percent remaining from offset gating
   
   
   
@@ -276,8 +276,8 @@ for(ii in 1:floor(n_files/6)){
   fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_event_gating)
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_event_gating)
   number_of_events_after_event_gating <-  number_of_events(data = fcs_data, file_names = file_names)
-  percent_loss_from_full_dataset[as.character(file_names),"Event_length"] <- number_of_events_after_event_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_loss_each_gating[as.character(file_names),"Event_length"] <- number_of_events_after_event_gating/number_of_events_after_width_gating * 100 #percent remaining from width gating
+  percent_lost_from_full_dataset[as.character(file_names),"Event_length"] <- number_of_events_after_event_gating/number_of_events_raw_data * 100 #percent remaining from total
+  percent_lost_each_gating[as.character(file_names),"Event_length"] <- number_of_events_after_event_gating/number_of_events_after_width_gating * 100 #percent remaining from width gating
   
   
   
@@ -315,8 +315,8 @@ for(ii in 1:floor(n_files/6)){
   fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_cis_gating)
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_cis_gating)
   number_of_events_after_cis_gating <-  number_of_events(data = fcs_data, file_names = file_names)
-  percent_loss_from_full_dataset[as.character(file_names),"Pt194Di"] <- number_of_events_after_cis_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_loss_each_gating[as.character(file_names),"Pt194Di"] <- number_of_events_after_cis_gating/number_of_events_after_event_gating * 100 #percent remaining from event gating
+  percent_lost_from_full_dataset[as.character(file_names),"Pt194Di"] <- number_of_events_after_cis_gating/number_of_events_raw_data * 100 #percent remaining from total
+  percent_lost_each_gating[as.character(file_names),"Pt194Di"] <- number_of_events_after_cis_gating/number_of_events_after_event_gating * 100 #percent remaining from event gating
   
   
   
@@ -352,8 +352,8 @@ for(ii in 1:floor(n_files/6)){
   fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_Ir191Di_gating)
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_Ir191Di_gating)
   number_of_events_after_Ir191Di_gating <-  number_of_events(data = fcs_data, file_names = file_names)
-  percent_loss_from_full_dataset[as.character(file_names),"Ir191Di"] <- number_of_events_after_Ir191Di_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_loss_each_gating[as.character(file_names),"Ir191Di"] <- number_of_events_after_Ir191Di_gating/number_of_events_after_cis_gating * 100 #percent remaining from cis gating
+  percent_lost_from_full_dataset[as.character(file_names),"Ir191Di"] <- number_of_events_after_Ir191Di_gating/number_of_events_raw_data * 100 #percent remaining from total
+  percent_lost_each_gating[as.character(file_names),"Ir191Di"] <- number_of_events_after_Ir191Di_gating/number_of_events_after_cis_gating * 100 #percent remaining from cis gating
   
   
   
@@ -384,8 +384,8 @@ for(ii in 1:floor(n_files/6)){
   fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_Ir193Di_gating)
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_Ir193Di_gating)
   number_of_events_after_Ir193Di_gating <-  number_of_events(data = fcs_data, file_names = file_names)
-  percent_loss_from_full_dataset[as.character(file_names),"Ir193Di"] <- number_of_events_after_Ir193Di_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_loss_each_gating[as.character(file_names),"Ir193Di"] <- number_of_events_after_Ir193Di_gating/number_of_events_after_cis_gating * 100 #percent remaining from cis gating
+  percent_lost_from_full_dataset[as.character(file_names),"Ir193Di"] <- number_of_events_after_Ir193Di_gating/number_of_events_raw_data * 100 #percent remaining from total
+  percent_lost_each_gating[as.character(file_names),"Ir193Di"] <- number_of_events_after_Ir193Di_gating/number_of_events_after_cis_gating * 100 #percent remaining from cis gating
   
   
   #************************************************
