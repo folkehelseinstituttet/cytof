@@ -281,7 +281,7 @@ gaus_gates <- function(dens,  lower_gate_prop, upper_gate_prop){
 
 
 find_gate_second_top <- function(xx, lower_gate_prop, upper_gate_prop, perc_included, main_top_to_left = F, minimum = NA){
-  #  browser()
+  #browser()
   dens <- density(xx)
   ts_y<-ts(smooth(dens$y))
   tp <- pastecs::turnpoints(ts_y)
@@ -295,10 +295,10 @@ find_gate_second_top <- function(xx, lower_gate_prop, upper_gate_prop, perc_incl
   }
   bunn_n <- min(max(which(tp$pits)[1], mini),  length(dens$y) - 1, na.rm = T)
  # print(bunn_n)
-  top_n <-  bunn_n + min(which(tp$peaks[bunn_n:length(dens$y)])[1], length(bunn_n:length(dens$y)), na.rm = T) - 1
+ ###slett# top_n <-  bunn_n + min(which(tp$peaks[bunn_n:length(dens$y)])[1], length(bunn_n:length(dens$y)), na.rm = T) - 1
+  top_n <-  bunn_n + min(which(dens$y[bunn_n:length(dens$y)] == max(dens$y[bunn_n:length(dens$y)]))[1],  length(bunn_n:length(dens$y)), na.rm = T) - 1 
   #tp$peaks[top]
   h <- dens$y[top_n] - dens$y[bunn_n]
-
   if(!is.na(lower_gate_prop[1])){
     cutoff_h_lower <- dens$y[bunn_n] + lower_gate_prop*h
     cutoff_n_lower <- bunn_n + which(dens$y[bunn_n:length(dens$y)] > cutoff_h_lower)[1] - 1
@@ -319,6 +319,51 @@ find_gate_second_top <- function(xx, lower_gate_prop, upper_gate_prop, perc_incl
 }
 
 
+
+
+
+
+#' find_gaussian_gates_second_top_selected_cells, find the split between the first and secound top for all subsets
+#' @param data, data 
+#' @param data, data 
+#' @param channel, which channel to plot
+#' @param include, list with matrices over which cells to include'
+#' @param positiv, default equal TRUE, include those cells that are positiv for mark in include list
+#' @param mark, which column from include to use
+#' @param lower_gate_percent, vector with percentage for lower gate, a number (same percentage for all subset) 
+#' @param upper_gate_percent,  vector with percentage for uppe gate, a number (same percentage for all subset)  
+#' @return list of vectors with lower and upper gates for each subset.
+
+find_gaussian_gates_second_top_top_selected_cells <- function(data, channel, lower_gate_percent = NA, upper_gate_percent = NA, perc_included, main_top_to_left ,  minimum = 0, include, mark, positiv = TRUE){
+  column <- which(colnames(data[[1]]) == channel)
+  if(!is.na(lower_gate_percent[[1]])){
+    if(lower_gate_percent >= 1){
+      lower_gate_prop <- lower_gate_percent/100
+    } else {
+      lower_gate_prop <- lower_gate_percent
+    }
+    if(upper_gate_percent >= 1){
+      upper_gate_prop <- upper_gate_percent/100
+    } else {
+      upper_gate_prop <- upper_gate_percent
+    }
+  } else {
+    lower_gate_prop <- NA
+    upper_gate_prop <- NA
+  }
+  lower_gates <- rep(NA, length(data))
+  upper_gates <- rep(NA, length(data))
+ for(i in 1:length(data)){
+    if(positiv){
+     res <-  find_gate_second_top(xx = data[[i]][include[[i]][,mark], column], lower_gate_prop = lower_gate_prop, upper_gate_prop = upper_gate_prop, perc_included = perc_included, main_top_to_left = main_top_to_left, minimum = minimum)
+    } else {
+      res <-  find_gate_second_top(xx = data[[i]][!include[[i]][,mark], column], lower_gate_prop = lower_gate_prop, upper_gate_prop = upper_gate_prop, perc_included = perc_included, main_top_to_left = main_top_to_left, minimum = minimum)
+    }
+     lower_gates[i] <- res[[1]]
+    upper_gates[i] <- res[[2]]
+  }
+  return(list(lower_gates = lower_gates, upper_gates = upper_gates))
+}
 
 
 
@@ -390,16 +435,26 @@ find_split_first_second_top <- function(data, channel, minimum = 0){
 
 
 
+
+
+
 #' find_split_first_second_top_selected_cells, find the split between the first and secound top for all subsets
 #' @param data, data 
 #' @param channel, which channel to plot
+#' @param include, list with matrices over which cells to include'
+#' @param positiv, default equal TRUE, include those cells that are positiv for mark in include list
+#' @param mark, which column from include to use
 #' @return vector of splits
 
-find_split_first_second_top_selected_cells <- function(data, channel, minimum = 0, include, mark){
+find_split_first_second_top_selected_cells <- function(data, channel, minimum = 0, include, mark, positiv = TRUE){
   column <- which(colnames(data[[1]]) == channel)
   splits <- rep(NA, length(data))
   for(i in 1:length(data)){
-    splits[[i]] <-  find_split(data[[i]][include[[i]][,mark], column], minimum)
+    if(positiv){
+      splits[[i]] <-  find_split(data[[i]][include[[i]][,mark], column], minimum)
+    } else {
+      splits[[i]] <-  find_split(data[[i]][!include[[i]][,mark], column], minimum)
+    }
   }
   return(splits)
 }
@@ -437,19 +492,27 @@ find_split_neg_low_high <- function(data, channel, neg = 0.05, minLowHigh = 0.1)
 #' find_split_first_second_top, find the split between the first and secound top for all subsets
 #' @param data, data 
 #' @param channel, which channel to plot
+#' @param include, list with matrices over which cells to include'
+#' @param positiv, default equal TRUE, include those cells that are positiv for mark in include list
+#' @param mark, which column from include to use
+
 #' @return vector of splits
 
-find_split_neg_low_high_selected_cells <- function(data, channel, include, mark, neg = 0.05, minLowHigh = 0.1){
+find_split_neg_low_high_selected_cells <- function(data, channel, include, mark, positiv = TRUE, neg = 0.05, minLowHigh = 0.1){
   column <- which(colnames(data[[1]]) == channel)
   splits <- rep(NA, length(data))
   neg <- rep(NA, length(data))
   lower_gates <- splits
   upper_gates <- splits
   for(i in 1:length(data)){
-    xx <- data[[i]][include[[i]][,mark],column]
+    if(positiv){
+      xx <- data[[i]][include[[i]][,mark],column]
+    } else{
+      xx <- data[[i]][!include[[i]][,mark],column]
+    }
     neg[[i]] <- find_split(xx, minimum = 0)
     #    neg[[i]] <- find_gate_first_top(xx, lower_gate_prop = negProp, upper_gate_prop = negProp)$upper_gate
-    splits[[i]] <-  find_split(xx[xx > neg[[i]]], minimum = minLowHigh)
+        splits[[i]] <-  find_split(xx[xx > neg[[i]]], minimum = minLowHigh)
   }
   return(list(neg_splits = neg, low_high_splits = splits))
 }
