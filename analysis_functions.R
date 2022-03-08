@@ -262,14 +262,21 @@ cells_to_select_from <- function(file_names, posNeg, senario_channels, senario_v
 }
 
 
-# må lages
-random_events_from_selected_cells <- function(mulige_celler, n = 25000){
-  result <- NULL
-  for(i in 1:length(mulige_celler)){
-    result[[i]] <- sample(mulige_celler[[i]], size = min(n, length(mulige_celler[[i]])), replace = FALSE)
-  }
-  return(result)
-}
+# # må lages
+# random_events_from_selected_cells <- function(mulige_celler, marker = NA, n = 25000){
+#   result <- NULL
+#  # browser()
+#   for(i in 1:length(mulige_celler)){
+#    if(is.na(marker)){
+#       result[[i]] <- sample(mulige_celler[[i]], size = min(n, length(mulige_celler[[i]])), replace = FALSE)
+#     } else {
+#       result[[i]] <- ssample(mulige_celler[[i]][,marker], size = min(n, sum(mulige_celler[[i]][,marker])), replace = FALSE)
+#     }
+#   }
+#   
+#   
+#   return(result)
+# }
 
 
 
@@ -280,6 +287,23 @@ median_per_cluster_marker<- function(data, kluster){
   rownames(result) <- sort(unique(kluster))
   for(i in rownames(result)){
     result[i,] <- apply(data[as.character(kluster) %in% i,], 2, median)
+  }
+  return(result)
+}
+
+
+
+
+
+q_per_cluster_marker<- function(data, kluster, probs){
+  if(probs > 1){
+    probs <- probs/100
+  }
+  result <- as.data.frame(matrix(NA, ncol = ncol(data), nrow = length(unique(kluster))))
+  colnames(result) <- colnames(data)
+  rownames(result) <- sort(unique(kluster))
+  for(i in rownames(result)){
+    result[i,] <- apply(data[as.character(kluster) %in% i,], 2, quantile, probs = probs)
   }
   return(result)
 }
