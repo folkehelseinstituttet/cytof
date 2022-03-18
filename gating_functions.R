@@ -1,3 +1,95 @@
+#' find_gate_lower_noise_plus_high_low_selected_cells find position for gating for each subdataset
+#' @param data fcs_data sets
+#' @param channel which channel used for gating
+#' @return value of gating for the given channel in each subdataset. 
+
+find_gate_lower_noise_plus_high_low_selected_cells <- function(data, channel, include, mark, positiv = TRUE){
+  column <- which(colnames(data[[1]]) == channel)
+  results <- rep(NA, length(data))
+  for(i in 1:length(data)){
+    if(positiv){
+      res <-  find_gate_lower_noise_per_file_plus_high_low(xx = data[[i]][include[[i]][,mark], column])
+    } else {
+      res <-  find_gate_lower_noise_per_file_plus_high_low(xx = data[[i]][!include[[i]][,mark], column])
+    }
+    lower_gates[i] <- res[[1]]
+    upper_gates[i] <- res[[2]]
+  }
+  return(list(lower_gates = lower_gates, upper_gates = upper_gates))  
+}
+
+
+
+
+#' find_gate_lower_noise_plus_high_low find position for gating for each subdataset
+#' @param data fcs_data sets
+#' @param channel which channel used for gating
+#' @return value of gating for the given channel in each subdataset. 
+
+find_gate_lower_noise_plus_high_low <- function(data, channel){
+  column <- which(colnames(data[[1]]) == channel)
+  results <- rep(NA, length(data))
+  for(i in 1:length(data)){
+    results[i] <- find_gate_lower_noise_per_file_plus_high_low(data[[i]][, column])
+  }
+  return(results)
+}
+
+
+#' find_gate_lower_noise_per_file_plus_high_low function
+#' @param xx vector of values
+#' @return the value that correspond to the percentage in the density plot.
+
+find_gate_lower_noise_per_file_plus_high_low <- function(xx){
+  dens <- density(xx)
+  #  ts_y<-ts(smooth(dens$y))
+  #  tp <- pastecs::turnpoints(ts_y)
+  #  top1 <- dens$x[tp$peaks][1]
+  top1 <- dens$x[dens$y == max(dens$y)]
+  firstGate <- top1 + (top1 - dens$x[1])
+  
+  xxx <- xx[xx > firstGate]
+  dens <- density(xxx)
+  browser()
+  
+  return(value)
+}
+
+
+
+
+#' find_gate_lower_noise find position for gating for each subdataset
+#' @param data fcs_data sets
+#' @param channel which channel used for gating
+#' @return value of gating for the given channel in each subdataset. 
+
+find_gate_lower_noise <- function(data, channel){
+  column <- which(colnames(data[[1]]) == channel)
+  results <- rep(NA, length(data))
+  for(i in 1:length(data)){
+    results[i] <- find_gate_lower_noise_per_file_based_on_x_top(data[[i]][, column])
+  }
+  return(results)
+}
+
+
+#' find_gate_lower_noise_per_file function
+#' @param xx vector of values
+#' @return the value that correspond to the percentage in the density plot.
+
+find_gate_lower_noise_per_file_based_on_x_top <- function(xx){
+  dens <- density(xx)
+#  ts_y<-ts(smooth(dens$y))
+#  tp <- pastecs::turnpoints(ts_y)
+#  top1 <- dens$x[tp$peaks][1]
+  top1 <- dens$x[dens$y == max(dens$y)]
+ value <- top1 + (top1 - dens$x[1])
+  return(value)
+}
+
+
+
+
 #' find_gate_perc_upper_noise find position for gating for each subdataset
 #' @param data fcs_data sets
 #' @param channel which channel used for gating
@@ -44,7 +136,7 @@ find_gate_gaussian_first_top_per_file <- function(xx, perc_included = 0.9995){
   
   # Calculated parameters
   pars <- as.vector(coef(fit))
-  w <- VGAM::logitlink(pars[1], inverse=TRUE)
+  w <- VGAM::logitlink(pars[1], inverse=TRUE, )
   m1 <- pars[2]
   sd1 <- exp(pars[3])
   m2 <- pars[4]
@@ -335,7 +427,8 @@ find_gate_second_top <- function(xx, lower_gate_prop, upper_gate_prop, perc_incl
 #' @return list of vectors with lower and upper gates for each subset.
 
 find_gaussian_gates_second_top_top_selected_cells <- function(data, channel, lower_gate_percent = NA, upper_gate_percent = NA, perc_included, main_top_to_left ,  minimum = 0, include, mark, positiv = TRUE){
-  column <- which(colnames(data[[1]]) == channel)
+ 
+   column <- which(colnames(data[[1]]) == channel)
   if(!is.na(lower_gate_percent[[1]])){
     if(lower_gate_percent >= 1){
       lower_gate_prop <- lower_gate_percent/100
@@ -621,5 +714,7 @@ find_gaussian_gates_highest_top <- function(data, channel, lower_gate_percent, u
 }
 
 
+
+      
 
 
