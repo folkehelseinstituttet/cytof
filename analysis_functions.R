@@ -307,3 +307,31 @@ q_per_cluster_marker<- function(data, kluster, probs){
   }
   return(result)
 }
+
+
+
+extra_column_posneg <- function(posNeg, column_name, senario_channels, senario_values){
+  for(i in 1:length(posNeg)){
+    kol <- ncol(posNeg[[i]])
+    posNeg[[i]][,kol + 1] <- rep(TRUE, nrow(posNeg[[i]]))
+    for(senario_j in 1:length(senario_channels)){
+      column_j <- which(colnames(posNeg[[i]]) == senario_channels[senario_j]) 
+      if(!(senario_values[senario_j] == 3 | senario_values[senario_j] == -1)){
+        if(senario_values[senario_j] %in% c(0,1,2)){
+          x <- posNeg[[i]][, column_j] == senario_values[senario_j]
+        } else {
+          print("ugyldig valg av verdi, gyldige verdier er: -1 = c(0,1), 0 = 0, 1 = 1, 2 = 2, 3 = c(1,2")
+        }
+      } else{
+        if(senario_values[senario_j] == 3){
+          x <- posNeg[[i]][, column_j] %in% c(1,2)
+        } else {
+          x <- posNeg[[i]][, column_j] %in% c(0,1)
+        }
+      }  
+      posNeg[[i]][,kol + 1] <- x &  posNeg[[i]][,kol + 1]
+    }
+    colnames(posNeg[[i]])[kol + 1] <- column_name
+  }
+  return(posNeg)
+}
