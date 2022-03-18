@@ -1,0 +1,346 @@
+---
+title: "Gating"
+author: "Anja Bråthen Kristoffersen"
+date: "28 2 2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, include=FALSE, message= FALSE, comment= FALSE}
+data_path <- fs::path("C:", "CyToF data", "immun_aga", "panel1")
+scriptPath <- fs::path("C:", "CyToF data", "fra github")
+
+source(fs::path(scriptPath,  "read_data_functions.R"))
+source(fs::path(scriptPath,  "transformation_functions.R"))
+source(fs::path(scriptPath,  "ploting_functions.R"))
+source(fs::path(scriptPath,  "clustering_functions.R"))
+source(fs::path(scriptPath,  "gating_functions.R"))
+source(fs::path(scriptPath,  "analysis_functions.R"))
+
+
+taMed <- c("Ko_Fe_A_86_580K1_Panel1.fcs", "M_Ma_A_65_T1_FHI075_Panel1.fcs", "S_Fe_A_93_T1_FHI016_Panel1.fcs", "S_Ma_A_87_T2_FHI136_Panel1.fcs")
+
+
+plot_multiple_signals<- function(signal){
+ g <- gridExtra::grid.arrange(signal$plotList[[1]], signal$plotList[[2]], signal$plotList[[3]], signal$plotList[[4]],   ncol = 2, nrow = 2)
+ return(g)
+}
+
+fcs_data_with_info <- read_specific_data_from_folder(data_path = data_path, files_to_open = taMed)
+fcs_data <- fcs_data_with_info$fcs_data
+file_names <- factor(fcs_data_with_info$file_names, levels = fcs_data_with_info$file_names)
+rm(fcs_data_with_info)
+
+file_names
+file_names_short <- c("C 580", "F 075", "F 016", "F 136")
+result <- list()
+
+
+kanaler <- c("CD3","CD4", "CD5", "CD8", "CD19", "CD45", "CD57", "CD56", "CCR4",
+             "KLRG1", "CD127", "CD15", "IgD", "CD11c", "CD16", "CD25", 
+             "CD134_OX40", "CD123", "TCRgd", "TIGIT", "CD45RA", "CXCR3", "CD27",
+             "IgG", "CD28", "CD160", "CD85j", "TCRVa7.2", "CD161", "CRTH2", "CD95",
+             "CCR7", "ICOS", "NKG2A", "CD169", "CXCR5", "CD38", "CD141", "PD-1", "CD14", 
+             "CD56", "CD11b", "CCR6", "HLADR")
+
+
+for(j in 1:length(file_names)){
+  mat <-  as.data.frame(matrix(NA, ncol = length(kanaler), nrow =  nrow(fcs_data[[j]])))
+  colnames(mat) <- kanaler
+  result[[j]] <- mat
+}
+
+# get the parameters of fcs_data and store them in params.
+params <- get_params_fcs_data(fcs_data[[1]])
+
+
+```
+
+
+
+# Gating based on density plot
+
+Different function can be used based on how the gate will be placed
+
+## Function find_gaussian_gates_second_top()
+
+
+To find lower gate for upper signal function find_gaussian_gates_second_top() can be used.
+It takes the variables
+
+  * data: here arc sinh transformed data are used
+  * channel: which marker/channel you want to gate, here CD3
+  * lower_gate_percent: tells where the lower gate is placed. See figure and explanation below, here 15%
+  * upper_gate_percent: tells where the upper gate is placed. See figure and explanation below, here not used
+
+
+```{r, echo = FALSE, message= FALSE, comment= FALSE}
+CD45 <- params$name[grep("CD45", params$desc)][1] 
+x <- "CD3"
+#params$desc[grep(x, params$desc)][1] #må sjekke at vi får riktig kanal.
+
+kanal <- params$name[grep(x, params$desc)][1] #må sjekke at vi får riktig kanal.
+data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45)) 
+random_event_for_plotting <- random_events(number_of_events(data))
+
+data_mat <- list_to_matrix_selected_events(data = data, kept_events = random_event_for_plotting, file_names = file_names_short, channels = c(kanal, CD45), archSin = F, cytofData = F)
+
+
+column <- which(colnames(data[[1]]) == kanal)
+xx <- data[[1]][, column]
+  dens <- density(xx)
+  ts_y<-ts(smooth(dens$y))
+  tp <- pastecs::turnpoints(ts_y)
+ 
+  bunn_n <- min(max(which(tp$pits)[1]),  length(dens$y) - 1, na.rm = T)
+   top_n <-  bunn_n + min(which(tp$peaks[bunn_n:length(dens$y)])[1], length(bunn_n:length(dens$y)), na.rm = T) - 1
+  #tp$peaks[top]
+  h <- dens$y[top_n] - dens$y[bunn_n]
+  lower_gate_prop <- 0.15
+  upper_gate_prop <- 0.15
+ cutoff_h_lower <- dens$y[bunn_n] + lower_gate_prop*h
+    cutoff_n_lower <- bunn_n + which(dens$y[bunn_n:length(dens$y)] > cutoff_h_lower)[1] - 1
+    lower_gate <- min(dens$x[cutoff_n_lower])
+    upper_gate <- max(dens$x[dens$y > max(dens$y) * upper_gate_prop])
+  
+
+plot(dens, lwd = 3, main = "density plot CD3", xlab = "arc sinh transformed signal")  
+abline(v = dens$x[bunn_n], col = "red")
+abline(v = dens$x[top_n], col = "red")
+abline(h = dens$y[bunn_n], col = "red")
+abline(h = dens$y[top_n], col = "red")
+lines(c(6,6), c(dens$y[bunn_n], dens$y[top_n]), col = "blue")   
+text(x = 6.2, y =dens$y[top_n] - (dens$y[top_n] - dens$y[bunn_n])*0.5, labels = "h", col = "blue")
+abline(v = lower_gate, col = "green")
+abline(h = dens$y[cutoff_n_lower], col = "green")
+```
+
+The density plot of the signal is here plotted in black. Then the first bottom and the next top are found. Here shown with red lines. The hight h between these lines are calculated, here shown in blue. The green horizontal line is found based on the lower percentage, so it is the height of the lower horizontal red line + lower_gate_percent/100 *  h. Where the green horizontal line first crosses the density curve after the bottom here shown with a green vertical line. The green vertical line is the lower gate produced by the function find_gaussian_gates_second_top()  
+
+
+This will then be done for many files simultaneously and plotted together either as a density plot or as a signal-signal plot
+
+
+```{r, fig.width= 12, fig.height=12}
+
+split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001)
+
+result_first_gating <- split$lower_gates
+
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names_short, lower_gate = split$lower_gates, main_title = x)
+density_plots 
+
+signal <- signal_signal_plot(data = data, random_events = random_event_for_plotting, channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names_short, title_size = 10)
+plot_multiple_signals(signal)
+
+
+#violin_per_sample(data_mat = data_mat, x = kanal, y = "dataset", line = NA)
+
+```
+where the gate is placed varies a little from file to file. 
+
+
+### save the result of the gating per cell per file
+
+The result of the gating is here saved per cell as either 0 or 1 where 0 means lower than gate and 1 higher. If more gate you can save the level for each cell as 0, 1, 2, 3 etc. The result is saved in a list result which is designed to be equal to your list data.
+
+```{r}
+result <- list()
+
+for(j in 1:length(data)){
+  mat <-  as.data.frame(matrix(NA, ncol = 1, nrow =  nrow(data[[j]])))
+  colnames(mat) <- c("above high gate")
+  result[[j]] <- mat
+}
+
+for(j in 1:length(data)){
+  result[[j]][,"above high gate"] <- data[[j]][, kanal] > split$lower_gates[j]
+}
+```
+
+The percentage of each file that are of a given level can be calucated from the result. Here you find the percent that are higher than the found gate.
+
+```{r}
+percents <- data.frame(prosent_per_channel(result, values = 1))
+
+
+percents
+```
+
+
+### if R have problem finding the gate you want.
+
+* you can try to use the variable minimum in find_gaussian_gates_second_top(). That will force the dataset to either use this value as the minimum or find the first minimum after this value as the minimum.
+
+* you might also just define your own gate. By using the same value fro all files. 
+
+
+## Function find_gaussian_gates_first_top()
+
+If you rather want to place the gates based on the first top you can use the function find_gaussian_gates_first_top(). It takes the variables:
+
+
+  * data: here arc sinh transformed data are used
+  * channel: which marker/channel you want to gate, here CD3
+  * lower_gate_percent: tells where the lower gate is placed. See figure and explanation below, here not used
+  * upper_gate_percent: tells where the upper gate is placed. See figure and explanation below, here 10 %
+  
+```{r, echo = F}
+min_upper_gate <- NA
+  lower_gate_prop <- 0.1
+  upper_gate_prop <- 0.1
+ CD45 <- params$name[grep("CD45", params$desc)][1] 
+x <- "CD3"
+#params$desc[grep(x, params$desc)][1] #må sjekke at vi får riktig kanal.
+
+kanal <- params$name[grep(x, params$desc)][1] #må sjekke at vi får riktig kanal.
+data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45)) 
+column <- which(colnames(data[[1]]) == kanal)
+ xx <- data[[1]][, column]
+  dens <- density(xx)
+  ts_y <- ts(smooth(dens$y))
+  tp <- pastecs::turnpoints(ts_y)
+  bunn1 <- dens$x[tp$pits][1]
+  
+  plot(dens, lwd = 3, main = "density plot CD3", xlab = "arc sinh transformed signal")  
+abline(v = bunn1, col = "red")
+
+```
+
+The first bottom is found, here shown with a red line, and everything above the red line is not used further in the calculation. Make a new density plot of the lower signal to find the gate. 
+
+
+```{r, echo = F}
+xx[xx > bunn1] <- NA
+  dens <- density(xx[!is.na(xx)])  
+  lower_gate <- max(min(dens$x[dens$y > max(dens$y) * lower_gate_prop]))
+  gate_n <- which(dens$y > max(dens$y) * upper_gate_prop)[1]
+  upper_gate <- max(c(dens$x[dens$y > max(dens$y) * upper_gate_prop], min_upper_gate), na.rm = T)
+  
+  plot(dens, lwd = 3, main = "density plot CD3, lower top", xlab = "arc sinh transformed signal")  
+abline(h = max(dens$y) , col = "red")
+lines(c(0.6,0.6), c(0, max(dens$y)), col = "blue")   
+text(x = 0.62, y =max(dens$y)*0.5, labels = "h", col = "blue")
+abline(v = upper_gate, col = "green")
+abline(h = dens$y[gate_n], col = "green")
+
+upper_gate
+```
+
+The density plot of the lower signal is here plotted in black. Then the first top are found. Here shown with red horizontal lines. The hight h between this line and 0 are calculated, here shown in blue. The green horizontal line is found based on the upper percentage, so it is  upper_gate_percent/100 *  h. Where the green horizontal line first crosses the density curve after the top here shown with a green vertical line. The green vertical line is the upper gate produced by the function find_gaussian_gates_first_top() 
+
+
+This will then be done for many files simultaneously and plotted together either as a density plot or as a signal-signal plot
+
+
+
+```{r, fig.width= 12, fig.height=12}
+
+split <- find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 10, upper_gate_percent = 10)
+split$upper_gates
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
+density_plots 
+
+result_second_gating <- split$upper_gates
+
+
+signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, yhigh  = split$upper_gates, xname = "CD45", yname = x, plot_title = file_names, title_size = 10)
+plot_multiple_signals(signal)
+
+```
+
+Unfortunately it looks like the gate is placed in the middel of the top. This is "just" a smoothing and visualisation problem. If we count how many cells that are above the upper gate found here we get..
+
+
+
+
+
+
+```{r}
+result <- list()
+for(j in 1:length(data)){
+  mat <-  as.data.frame(matrix(NA, ncol = 2, nrow =  nrow(data[[j]])))
+  colnames(mat) <- c("above first gate", "above second gate")
+  result[[j]] <- mat
+}
+
+for(j in 1:length(data)){
+  result[[j]][,"above first gate"] <- data[[j]][, kanal] > result_first_gating[j]
+  result[[j]][,"above second gate"] <- data[[j]][, kanal] > result_second_gating[j]
+}
+
+
+
+percents <- data.frame(prosent_per_channel(result, values = 1))
+```
+
+
+
+this means that the area between the two gates consist of
+
+```{r}
+
+percents$above.second.gate - percents$above.first.gate
+
+```
+## Function find_gaussian_gates_first_top()
+
+```{r, echo = F}
+ xx <- data[[1]][, column]
+  dens <- density(xx)
+  ts_y <- ts(smooth(dens$y))
+  tp <- pastecs::turnpoints(ts_y)
+  bunn1 <- dens$x[tp$pits][1]
+  
+  plot(dens, lwd = 3, main = "density plot CD3", xlab = "arc sinh transformed signal")  
+abline(v = bunn1, col = "red")
+
+```
+
+
+```{r}
+find_split_first_second_top(data = data, channel = kanal)
+```
+
+
+```{r, fig.width= 12, fig.height=12}
+
+split <- find_split_first_second_top(data = data, channel = kanal)
+
+split
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split, main_title = x)
+density_plots 
+
+result_third_gating <- split
+
+
+signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, yhigh  = split, xname = "CD45", yname = x, plot_title = file_names, title_size = 10)
+plot_multiple_signals(signal)
+
+```
+
+
+
+
+```{r}
+result <- list()
+for(j in 1:length(data)){
+  mat <-  as.data.frame(matrix(NA, ncol = 3, nrow =  nrow(data[[j]])))
+  colnames(mat) <- c("above first gate", "above second gate", "above third gate")
+  result[[j]] <- mat
+}
+
+for(j in 1:length(data)){
+  result[[j]][,"above first gate"] <- data[[j]][, kanal] > result_first_gating[j]
+  result[[j]][,"above second gate"] <- data[[j]][, kanal] > result_second_gating[j]
+  result[[j]][,"above third gate"] <- data[[j]][, kanal] > result_third_gating[j]
+}
+
+
+
+percents <- data.frame(prosent_per_channel(result, values = c(1, 1, 1)))
+percents
+```
