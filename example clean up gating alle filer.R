@@ -10,7 +10,8 @@ ptm <- proc.time()
 # path to where the fcs files are stored F:\Forskningsprosjekter\PDB 2794 - Immune responses aga_\Forskningsfiler\JOBO\CyTOF\Datafiles\Panel 1 all files
 data_path <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF","Datafiles", "Panel 1 all files")
 outDataPath <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF","Gating", "Gating fra R_FINAL_CISnedre")
-scriptPath <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF","Analyse i R OUS", "gating")
+#scriptPath <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF","Analyse i R OUS", "gating")
+scriptPath <- fs::path("C:", "CyToF data", "fra github")
 out_result <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF","Analyse i R OUS", "gating", "gating_results_FINAL_CISnedre")
 
 
@@ -20,11 +21,12 @@ source(fs::path(scriptPath, "gating_functions.R"))
 source(fs::path(scriptPath, "ploting_functions.R"))
 source(fs::path(scriptPath, "read_data_functions.R"))
 source(fs::path(scriptPath, "transformation_functions.R"))
+source(fs::path(scriptPath, "analysis_functions.R"))
+
 
 fcs_files <- fs::path(data_path, rownames(file.info(list.files(data_path))))
 fcs_files
 
-tvungetLavereCISgate <- 0.5 #sett inn NA hvis du heller vil bruke gaussian gate for CIS. evt annet tall..
 
 files_to_open <- basename(fcs_files)
 files_to_open <- files_to_open[grepl(".fcs", files_to_open)]
@@ -39,21 +41,45 @@ filenumber <- 1:n_files
 percent_lost_each_gating <- as.data.frame(matrix(NA, ncol = 9, nrow = n_files))
 percent_lost_from_full_dataset <-   as.data.frame(matrix(NA, ncol = 9, nrow = n_files))
 
+
 colnames(percent_lost_each_gating) <- c("Ce140Di", "Residual", "Center", "Offset", "Width",
                                         "Event_length", "Pt194Di", "Ir191Di", "Ir193Di")
 
-colnames(percent_lost_from_full_dataset) <- c("Ce140Di", "Residual", "Center", "Offset", "Width",
-                                              "Event_length", "Pt194Di", "Ir191Di", "Ir193Di")
+colnames(percent_lost_from_full_dataset) <- colnames(percent_lost_each_gating)
 
 rownames(percent_lost_each_gating) <- file_names
-rownames(percent_lost_from_full_dataset) <- file_names
+rownames(percent_lost_from_full_dataset) <- rownames(percent_lost_each_gating)
 
-for(ii in 1:floor(n_files/6)){
-  
-  i <- filenumber[((ii-1) * 6 + (1:6))]
-  i <- i[!is.na(i)]
+plotSignal <- function(plot_list){
+g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
+             plot_list[[3]], plot_list[[4]], plot_list[[5]],
+             plot_list[[6]],  plot_list[[7]], plot_list[[8]],
+             plot_list[[9]], plot_list[[10]], plot_list[[11]],
+             plot_list[[12]], plot_list[[13]], plot_list[[14]],
+             plot_list[[15]], plot_list[[16]], plot_list[[17]],
+             plot_list[[18]], plot_list[[19]], plot_list[[20]],
+             plot_list[[21]], plot_list[[22]], plot_list[[23]],
+             plot_list[[24]], plot_list[[25]], plot_list[[26]],
+             plot_list[[27]], plot_list[[28]], plot_list[[29]],
+             plot_list[[30]], plot_list[[31]], plot_list[[32]],
+             plot_list[[33]], plot_list[[34]], plot_list[[35]],
+             plot_list[[36]], plot_list[[37]], plot_list[[38]],
+             plot_list[[39]], plot_list[[40]], plot_list[[41]],
+             plot_list[[42]], plot_list[[43]], plot_list[[44]],
+             plot_list[[45]], plot_list[[46]], plot_list[[47]],
+             plot_list[[48]], plot_list[[49]], plot_list[[50]],
+             plot_list[[51]], plot_list[[52]], plot_list[[53]],
+             plot_list[[54]], plot_list[[55]], plot_list[[56]],
+             plot_list[[57]], plot_list[[58]], plot_list[[59]],
+             plot_list[[60]], plot_list[[61]], plot_list[[62]],
+             plot_list[[63]], plot_list[[64]], plot_list[[65]],
+             plot_list[[66]],  ncol = 11, nrow = 6)
+   return(g)
+}
+
+
   # read all files in data_path into one dataset fcs_data
-  fcs_data_with_info <- read_some_data_from_folder(data_path, file_number = i)
+  fcs_data_with_info <- read_some_data_from_folder(data_path, file_number = filenumbers)
   fcs_data <- fcs_data_with_info$fcs_data
   file_names <- factor(fcs_data_with_info$file_names, levels = fcs_data_with_info$file_names)
   rm(fcs_data_with_info)
@@ -77,18 +103,27 @@ for(ii in 1:floor(n_files/6)){
   
   #find upper_gate for noise gating based on Ce140Di
   upper_gate_Ce140Di <- find_gate_perc_height_upper_noise(data = beads_data, channel =  "Ce140Di", upper_perc_height = 0.001)
-  #time_signal_plots <- time_signal_plot(data = beads_data, random_events = random_events_for_plotting, 
-  #                                      channel = "Ce140Di",  plot_title = file_names, upper_gate = upper_gate_Ce140Di)
+  time_signal_plots <- time_signal_plot(data = beads_data, random_events = random_events_for_plotting, 
+                                        channel = "Ce140Di",  plot_title = file_names, upper_gate = upper_gate_Ce140Di)
+  
+  # remove # for those lines that you want to use. 
+  
   #time_signal_plots # to see all plots
   #time_signal_plots[1] # to see first plot
+  
+  # if you want to save all plots for later evaluation:
+  # tiff(fs::path(outFigPath, paste0("Signal_fig1_bead_gating.tiff")))
+  # plotSignal(plot_list = time_signal_plots)
+  # dev.off()
+  
   density_plots <- density_plot(data = beads_data, channel = "Ce140Di", plot_title = file_names, upper_gate = upper_gate_Ce140Di)
   #density_plots # to see the plots
   
   
-  tiff(fs::path(outFigPath, paste0("fig1_bead_gating", ii, ".tiff")))
-  print(density_plots)
-  dev.off()
-  
+  # tiff(fs::path(outFigPath, paste0("fig1_bead_gating", ii, ".tiff")))
+  # print(density_plots)
+  # dev.off()
+  # 
   
   
   ## use the upper_gates found for gating. Either on one of the beads or why not all. 
@@ -137,10 +172,15 @@ for(ii in 1:floor(n_files/6)){
   #time_signal_plots[1] # to see first plot
   
   
-  tiff(fs::path(outFigPath, paste0("fig2_residual_gating", ii, ".tiff")))
-  print(density_plots)
-  dev.off()
+  # if you want to save all plots for later evaluation:
+  # tiff(fs::path(outFigPath, paste0("Signal_fig2_residual_gating.tiff")))
+  # plotSignal(plot_list = time_signal_plots)
+  # dev.off()
   
+  # tiff(fs::path(outFigPath, paste0("fig2_residual_gating", ii, ".tiff")))
+  # print(density_plots)
+  # dev.off()
+  # 
   events_to_keep_after_gating <- events_to_keep(data = clean_up_data, channel = "Residual", lower_gate = residual_gates$lower_gates, 
                                                 upper_gate = residual_gates$upper_gate)
   #percent_to_keep_this_gating(kept_events = events_to_keep_after_gating, file_names = file_names)
@@ -168,11 +208,17 @@ for(ii in 1:floor(n_files/6)){
   #time_signal_plots[1] # to see first plot
   
   
-  tiff(fs::path(outFigPath, paste0("fig3_event_gating", ii, ".tiff")))
-  print(density_plots)
-  dev.off()
-  events_to_keep_after_center_gating <- events_to_keep(data = clean_up_data, channel = "Center", lower_gate = center_gates$lower_gate, upper_gate = center_gates$upper_gate)
-  #percent_to_keep_this_gating(kept_events = events_to_keep_after_center_gating, file_names = file_names)
+  # if you want to save all plots for later evaluation:
+  # tiff(fs::path(outFigPath, paste0("Signal_fig3_event_gating.tiff")))
+  # plotSignal(plot_list = time_signal_plots)
+  # dev.off()
+  
+  # 
+  # tiff(fs::path(outFigPath, paste0("fig3_event_gating", ii, ".tiff")))
+  # print(density_plots)
+  # dev.off()
+  # events_to_keep_after_center_gating <- events_to_keep(data = clean_up_data, channel = "Center", lower_gate = center_gates$lower_gate, upper_gate = center_gates$upper_gate)
+  # 
   
   
   fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_center_gating)
@@ -291,6 +337,8 @@ for(ii in 1:floor(n_files/6)){
   
   #update lower_gate_percent, upper_gate_percent
   cis_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Pt194Di", lower_gate_percent = 5, upper_gate_percent = 30)
+  # if you want to overwrite the gate found this could be done like this:
+  tvungetLavereCISgate <- 0.5 #sett inn NA hvis du heller vil bruke gaussian gate for CIS. evt annet tall..
   if(!is.na(tvungetLavereCISgate)){
     cis_gates$lower_gates <- rep(tvungetLavereCISgate, length(cis_gates$lower_gates))
   }
@@ -394,9 +442,9 @@ for(ii in 1:floor(n_files/6)){
   
   flowCore::write.flowSet(fcs_data, outdir = outDataPath, filename = as.character(file_names))
   print(".")
-}
 
-write.csv2(percent_loss_each_gating, fs::path(out_result, "percent_kept_each_gatingnr2.csv"))
-write.csv2(percent_loss_from_full_dataset, fs::path(out_result, "percent_kept_from_full_datasetnr2.csv"))
+
+write.csv2(percent_lost_each_gating, fs::path(out_result, "percent_kept_each_gatingnr2.csv"))
+write.csv2(percent_lost_from_full_dataset, fs::path(out_result, "percent_kept_from_full_datasetnr2.csv"))
 
 proc.time() - ptm
