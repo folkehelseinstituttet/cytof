@@ -1,0 +1,127 @@
+---
+title: "A brief introduction to R"
+author: "Anja Bråthen Kristoffersen"
+date: "16 2 2022"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This is a brief introduction to R, introducing some of the basic functions that are used when analysing cytof data.
+
+## Assign a value to a variable
+* x is assigned the value 5 by using  <- 
+* two variables are added using +
+
+
+```{r}
+x <- 5
+y <- 3
+x+y
+```
+
+# functions
+
+all functions are called by their name and the bracket () behind
+
+```{r}
+x <- c(1, 3, 4, 6, 7, 4, 4, 5, 5, 3, 2, 1, 4, 10, 13)
+mean(x)
+```
+* c() is a function that combinde elements of the same type. Here it makes a vector with 5 numbers
+* mean() is a predifined function that find the mean of the vector in the brackets.
+
+
+## Assign a matrix with desired number of rows and column
+
+* use the function matrix() to define an empty matrix m with 5 columns and 3 rows
+
+```{r}
+m <- matrix(NA, ncol = 5, nrow = 3)
+```
+
+We give the matrix m column and row names by using the function colnames() and rownames(). 
+
+```{r}
+colnames(m) <- c("col_1", "col_2",  "col_3",  "col_4",  "col_5")
+rownames(m) <- paste0("row_", 1:3)
+```
+
+the column names are here combined using the function c() while to make the row names the function paste0 are used. The resulting rownames can be found by using the function rownames without assigning any values
+
+```{r}
+rownames(m)
+```
+
+the elements in matrix m are then given values by adressing the row and column, either by name or number
+
+```{r}
+m[1,1] <- 6
+m["row_3", "col_5"] <- 3
+m
+```
+
+a matrix is defined to only contain the same type of variables. Here numbers
+
+## data frame
+
+A data frame is in many ways a matrix, but the column can contain different variable types
+
+```{r}
+d <- data.frame(x = x, x2 = 2*x, name =  paste0("row_", 1:15))
+d
+rownames(d) <- d$name
+```
+* rownames() can also be used for data.frame. Here the rownames are assigned to be the same as column name of data.frame d. The column n are reached using $. d$name
+
+```{r}
+d
+```
+
+To seewhat is contained in an object of the tyep data.frame or matrix the function summary(), head() or tail(), giving a summary, the first 6 rows and the last six rows respectively
+
+```{r}
+summary(d)
+```
+
+```{r}
+head(d)
+```
+
+```{r}
+tail(d)
+```
+
+## find elements in a data.frame or matrix that forfil a certain creteria
+
+grep and grepl are two functions that might be used:
+
+```{r}
+grep(4, d$x)
+```
+returns the row numbers of d where column x is 4
+
+```{r}
+grepl(4, d$x)
+
+```
+
+returns a vector with TRUE and FALSE which has the same length as d has rows
+
+
+grep and grepl could also be used if it is a text string that are searched for
+
+
+Another way to find elements is to use which, then an expression can be used 
+
+```{r}
+l <- list()
+
+Trenger internett
+```
+
+
+## for loop
+
