@@ -1,0 +1,131 @@
+---
+title: "Introduction to FlowSOM analyse"
+author: "Anja Bråthen Kristoffersen"
+date: "08 March 2022"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+This document describes the different lines of the file "FlowSOM_analyse.R". To perform your own flowSOM analysis save the file "FlowSOM_analyse.R" from github https://github.com/folkehelseinstituttet/cytof give it a new name and change the necessary paths and values throughout the document to use it on your own data. The file "FlowSOM_analyse.R" is sourced from the file "runFlowSOM_analyse.R" which also can be found on github together with an explanatory file called "Introduction to runFlowSOM_analyse.R". These documents only make a clustering of your data and some additional files that later will be used when analysing the flowSOM data together with metadata, examples of analysing of the clustering data together with metadata can be found in XXX. 
+
+
+This file is as explained sourced from "runFlowSOM_analyse.R". In "runFlowSOM_analyse.R" the variable "selectedEvents", "fcs_data", "file_names", "posNeg", "channel", "n_per_file", "seed", "kanalnavn", "kanaler", "xdim", "ydim", "ks", "utSti" and "tamed" are already defined. In brief
+
+ * selectedEvents is either TRUE or FALSE indicating if just some events or all events are used.
+ * fcs_data is your cytof data, as a list of matrixes per file, you get this data by running the file readDataToAnalyse.R
+ * file_names is the names of the files in fcs_data in the same order as the list.
+ * posNeg is a list of pregated matrix with values 0, 1, 2. posNeg has the same size as fcs_data but each event for each channel has one of the values 0 (negative), 1 (low or positive), 2 (high, if used), only applicable if selectedEvents is TRUE.  
+ * channel indicate which channel in posNeg that will be used, only applicable if selectedEvents is TRUE. 
+ * n_per_file is a value that indicate how many cells that should be randomly chosen.
+ * seed is a number that ensure that you get the same clustering if the file is run again. 
+ * kanalnavn is a vector with names of the channels that will be used in the clustering. This names correspond to the names in the cytof dataset.
+ * kanaler is a vector of the same length as kanalnavn, but this vector have names that correspond to the names in kanalnavn, but they are easier to remember.
+ * xdim and ydim are two variables indication how many nodes that will be made in the pre clustering done by flowSOM. When less then 30 cluster are expected there could be enough with 100 nodes (which give xdim = ydim = 100). While for more clusters more nodes are needed here 14*14 = 196 nodes are used.
+ * ks is a vector of number of clusters that you want to make of the clustering with this seed. 
+ * utSti which is the path to the folder where you want to save the clustering result. 
+ * tamed a list of which filenames to use in the clustering
+
+First the random events to use in the clustering are chosen. By using the R function set.seed() it is ensured that the same random cells will be chosen every time the script is run. If selectedEvenst is TRUE the function random_events_from_selected_events() is used. This function use the variable posNeg and a given marker here with the variable name channel to randomly select n_per_file number of cells that all have the value 1 (or 2) for channel in the posNeg list of matrixes. If selectedEvenst is FALSE the random events are chosen from all events in each matrix. To find the number of events in each file the function number_of_events() is used and then n_per_file number of events are chosen by using the function random_events()
+
+
+```{r, eval=F, echo=T}
+if(selectedEvents == T){
+  set.seed(seed)
+  random_events_data <- random_events_from_selected_events(posNeg = posNeg, marker = channel, n = n_per_file)
+  ext_name <- channel
+} else {
+  set.seed(seed)
+  number_of_events_data <-  number_of_events(data = fcs_data, file_names = file_names)
+  random_events_data <- random_events(number_of_events_data, n = n_per_file)
+  ext_name <- "all"
+}
+```
+
+Now when the random events to use are chosen a matrix with the chosen events for each file is made by using the function list_to_matrix_selected_events(). This function takes the cytof data stored in fcs_data, random events chosen stored in random_events_data, the file_names of the fcs_data, which channels to use for gating, stored in kanalnavn in addtion to archSin a boolean variable with default TRUE, cofactor which have default 5 and scale which have default FALSE
+
+```{r, eval=F, echo=T}
+arcSindataMatrix <- list_to_matrix_selected_events(data = fcs_data, 
+                                                          kept_events = random_events_data, 
+                                                          file_names = file_names, 
+                                                          channels = kanalnavn,
+                                                          archSin = T, 
+                                                          cofactor = 5, 
+                                                          scale = F
+)
+colnames(arcSindataMatrix)[1:length(kanaler)] <- kanaler
+print("arcsin")
+```
+
+then all parameters are stored together in a list called params
+
+```{r, eval=F, echo=T}
+params <- list(seed = seed,
+               data = arcSindataMatrix[arcSindataMatrix$dataset %in% tamed, ],
+               kanaler = kanaler,
+               ydim = xdim,
+               xdim = ydim
+)
+```
+
+The seed is again set to make sure the FlowSOM analysis are done similarly each time repeated for the same seed. And the initial FlowSOM analysis are run assigning each event in the arcSindataMatrix to a node in the xdim times ydim node network. 
+
+```{r, eval=F, echo=T}
+set.seed(params$seed) # to ensure same plot every time
+out <- FlowSOM::ReadInput(as.matrix(params$data[,params$kanaler]), transform = F, scale = params$scaling)
+print(1)
+out <- FlowSOM::BuildSOM(out, colsToUse = 1:(ncol(params$data[,params$kanaler])), xdim = params$xdim, ydim = params$ydim)
+print(2)
+out <- FlowSOM::BuildMST(out)
+print(3)
+cluster_FlowSOM_pre <- out$map$mapping[, 1]
+```
+
+Then for each value k in the vector ks the clustering of nodes to k clusters are done, the 10 and 90 % quantiles together with the median signal of all events in the clusters are calculated and written to a file in the folder utSti for every channel used. A heatmap is calculated and saved. The total number of events in each cluster is calculated and saved to a file. The total numberof events per file is also calculated and saved. 
+
+```{r, eval=F, echo=T}
+set.seed(params$seed)
+for(k in ks){
+  print(k)
+  out_k <- FlowSOM::metaClustering_consensus(out$map$codes, k = k, seed = params$seed)
+  cluster_FlowSOM_k <- out_k[cluster_FlowSOM_pre]
+  cluster_FlowSOM_k_factor <- factor(cluster_FlowSOM_k, levels = 1:k)
+print("cluster")
+  q10_k <- q_per_cluster_marker(data = params$data[,params$kanaler], kluster = cluster_FlowSOM_k, probs = 0.1)
+  write.csv2(q10_k, fs::path(utSti, paste0("q10_per_kluster_k_", k, "_seed", params$seed, ext_name, ".csv")))
+  q90_k <- q_per_cluster_marker(data = params$data[,params$kanaler], kluster = cluster_FlowSOM_k, probs = 0.9)
+  write.csv2(q90_k, fs::path(utSti, paste0("q90_per_kluster_k_", k, "_seed", params$seed, ext_name, ".csv")))
+print("q")
+
+  medians_k <- median_per_cluster_marker(data = params$data[,params$kanaler], kluster = cluster_FlowSOM_k)
+  write.csv2(medians_k, fs::path(utSti, paste0("medians_per_kluster_k_", k, "_seed", params$seed, ext_name, ".csv")))
+print("median")
+
+
+
+  tiff(fs::path(utSti, paste0("heatmap_median_k_", k, "_cluster_seed", seed, ext_name, ".tiff")), width = 1000, height = 800)
+    Heatmap(as.matrix(medians_k) )
+  dev.off()
+print("heatmap")
+
+
+  totalt_antall_i_kluster <- table(cluster_FlowSOM_k_factor)
+  
+
+  antallPerKluster <- cbind(totalt_antall_i_kluster, totalt_antall_i_kluster/nrow(params$data))
+  colnames(antallPerKluster) <- c("antall", "prosent")
+  write.csv2(antallPerKluster, fs::path(utSti, paste0("antallPerCluster_k_", k, "_seed", params$seed, ext_name, ".csv")))
+print("totalt antall")
+
+  
+  perSample <- table(params$data$dataset, cluster_FlowSOM_k_factor)
+  colnames(perSample) <- paste0("kluster_", 1:k)
+
+  write.csv2(perSample, fs::path(utSti, paste0("antallPerClusterOgPat_k_", k, "_seed", params$seed, ext_name, ".csv")))
+print("antall per fil")
+
+}
+```
+  
