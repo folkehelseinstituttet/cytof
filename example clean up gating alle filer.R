@@ -189,7 +189,7 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_gating)
   number_of_events_after_residual_gating <-  number_of_events(data = fcs_data, file_names = file_names)
   percent_lost_from_full_dataset[as.character(file_names),"Residual"] <- number_of_events_after_residual_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_lost_each_gating[as.character(file_names),"Residual"] <- number_of_events_after_residual_gating/number_of_events_after_beads_gating * 100 #percent remaining from bead gating
+  percent_lost_each_gating[as.character(file_names),"Residual"] <- number_of_events_after_residual_gating/number_of_events_before_residual_gating * 100 #percent remaining from bead gating
   
   
   
@@ -225,7 +225,7 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_center_gating)
   number_of_events_after_center_gating <-  number_of_events(data = fcs_data, file_names = file_names)
   percent_lost_from_full_dataset[as.character(file_names),"Center"] <- number_of_events_after_center_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_lost_each_gating[as.character(file_names),"Center"] <-number_of_events_after_center_gating/number_of_events_after_residual_gating * 100 #percent remaining from residual gating
+  percent_lost_each_gating[as.character(file_names),"Center"] <-number_of_events_after_center_gating/number_of_events_before_center_gating * 100 
   
   
   
@@ -249,7 +249,7 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   print(density_plots)
   dev.off()
   events_to_keep_after_offset_gating <- events_to_keep(data = clean_up_data, channel = "Offset",  lower_gate = offset_gates$lower_gate, upper_gate = offset_gates$upper_gate)
-  #percent_to_keep_this_gating(kept_events = events_to_keep_after_offset_gating, file_names = file_names)
+  
   
   
   
@@ -257,7 +257,7 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_offset_gating)
   number_of_events_after_offset_gating <- number_of_events(data = fcs_data, file_names = file_names)
   percent_lost_from_full_dataset[as.character(file_names),"Offset"] <- number_of_events_after_offset_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_lost_each_gating[as.character(file_names),"Offset"] <- number_of_events_after_offset_gating/number_of_events_after_center_gating * 100 #percent remaining from  center gating
+  percent_lost_each_gating[as.character(file_names),"Offset"] <- number_of_events_after_offset_gating/number_of_events_before_offset_gating * 100 #percent remaining from  center gating
   
   #************************************************
   #gating on Width+ ----
@@ -283,14 +283,14 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   
   
   events_to_keep_after_width_gating <- events_to_keep(data = clean_up_data, channel = "Width", lower_gate = width_gates$lower_gate, upper_gate = width_gates$upper_gate)
-  #percent_to_keep_this_gating(kept_events = events_to_keep_after_width_gating, file_names = file_names)
+  
   
   
   fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = events_to_keep_after_width_gating)
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_width_gating)
   number_of_events_after_width_gating <- number_of_events(data = fcs_data, file_names = file_names)
   percent_lost_from_full_dataset[as.character(file_names),"Width"] <- number_of_events_after_width_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_lost_each_gating[as.character(file_names),"Width"] <- number_of_events_after_width_gating/number_of_events_after_offset_gating * 100 #percent remaining from offset gating
+  percent_lost_each_gating[as.character(file_names),"Width"] <- number_of_events_after_width_gating/number_of_events_before_width_gating * 100 
   
   
   
@@ -323,7 +323,7 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_event_gating)
   number_of_events_after_event_gating <-  number_of_events(data = fcs_data, file_names = file_names)
   percent_lost_from_full_dataset[as.character(file_names),"Event_length"] <- number_of_events_after_event_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_lost_each_gating[as.character(file_names),"Event_length"] <- number_of_events_after_event_gating/number_of_events_after_width_gating * 100 #percent remaining from width gating
+  percent_lost_each_gating[as.character(file_names),"Event_length"] <- number_of_events_after_event_gating/number_of_events_before_event_gating * 100 
   
   
   
@@ -364,7 +364,7 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_cis_gating)
   number_of_events_after_cis_gating <-  number_of_events(data = fcs_data, file_names = file_names)
   percent_lost_from_full_dataset[as.character(file_names),"Pt194Di"] <- number_of_events_after_cis_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_lost_each_gating[as.character(file_names),"Pt194Di"] <- number_of_events_after_cis_gating/number_of_events_after_event_gating * 100 #percent remaining from event gating
+  percent_lost_each_gating[as.character(file_names),"Pt194Di"] <- number_of_events_after_cis_gating/number_of_events_before_cis_gating * 100 
   
   
   
@@ -401,7 +401,7 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_Ir191Di_gating)
   number_of_events_after_Ir191Di_gating <-  number_of_events(data = fcs_data, file_names = file_names)
   percent_lost_from_full_dataset[as.character(file_names),"Ir191Di"] <- number_of_events_after_Ir191Di_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_lost_each_gating[as.character(file_names),"Ir191Di"] <- number_of_events_after_Ir191Di_gating/number_of_events_after_cis_gating * 100 #percent remaining from cis gating
+  percent_lost_each_gating[as.character(file_names),"Ir191Di"] <- number_of_events_after_Ir191Di_gating/number_of_events_before_Ir191Di_gating * 100 
   
   
   
@@ -433,7 +433,7 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_Ir193Di_gating)
   number_of_events_after_Ir193Di_gating <-  number_of_events(data = fcs_data, file_names = file_names)
   percent_lost_from_full_dataset[as.character(file_names),"Ir193Di"] <- number_of_events_after_Ir193Di_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_lost_each_gating[as.character(file_names),"Ir193Di"] <- number_of_events_after_Ir193Di_gating/number_of_events_after_cis_gating * 100 #percent remaining from cis gating
+  percent_lost_each_gating[as.character(file_names),"Ir193Di"] <- number_of_events_after_Ir193Di_gating/number_of_events_before_Ir193Di_gating * 100 
   
   
   #************************************************
