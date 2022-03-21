@@ -323,6 +323,14 @@ events_to_keep_after_gating <- events_to_keep(data = beads_data, channel = "Ce14
   number_of_events_after_beads_gating <- number_of_events_after_gating
 ```
 
+
+The percent of events lost for this gating is saved in the matrix percent_lost_each_gating, and can be printed here as
+
+```{r}
+percent_lost_each_gating[as.character(file_names),"Ce140Di"]
+```
+
+
 Since we are finished working with beads_data, remove them to save space in memory
 
 ```{r}
@@ -490,9 +498,14 @@ If ok, proceed using the gate and adjust the dataset by excluding the events tha
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_gating)
   number_of_events_after_residual_gating <-  number_of_events(data = fcs_data, file_names = file_names)
   percent_lost_from_full_dataset[as.character(file_names),"Residual"] <- number_of_events_after_residual_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_lost_each_gating[as.character(file_names),"Residual"] <- number_of_events_after_residual_gating/number_of_events_after_beads_gating * 100 #percent remaining from bead gating
+  percent_lost_each_gating[as.character(file_names),"Residual"] <- number_of_events_after_residual_gating/number_of_events_before_residual_gating * 100 #percent remaining from bead gating
 ```
 
+The percent of events lost for this gating is 
+
+```{r}
+percent_lost_each_gating[as.character(file_names),"Residual"]
+```
 
 # Gating on Center
 
@@ -542,12 +555,17 @@ events_to_keep_after_center_gating <- events_to_keep(data = clean_up_data, chann
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_center_gating)
   number_of_events_after_center_gating <-  number_of_events(data = fcs_data, file_names = file_names)
   percent_lost_from_full_dataset[as.character(file_names),"Center"] <- number_of_events_after_center_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_lost_each_gating[as.character(file_names),"Center"] <-number_of_events_after_center_gating/number_of_events_after_residual_gating * 100 #percent remaining from residual gating
+  percent_lost_each_gating[as.character(file_names),"Center"] <-number_of_events_after_center_gating/number_of_events_before_center_gating * 100 #percent remaining from residual gating
 
   
   
 ```
 
+The percent of events lost for this gating is 
+
+```{r}
+percent_lost_each_gating[as.character(file_names), "Center"]
+```
 
 # Gating on Offset
 
@@ -595,9 +613,15 @@ fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = e
 clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_offset_gating)
 number_of_events_after_offset_gating <- number_of_events(data = fcs_data, file_names = file_names)
 percent_lost_from_full_dataset[as.character(file_names),"Offset"] <- number_of_events_after_offset_gating/number_of_events_raw_data * 100 #percent remaining from total
-percent_lost_each_gating[as.character(file_names),"Offset"] <- number_of_events_after_offset_gating/number_of_events_after_center_gating * 100 #percent remaining from  center gating
+percent_lost_each_gating[as.character(file_names),"Offset"] <- number_of_events_after_offset_gating/number_of_events_before_offset_gating * 100 #percent remaining from  center gating
 ```
 
+
+The percent of events lost for this gating is 
+
+```{r}
+percent_lost_each_gating[as.character(file_names), "Offset"]
+```
 
 # Gating on Width
 
@@ -696,7 +720,13 @@ events_to_keep_after_width_gating <- events_to_keep(data = clean_up_data, channe
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_width_gating)
   number_of_events_after_width_gating <- number_of_events(data = fcs_data, file_names = file_names)
   percent_lost_from_full_dataset[as.character(file_names),"Width"] <- number_of_events_after_width_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_lost_each_gating[as.character(file_names),"Width"] <- number_of_events_after_width_gating/number_of_events_after_offset_gating * 100 #percent remaining from offset gating
+  percent_lost_each_gating[as.character(file_names),"Width"] <- number_of_events_after_width_gating/number_of_events_before_width_gating * 100 #percent remaining from offset gating
+```
+
+The percent of events lost for this gating is 
+
+```{r}
+percent_lost_each_gating[as.character(file_names), "Width"]
 ```
 
 
@@ -750,7 +780,13 @@ fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = e
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_event_gating)
   number_of_events_after_event_gating <-  number_of_events(data = fcs_data, file_names = file_names)
   percent_lost_from_full_dataset[as.character(file_names),"Event_length"] <- number_of_events_after_event_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_lost_each_gating[as.character(file_names),"Event_length"] <- number_of_events_after_event_gating/number_of_events_before_width_gating * 100 #percent remaining from width gating
+  percent_lost_each_gating[as.character(file_names),"Event_length"] <- number_of_events_after_event_gating/number_of_events_before_event_gating * 100 #percent remaining from width gating
+```
+
+The percent of events lost for this gating is 
+
+```{r}
+percent_lost_each_gating[as.character(file_names), "Event_length"]
 ```
 
 
@@ -786,7 +822,7 @@ Also CIS is gated by using the function find_gaussian_gates_second_top(). But he
   # tiff(fs::path(outFigPath, paste0("fig7_cis_gating.tiff")))
   # print(density_plots)
   # dev.off()
-  #time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = random_events_for_plotting, channel = "Pt194Di", plot_title = file_names, lower_gate = cis_gates$lower_gate, upper_gate = cis_gates$upper_gate)
+  time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = random_events_for_plotting, channel = "Pt194Di", plot_title = file_names, lower_gate = cis_gates$lower_gate, upper_gate = cis_gates$upper_gate)
   #time_signal_plots # to see all plots
   #time_signal_plots[1] # to see first plot
   #time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = random_events_for_plotting, channel = "Pt194Di", plot_title = file_names, lower_gate = NA, upper_gate = NA)
@@ -809,7 +845,13 @@ events_to_keep_after_cis_gating <- events_to_keep(data = clean_up_data, channel 
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_cis_gating)
   number_of_events_after_cis_gating <-  number_of_events(data = fcs_data, file_names = file_names)
   percent_lost_from_full_dataset[as.character(file_names),"Pt194Di"] <- number_of_events_after_cis_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_lost_each_gating[as.character(file_names),"Pt194Di"] <- number_of_events_after_cis_gating/number_of_events_after_event_gating * 100 #percent remaining from event gating
+  percent_lost_each_gating[as.character(file_names),"Pt194Di"] <- number_of_events_after_cis_gating/number_of_events_before_cis_gating * 100 #percent remaining from event gating
+```
+
+The percent of events lost for this gating is 
+
+```{r}
+percent_lost_each_gating[as.character(file_names), "Pt194Di"]
 ```
 
 # gating on DNA1, Ir 191
@@ -830,7 +872,7 @@ First the number of events left before this gating are found and a new set rando
 
 Also, here gaussian gate for the second top is found, but instead of using the variables lower_gate_percent and upper_gate_percent another variable is used. This is perc_include. In this version of the function, we assume the signals to come from two normal distribution and that we want to find the gate that include 99 % of the normal distribution with the highest top. This way of finding the gates involves some computation and will take some time. The best approach is to test on some files and then run it for all files later. 
 
-```{r, message=FALSE, warning=FALSE}
+```{r, message=FALSE, warning=FALSE, comment=FALSE}
 Ir191di_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Ir191Di", lower_gate_percent = NA, upper_gate_percent = NA, perc_included = 0.99, main_top_to_left = F)
 
 density_plots <- density_plot(data = clean_up_data, "Ir191Di", plot_title = file_names, lower_gate = Ir191di_gates$lower_gate, upper_gate = Ir191di_gates$upper_gate)
@@ -839,7 +881,7 @@ density_plots
 # tiff(fs::path(outFigPath, paste0("fig8_Ir191_gating.tiff")))
 # print(density_plots)
 # dev.off()
-#time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = random_events_for_plotting, channel = "Ir191Di", plot_title = file_names, lower_gate = Ir191di_gates$lower_gate, upper_gate = Ir191di_gates$upper_gate)
+time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = random_events_for_plotting, channel = "Ir191Di", plot_title = file_names, lower_gate = Ir191di_gates$lower_gate, upper_gate = Ir191di_gates$upper_gate)
 #time_signal_plots # to see all plots
 #time_signal_plots[1] # to see first plot
 
@@ -861,7 +903,13 @@ fcs_data <- update_data_based_on_events_to_keep(data = fcs_data, kept_events = e
 clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_Ir191Di_gating)
 number_of_events_after_Ir191Di_gating <-  number_of_events(data = fcs_data, file_names = file_names)
 percent_lost_from_full_dataset[as.character(file_names),"Ir191Di"] <- number_of_events_after_Ir191Di_gating/number_of_events_raw_data * 100 #percent remaining from total
-percent_lost_each_gating[as.character(file_names),"Ir191Di"] <- number_of_events_after_Ir191Di_gating/number_of_events_after_cis_gating * 100 #percent remaining from cis gating
+percent_lost_each_gating[as.character(file_names),"Ir191Di"] <- number_of_events_after_Ir191Di_gating/number_of_events_before_Ir191Di_gating * 100 #percent remaining from cis gating
+```
+
+The percent of events lost for this gating is 
+
+```{r}
+percent_lost_each_gating[as.character(file_names), "Ir191Di"]
 ```
 
 
@@ -916,7 +964,13 @@ events_to_keep_after_Ir193Di_gating <- events_to_keep(data = clean_up_data, chan
   clean_up_data <- update_data_based_on_events_to_keep(data = clean_up_data, kept_events = events_to_keep_after_Ir193Di_gating)
   number_of_events_after_Ir193Di_gating <-  number_of_events(data = fcs_data, file_names = file_names)
   percent_lost_from_full_dataset[as.character(file_names),"Ir193Di"] <- number_of_events_after_Ir193Di_gating/number_of_events_raw_data * 100 #percent remaining from total
-  percent_lost_each_gating[as.character(file_names),"Ir193Di"] <- number_of_events_after_Ir193Di_gating/number_of_events_after_cis_gating * 100 #percent remaining from cis gating
+  percent_lost_each_gating[as.character(file_names),"Ir193Di"] <- number_of_events_after_Ir193Di_gating/number_of_events_before_Ir193Di_gating * 100 #percent remaining from cis gating
+```
+
+The percent of events lost for this gating is 
+
+```{r}
+percent_lost_each_gating[as.character(file_names), "Ir193Di"]
 ```
 
 The last ting to do is to save the clean files. 
@@ -932,8 +986,8 @@ The last ting to do is to save the clean files.
 and the amount of the files lost during gating. 
 
 ```{r}
-# write.csv2(percent_lost_each_gating, fs::path(out_result, "percent_kept_each_gatingnr2.csv"))
-# write.csv2(percent_lost_from_full_dataset, fs::path(out_result, "percent_kept_from_full_datasetnr2.csv"))
+ write.csv2(percent_lost_each_gating, fs::path(out_result, "percent_kept_each_gatingnr2.csv"))
+ write.csv2(percent_lost_from_full_dataset, fs::path(out_result, "percent_kept_from_full_datasetnr2.csv"))
 
 
 ```
