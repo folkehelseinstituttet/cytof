@@ -1,7 +1,6 @@
 
 if(selectedEvents == T){
   set.seed(seed)
-  number_of_events_data <-  number_of_events(data = fcs_data, file_names = file_names)
   random_events_data <- random_events_from_selected_events(posNeg = posNeg, marker = channel, n = n_per_file)
   ext_name <- channel
 } else {
@@ -27,16 +26,16 @@ params <- list(seed = seed,
                data = arcSindataMatrix[arcSindataMatrix$dataset %in% tamed, ],
                n_random_for_plotting_per_fil = 5000,
                kanaler = kanaler,
-               scaling = TRUE,
-               with_density_plot = TRUE,
-               adj_p_value = T,
-               cut_off = 0.1, 
-               pca_plot = TRUE, 
-               UMAP_plot = F,
-               by_status = TRUE,
-               by_sex = TRUE,
-               by_tid = TRUE,
-               ydim = xdim,
+               # scaling = TRUE,
+               # with_density_plot = TRUE,
+               # adj_p_value = T,
+               # cut_off = 0.1, 
+               # pca_plot = TRUE, 
+               # UMAP_plot = F,
+               # by_status = TRUE,
+               # by_sex = TRUE,
+               # by_tid = TRUE,  SLETT senere
+               ydim = xdim,  
                xdim = ydim
 )
 
@@ -49,9 +48,6 @@ out <- FlowSOM::BuildMST(out)
 print(3)
 cluster_FlowSOM_pre <- out$map$mapping[, 1]
 set.seed(params$seed)
-
-#random_events_for_plotting <- random_events_vector(params$data$dataset, n = params$n_random_for_plotting_per_fil)
-
 
 for(k in ks){
   print(k)
@@ -93,9 +89,10 @@ print("totalt antall")
 print("antall per fil")
 
 
-# 
+
+#  randomEvents <- sample(nrow(params$data), 10000)  #might have to rethink to ensure given cluster is represented among random cells. 
 #   pdf(fs::path(utSti, paste0("density_plot_per_cluster_k_", k, "_cluster_seed", params$seed, ext_name, ".pdf")), width = 10, height = 7)
-#   density_plot_per_cluster(data = params$data[,params$kanaler], cluster_per_cell = cluster_FlowSOM_k_factor,  nrow_plot = 5, strip_text_size = 5)
+#   density_plot_per_cluster(data = params$data[randomEvents,params$kanaler], cluster_per_cell = cluster_FlowSOM_k_factor[randomEvents],  nrow_plot = 5, strip_text_size = 5)
 #   dev.off()
 # print("density")
 }
