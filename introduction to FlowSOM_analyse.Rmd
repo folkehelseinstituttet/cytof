@@ -66,7 +66,9 @@ params <- list(seed = seed,
                data = arcSindataMatrix[arcSindataMatrix$dataset %in% tamed, ],
                kanaler = kanaler,
                ydim = xdim,
-               xdim = ydim
+               xdim = ydim,
+               scaling = TRUE
+
 )
 ```
 
