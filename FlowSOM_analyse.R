@@ -27,14 +27,8 @@ params <- list(seed = seed,
                n_random_for_plotting_per_fil = 5000,
                kanaler = kanaler,
                scaling = TRUE,
-               with_density_plot = TRUE, #SLETT senere
-               adj_p_value = T, #SLETT senere
-               cut_off = 0.1, #SLETT senere
-               pca_plot = TRUE, #SLETT senere
-               UMAP_plot = F, #SLETT senere
-               by_status = TRUE, #SLETT senere
-               by_sex = TRUE, #SLETT senere
-               by_tid = TRUE,  #SLETT senere
+               column_cluster = column_cluster, 
+               o <- o,
                ydim = xdim,  
                xdim = ydim
 )
@@ -68,7 +62,12 @@ print("median")
 
 
   tiff(fs::path(utSti, paste0("heatmap_median_k_", k, "_cluster_seed", seed, ext_name, ".tiff")), width = 1000, height = 800)
-    Heatmap(as.matrix(medians_k) )
+  if(params$column_cluster){  
+    Heatmap(as.matrix(medians_k))
+  } else {
+    Heatmap(as.matrix(medians_k[,o], cluster_columns = FALSE))
+  }
+  
   dev.off()
 print("heatmap")
 
