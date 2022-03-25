@@ -22,6 +22,10 @@ arcSindataMatrix <- list_to_matrix_selected_events(data = fcs_data,
 colnames(arcSindataMatrix)[1:length(kanaler)] <- kanaler
 print("arcsin")
 
+if(column_cluster = TRUE){
+  o <- kanaler
+}
+
 params <- list(seed = seed,
                data = arcSindataMatrix[arcSindataMatrix$dataset %in% tamed, ],
                n_random_for_plotting_per_fil = 5000,
@@ -62,12 +66,7 @@ print("median")
 
 
   tiff(fs::path(utSti, paste0("heatmap_median_k_", k, "_cluster_seed", seed, ext_name, ".tiff")), width = 1000, height = 800)
-  if(params$column_cluster){  
-    Heatmap(as.matrix(medians_k))
-  } else {
-    Heatmap(as.matrix(medians_k[,o], cluster_columns = FALSE))
-  }
-  
+    Heatmap(as.matrix(medians_k[,o], cluster_columns = params$column_cluster))
   dev.off()
 print("heatmap")
 
