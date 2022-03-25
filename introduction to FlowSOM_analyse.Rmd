@@ -1,7 +1,7 @@
 ---
 title: "Introduction to FlowSOM analyse"
 author: "Anja Bråthen Kristoffersen"
-date: "08 March 2022"
+date: "23 March 2022"
 output: word_document
 ---
 
@@ -12,7 +12,7 @@ knitr::opts_chunk$set(echo = TRUE)
 This document describes the different lines of the file "FlowSOM_analyse.R". To perform your own flowSOM analysis save the file "FlowSOM_analyse.R" from github https://github.com/folkehelseinstituttet/cytof give it a new name and change the necessary paths and values throughout the document to use it on your own data. The file "FlowSOM_analyse.R" is sourced from the file "runFlowSOM_analyse.R" which also can be found on github together with an explanatory file called "Introduction to runFlowSOM_analyse.R". These documents only make a clustering of your data and some additional files that later will be used when analysing the flowSOM data together with metadata, examples of analysing of the clustering data together with metadata can be found in XXX. 
 
 
-This file is as explained sourced from "runFlowSOM_analyse.R". In "runFlowSOM_analyse.R" the variable "selectedEvents", "fcs_data", "file_names", "posNeg", "channel", "n_per_file", "seed", "kanalnavn", "kanaler", "xdim", "ydim", "ks", "utSti" and "tamed" are already defined. In brief
+This file is as explained sourced from "runFlowSOM_analyse.R". In "runFlowSOM_analyse.R" the variable "selectedEvents", "fcs_data", "file_names", "posNeg", "channel", "n_per_file", "seed", "kanalnavn", "kanaler", "xdim", "ydim", "ks", "utSti", "o", "column_cluster" and "tamed" are already defined. In brief
 
  * selectedEvents is either TRUE or FALSE indicating if just some events or all events are used.
  * fcs_data is your cytof data, as a list of matrixes per file, you get this data by running the file readDataToAnalyse.R
@@ -25,7 +25,8 @@ This file is as explained sourced from "runFlowSOM_analyse.R". In "runFlowSOM_an
  * kanaler is a vector of the same length as kanalnavn, but this vector have names that correspond to the names in kanalnavn, but they are easier to remember.
  * xdim and ydim are two variables indication how many nodes that will be made in the pre clustering done by flowSOM. When less then 30 cluster are expected there could be enough with 100 nodes (which give xdim = ydim = 100). While for more clusters more nodes are needed here 14*14 = 196 nodes are used.
  * ks is a vector of number of clusters that you want to make of the clustering with this seed. 
- * utSti which is the path to the folder where you want to save the clustering result. 
+ * utSti which is the path to the folder where you want to save the clustering result.  * o is optional, but must be included if  
+ * 
  * tamed a list of which filenames to use in the clustering
 
 First the random events to use in the clustering are chosen. By using the R function set.seed() it is ensured that the same random cells will be chosen every time the script is run. If selectedEvenst is TRUE the function random_events_from_selected_events() is used. This function use the variable posNeg and a given marker here with the variable name channel to randomly select n_per_file number of cells that all have the value 1 (or 2) for channel in the posNeg list of matrixes. If selectedEvenst is FALSE the random events are chosen from all events in each matrix. To find the number of events in each file the function number_of_events() is used and then n_per_file number of events are chosen by using the function random_events()
@@ -62,14 +63,21 @@ print("arcsin")
 then all parameters are stored together in a list called params
 
 ```{r, eval=F, echo=T}
+if(column_cluster = TRUE){
+  o <- kanaler
+}
+
 params <- list(seed = seed,
                data = arcSindataMatrix[arcSindataMatrix$dataset %in% tamed, ],
+               n_random_for_plotting_per_fil = 5000,
                kanaler = kanaler,
-               ydim = xdim,
-               xdim = ydim,
-               scaling = TRUE
-
+               scaling = TRUE,
+               column_cluster = column_cluster, 
+               o <- o,
+               ydim = xdim,  
+               xdim = ydim
 )
+
 ```
 
 The seed is again set to make sure the FlowSOM analysis are done similarly each time repeated for the same seed. And the initial FlowSOM analysis are run assigning each event in the arcSindataMatrix to a node in the xdim times ydim node network. 
@@ -108,7 +116,7 @@ print("median")
 
 
   tiff(fs::path(utSti, paste0("heatmap_median_k_", k, "_cluster_seed", seed, ext_name, ".tiff")), width = 1000, height = 800)
-    Heatmap(as.matrix(medians_k) )
+    Heatmap(as.matrix(medians_k[,o], cluster_columns = params$column_cluster))
   dev.off()
 print("heatmap")
 
