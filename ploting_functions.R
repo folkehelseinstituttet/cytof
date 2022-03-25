@@ -345,7 +345,7 @@ time_signal_plot <- function(data, random_events, channel,  plot_title,
 #' @param xlim, xlim default NA.
 #' @return density plots
 
-density_plot <- function(data, channel, plot_title = NA, lower_gate = NA, upper_gate = NA, xlim = NA, main_title = "", included_files = NA){
+density_plot <- function(data, channel, plot_title = NA, lower_gate = NA, upper_gate = NA, xlim = NA, main_title = "", included_files = NA, maksCellsUsed = NA){
   
   number_of_files <- length(data)
   if(is.na(included_files[1])){
@@ -359,9 +359,19 @@ density_plot <- function(data, channel, plot_title = NA, lower_gate = NA, upper_
   }
   plot_title_nr <- 1:length(possible_i)
   column <- which(colnames(data[[possible_i[1]]]) == channel)
-  df <- data.frame(Values = data[[possible_i[1]]][,column], Sample = rep(plot_title[possible_i[1]], nrow(data[[possible_i[1]]])))
-  for(i in possible_i[2:length(possible_i)]){
-    df <- rbind(df, data.frame(Values = data[[i]][,column], Sample = rep(plot_title[i], nrow(data[[i]]))))
+  if(is.na(maksCellsUsed)){
+    df <- data.frame(Values = data[[possible_i[1]]][,column], Sample = rep(plot_title[possible_i[1]], nrow(data[[possible_i[1]]])))
+    for(i in possible_i[2:length(possible_i)]){
+      df <- rbind(df, data.frame(Values = data[[i]][,column], Sample = rep(plot_title[i], nrow(data[[i]]))))
+    }
+  } else {
+     tamed <- sample(nrow(data[[possible_i[1]]]), min(c(maksCellsUsed, nrow(data[[possible_i[1]]]))))
+    df <- data.frame(Values = data[[possible_i[1]]][tamed,column], Sample = rep(plot_title[possible_i[1]], length(tamed)))
+    for(i in possible_i[2:length(possible_i)]){
+      tamed <- sample(nrow(data[[possible_i[i]]]), min(c(maksCellsUsed, nrow(data[[possible_i[i]]]))))
+      df <- rbind(df, data.frame(Values = data[[i]][tamed,column], Sample = rep(plot_title[i], length(tamed))))
+    }
+    
   }
   gg <- ggplot2::ggplot(df, ggplot2::aes(x = Values, y = Sample, col = Sample, fill = Sample))+
     ggjoy::geom_joy(scale = 2, alpha=0.5, show.legend= F) +
