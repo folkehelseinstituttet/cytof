@@ -64,7 +64,6 @@ n_files <- length(file_names)
 filenumber <- 1:n_files
 
 
-result <- list()
 
 
 
@@ -88,6 +87,7 @@ kanaler <- c("CD45", "CD57",  "CD19", "CD8", "HLADR", "CD3", "CD4", "TCRgd", "CX
              
 
 
+result <- list()
 
 
 for(j in filene){
