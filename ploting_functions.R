@@ -346,29 +346,32 @@ time_signal_plot <- function(data, random_events, channel,  plot_title,
 #' @return density plots
 
 density_plot <- function(data, channel, plot_title = NA, lower_gate = NA, upper_gate = NA, xlim = NA, main_title = "", included_files = NA, maksCellsUsed = NA){
-  
-  number_of_files <- length(data)
-  if(is.na(included_files[1])){
-    possible_i <- 1:number_of_files 
-  } else {
+#browser()
+    number_of_files <- length(data)  
+  possible_i <- 1:number_of_files 
+ 
+ if(!is.na(included_files[1])){
     possible_i <- included_files
   }
   
   if(is.na(plot_title[1])){
     plot_title <- as.character(possible_i)
   }
+  n_used <- maksCellsUsed
   plot_title_nr <- 1:length(possible_i)
   column <- which(colnames(data[[possible_i[1]]]) == channel)
   if(is.na(maksCellsUsed)){
     df <- data.frame(Values = data[[possible_i[1]]][,column], Sample = rep(plot_title[possible_i[1]], nrow(data[[possible_i[1]]])))
     for(i in possible_i[2:length(possible_i)]){
-      df <- rbind(df, data.frame(Values = data[[i]][,column], Sample = rep(plot_title[i], nrow(data[[i]]))))
+      df <- rbind(df, data.frame(Values = data[[i]][,column], Sample = rep(plot_title[possible_i[i]], nrow(data[[i]]))))
     }
   } else {
-     tamed <- sample(nrow(data[[possible_i[1]]]), min(c(maksCellsUsed, nrow(data[[possible_i[1]]]))))
+    n_used <- min(c(maksCellsUsed, nrow(data[[possible_i[1]]])))
+     tamed <- sample(nrow(data[[possible_i[1]]]), n_used)
     df <- data.frame(Values = data[[possible_i[1]]][tamed,column], Sample = rep(plot_title[possible_i[1]], length(tamed)))
     for(i in possible_i[2:length(possible_i)]){
-      tamed <- sample(nrow(data[[possible_i[i]]]), min(c(maksCellsUsed, nrow(data[[possible_i[i]]]))))
+      n_used <- min(c(maksCellsUsed, nrow(data[[possible_i[i]]])))
+      tamed <- sample(nrow(data[[possible_i[i]]]), n_used)
       df <- rbind(df, data.frame(Values = data[[i]][tamed,column], Sample = rep(plot_title[i], length(tamed))))
     }
     
