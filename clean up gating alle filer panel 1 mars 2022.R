@@ -152,8 +152,36 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   #clean_up_data
   #************************************************
   clean_up_channels <- as.character(params$name[grep("Center|Offset|Width|Residual|Event|Ir191|Ir193|Pt195Di|Pt194Di", params$name)])  #Pt194Di og 195 tilsvarer Cis
+  as.character(params$desc[grep("CD3|CD45", params$desc)])  #Cd3 og CD45 is the two first in this list
+  extra_channels <- as.character(params$name[grep("CD3|CD45", params$desc)[1:2]])  #Cd3 og CD45 is the two first
+  CD3 <- extra_channels[2]
+  CD45 <- extra_channels[1]
+  
   number_of_events_before_clean_up_gating <-  number_of_events(data = fcs_data, file_names = file_names)
-  clean_up_data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = clean_up_channels)
+  clean_up_data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(clean_up_channels, extra_channels))
+  
+  
+  
+  posNeg <- list()
+  
+  
+  for(j in 1:n_files){
+    mat <-  as.data.frame(matrix(NA, ncol = 2, nrow =  nrow(clean_up_data[[j]])))
+    colnames(mat) <- c("CD3", "CD45")
+    posNeg[[j]] <- mat
+  }
+  
+  
+  
+  for(j in 1:n_files){
+    posNeg[[j]][,"CD3"] <- clean_up_data[[j]][, CD3] > 1
+    posNeg[[j]][,"CD45"] <- clean_up_data[[j]][, CD45] > 1
+
+  }
+  
+  
+
+  
   
   #************************************************
   #gating on Residual+ ----
@@ -163,7 +191,7 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   
   
   #update lower_gate_percent, upper_gate_percent
-  residual_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Residual", lower_gate_percent = 25, upper_gate_percent = 30)
+  residual_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Residual", lower_gate_percent = 25, upper_gate_percent = 35)
   density_plots <- density_plot(data = clean_up_data, "Residual", plot_title = file_names_in_plot, lower_gate = residual_gates$lower_gate, upper_gate = residual_gates$upper_gate, maksCellsUsed = 25000)
   #density_plots
   time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = random_events_for_plotting, channel = "Residual", plot_title = file_names_in_plot,  lower_gate = residual_gates$lower_gate, upper_gate = residual_gates$upper_gate)
@@ -236,7 +264,7 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   
   
   #update lower_gate_percent, upper_gate_percent
-  offset_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Offset", lower_gate_percent = 20, upper_gate_percent = 20)
+  offset_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Offset", lower_gate_percent = 25, upper_gate_percent = 25)
  
   #MANUALLY CHANGING SOME GATES
   offset_gates$lower_gates[grep("T1_FHI003", file_names)] <- offset_gates$lower_gates[grep("T2_FHI003", file_names)] 
@@ -359,8 +387,10 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   
   
   #update lower_gate_percent, upper_gate_percent
-  cis_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Pt194Di", lower_gate_percent = 20, upper_gate_percent = 40)
+  cis_gates <- find_gaussian_gates_second_top_top_selected_cells(data = clean_up_data, channel = "Pt194Di", lower_gate_percent = 2, upper_gate_percent = 40, include = posNeg, mark = "CD3")
   # if you want to overwrite the gate found this could be done like this:
+  cis_gates$lower_gate <- rep(0.5, length(cis_gates$lower_gate))  #do not want to gate for low values. This is all live cells. 
+  
   
   density_plots <- density_plot(data = clean_up_data, "Pt194Di", plot_title = file_names_in_plot, lower_gate = cis_gates$lower_gate, upper_gate = cis_gates$upper_gate, maksCellsUsed = 25000)
   #density_plots
@@ -377,6 +407,30 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   plotSignal(plot_list = time_signal_plots)
   dev.off()
   
+  
+ 
+  time_signal_plots <- signal_signal_plot(data = clean_up_data, random_events = random_events_for_plotting, channel2 = "Pt194Di", channel1 = CD3, 
+                                          xname = "CD3", yname = "CIS", ylim = c(0,7),
+                                          plot_title = file_names_in_plot, ylow = cis_gates$lower_gate, yhigh = cis_gates$upper_gate)
+  #time_signal_plots # to see all plots
+  #time_signal_plots[1] # to see first plot
+  
+  tiff(fs::path(outFigSignalPath, "Signal_signal_fig7_cis_CD3_gating.tiff"), width = 1800, height = 1200)
+    plotSignal(plot_list = time_signal_plots$plotList)
+  dev.off()
+  
+  
+  
+  
+  time_signal_plots <- signal_signal_plot(data = clean_up_data, random_events = random_events_for_plotting, channel2 = "Pt194Di", channel1 = CD45, 
+                                          xname = "CD45", yname = "CIS", ylim = c(0,7),
+                                          plot_title = file_names_in_plot, ylow = cis_gates$lower_gate, yhigh = cis_gates$upper_gate)
+  #time_signal_plots # to see all plots
+  #time_signal_plots[1] # to see first plot
+  
+  tiff(fs::path(outFigSignalPath, "Signal_signal_fig7_cis_CD45_gating.tiff"), width = 1800, height = 1200)
+  plotSignal(plot_list = time_signal_plots$plotList)
+  dev.off()
   
   
     events_to_keep_after_cis_gating <- events_to_keep(data = clean_up_data, channel = "Pt194Di",  lower_gate = cis_gates$lower_gate,  upper_gate = cis_gates$upper_gate)
@@ -399,16 +453,20 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   random_events_for_plotting <- random_events(number_of_events_before_Ir191Di_gating)
   
   #update lower_gate_percent, upper_gate_percent
-  # Ir191di_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Ir191Di", lower_gate_percent = NA, upper_gate_percent = NA, perc_included = 0.99995, main_top_to_left = F)
-  # 
+ 
+#  Ir191di_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Ir191Di", lower_gate_percent = NA, upper_gate_percent = NA, perc_included = 0.99, main_top_to_left = F)
+  Ir191di_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Ir191Di", lower_gate_percent = 25, upper_gate_percent = 25)
+  Ir191di_gates$lower_gates[54] <- 5.1
+  Ir191di_gates$upper_gates[54] <- 5.75
+  Ir191di_gates$upper_gates[58] <- 5.85
+  
+
+  
+  
   density_plots <- density_plot(data = clean_up_data, "Ir191Di", plot_title = file_names_in_plot, lower_gate = Ir191di_gates$lower_gate, upper_gate = Ir191di_gates$upper_gate, maksCellsUsed = 25000)
   #density_plots
   
-  
-#  Ir191di_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Ir191Di", lower_gate_percent = NA, upper_gate_percent = NA, perc_included = 0.99, main_top_to_left = F)
-  Ir191di_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Ir191Di", lower_gate_percent = 20, upper_gate_percent = 20)
  
-
   tiff(fs::path(outFigDensityPath, "fig8_Ir191_gating.tiff"), width = 1200, height = 2000)
   print(density_plots)
   dev.off()
