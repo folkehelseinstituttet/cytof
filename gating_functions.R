@@ -427,7 +427,7 @@ find_gate_second_top <- function(xx, lower_gate_prop, upper_gate_prop, perc_incl
 #' @return list of vectors with lower and upper gates for each subset.
 
 find_gaussian_gates_second_top_top_selected_cells <- function(data, channel, lower_gate_percent = NA, upper_gate_percent = NA, perc_included, main_top_to_left ,  minimum = 0, include, mark, positiv = TRUE){
- 
+# browser()
    column <- which(colnames(data[[1]]) == channel)
   if(!is.na(lower_gate_percent[[1]])){
     if(lower_gate_percent >= 1){
@@ -455,7 +455,7 @@ find_gaussian_gates_second_top_top_selected_cells <- function(data, channel, low
      lower_gates[i] <- res[[1]]
     upper_gates[i] <- res[[2]]
   }
-  return(list(lower_gates = lower_gates, upper_gates = upper_gates))
+  return(list(lower_gate = lower_gates, upper_gate = upper_gates))
 }
 
 
