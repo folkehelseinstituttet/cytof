@@ -16,7 +16,7 @@ You start with defining a variable data_path that contains the path of the folde
 
 
 ```{r}
-data_path <- fs::path("C:", "CyToF data", "immun_aga", "panel1 RAA")
+data_path <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF","Datafiles", "Panel 1 all files")
 ```
 
 which gives the path
@@ -32,9 +32,11 @@ Now define the paths to the folder where you want to save
  
 Do also define the path where the files script used are saved.
 ```{r}
-outDataPath <- fs::path("C:", "CyToF data", "immun_aga", "panel 1 cleaned data")
-out_result <- fs::path("C:", "CyToF data", "immun_aga", "figures panel 1 cleaning")
-scriptPath <- fs::path("C:", "CyToF data", "fra github")
+outDataPath <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "CleanUpGatingMarch2022", "gating_results_Panel1_mars2022", "clean data")
+scriptPath <- fs::path("H:", "git", "cytof")
+out_result <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF","Analyse i R OUS", "CleanUpGatingMarch2022", "gating_results_Panel1_mars2022")
+outFigSignalPath <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF","Analyse i R OUS", "CleanUpGatingMarch2022", "gating_results_Panel1_mars2022", "FigSignal")
+outFigDensityPath <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF","Analyse i R OUS", "CleanUpGatingMarch2022", "gating_results_Panel1_mars2022", "FigDensity")
 ```
 
 I have already made many functions that can be used for reading, transforming, gating and plotting in R. These functions can be found on github https://github.com/folkehelseinstituttet/cytof. Save the files gating_functions.R, ploting_functions, read_data_function.R, analysis_functions.R and transformation_functions.R into your script folder and source them into R so that you might use them later
@@ -45,11 +47,12 @@ I have already made many functions that can be used for reading, transforming, g
 
 
 ```{r}
-source(fs::path(scriptPath, "gating_functions.R"))
-source(fs::path(scriptPath, "ploting_functions.R"))
-source(fs::path(scriptPath, "read_data_functions.R"))
-source(fs::path(scriptPath, "transformation_functions.R"))
-source(fs::path(scriptPath, "analysis_functions.R"))
+source(fs::path(scriptPath,  "read_data_functions.R"))
+source(fs::path(scriptPath,  "transformation_functions.R"))
+source(fs::path(scriptPath,  "ploting_functions.R"))
+source(fs::path(scriptPath,  "clustering_functions.R"))
+source(fs::path(scriptPath,  "gating_functions.R"))
+source(fs::path(scriptPath,  "analysis_functions.R"))
 ```
 
 file.info() and list.files() are functions in R that can be  used to find the name of all files in one folder 
@@ -58,10 +61,11 @@ file.info() and list.files() are functions in R that can be  used to find the na
 fcs_files <- fs::path(data_path, rownames(file.info(list.files(data_path))))
 ```
 
-to see which files that is included in the variable fcs_files:
+I here choose to only look at the first 6 files, which is. 
 
 ```{r}
-fcs_files
+fcs_files[c(1, 11, 21, 31, 41, 51)]
+fcs_files <- fcs_files[c(1, 11, 21, 31, 41, 51)]
 ```
 
 basename() is a function that give you the name of the file without the path. By using the function grepl() we choose only the files that contains .fcs. 
@@ -113,7 +117,6 @@ rownames(percent_lost_from_full_dataset) <- rownames(percent_lost_each_gating)
 ```
 
 
-
 plotSignal() is a function that has to be made to the dataset that are used. It tells how to plot the files you use. Here I have 6 files and I want to plot them with 2 rows and 3 columns. The variable plot_list is a list that I will produce later that contain a plot per file. To write comments into an R code you use # in the beginning of the line. I have here written a version of this function that plots 66 plots in 6 rows and 11 columns.
 
 ```{r}
@@ -122,7 +125,6 @@ plotSignal <- function(plot_list){
                           plot_list[[6]], ncol = 3, nrow = 2)
   return(g)
 }
-
 # plotSignal <- function(plot_list){
 # g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]], 
 #              plot_list[[3]], plot_list[[4]], plot_list[[5]],
@@ -149,10 +151,7 @@ plotSignal <- function(plot_list){
 #              plot_list[[66]],  ncol = 11, nrow = 6)
 #    return(g)
 # }
-
-
 ```
-
 
 
 ```{r, include = FALSE}
@@ -280,7 +279,7 @@ plotSignal(plot_list = time_signal_plots)
 I prefer to save this plot to a tiff file instead of plotting it in R. In that way you have saved it to later evaluations. To run the lines remove "#".
 
 ```{r}
-# tiff(fs::path(outFigPath, paste0("Signal_fig1_bead_gating.tiff")))
+# tiff(fs::path(outFigPath, "Signal_fig1_bead_gating.tiff"), width = 1800, height = 1200)
 # plotSignal(plot_list = time_signal_plots)
 # dev.off()
 ```
@@ -289,11 +288,11 @@ I prefer to save this plot to a tiff file instead of plotting it in R. In that w
 The gate could also be plotted in a density plot made by the function density_plot(). Again you could either see it directly in the RStudio or save it to a tiff file. If saving it, you do not have to run the script again to see what you did.  
 
 ```{r}
-density_plots <- density_plot(data = beads_data, channel = x, plot_title = file_names, upper_gate = upper_gate_Ce140Di)
+density_plots <- density_plot(data = beads_data, channel = x, plot_title = file_names, upper_gate = upper_gate_Ce140Di, maksCellsUsed = 25000)
 density_plots # to see the plots
   
   
-# tiff(fs::path(outFigPath, paste0("fig1_bead_gating.tiff")))
+# tiff(fs::path(outFigPath, "fig1_bead_gating.tiff"), width = 1200, height = 2000)
 # density_plots
 # dev.off()
 ```
@@ -458,7 +457,7 @@ plotSignal(plot_list = time_signal_plots)
 I prefer to save this plot to a tiff file instead of plotting it in R. In that way you have saved it to later evaluations. 
 
 ```{r}
-# tiff(fs::path(outFigPath, paste0("Signal_fig2_residal_gating.tiff")))
+# tiff(fs::path(outFigPath, "Signal_fig2_residal_gating.tiff"), width = 1800, height = 1200)
 # plotSignal(plot_list = time_signal_plots)
 # dev.off()
 ```
@@ -467,11 +466,11 @@ I prefer to save this plot to a tiff file instead of plotting it in R. In that w
 The gate could also be plotted in a density plot made by the function density_plot(). Again, you could either see it directly in the RStudio or save it to a tiff file. If saving it, you do not have to run the script again to see what you did.  
 
 ```{r}
-density_plots <- density_plot(data = clean_up_data, "Residual", plot_title = file_names, lower_gate = residual_gates$lower_gate, upper_gate = residual_gates$upper_gate)
+density_plots <- density_plot(data = clean_up_data, "Residual", plot_title = file_names, lower_gate = residual_gates$lower_gate, upper_gate = residual_gates$upper_gate, maksCellsUsed = 25000)
 density_plots # to see the plots
   
   
-# tiff(fs::path(outFigPath, paste0("fig1_bead_gating.tiff")))
+# tiff(fs::path(outFigPath, "fig1_bead_gating.tiff"), width = 1200, height = 2000)
 # density_plots
 # dev.off()
 ```
@@ -533,14 +532,14 @@ center_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "
 time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = random_events_for_plotting, channel = "Center", plot_title = file_names, lower_gate = center_gates$lower_gate, upper_gate = center_gates$upper_gate)
 plotSignal(plot_list = time_signal_plots)
 
-# tiff(fs::path(outFigPath, paste0("Signal_fig3_center_gating.tiff")))
+# tiff(fs::path(outFigPath, "Signal_fig3_center_gating.tiff"), width = 1800, height = 1200)
 # plotSignal(plot_list = time_signal_plots)
 # dev.off()
 
-density_plots <- density_plot(data = clean_up_data, "Center", plot_title = file_names, lower_gate = center_gates$lower_gate, upper_gate = center_gates$upper_gate)
+density_plots <- density_plot(data = clean_up_data, "Center", plot_title = file_names, lower_gate = center_gates$lower_gate, upper_gate = center_gates$upper_gate, maksCellsUsed = 25000)
 density_plots
 
-# tiff(fs::path(outFigPath, paste0("fig3_center_gating.tiff")))
+# tiff(fs::path(outFigPath, "fig3_center_gating.tiff"), width = 1200, height = 2000)
 # print(density_plots)
 # dev.off()
 ```
@@ -582,23 +581,23 @@ number_of_events_before_offset_gating <-  number_of_events_after_center_gating
 random_events_for_plotting <- random_events(number_of_events_before_offset_gating)
 ```
 
-Also offset is gated in the same way as Residuals and Center by using the function find_gaussian_gates_second_top(). But here we have chosen to include more of the data using 7 % gaussian gates for both lower and upper gate. This must be adjusted to what level you want to use for your data. Plots are made and if wanted saved in the same way as for Residuals. 
+Also offset is gated in the same way as Residuals and Center by using the function find_gaussian_gates_second_top(). But here we have chosen to using 18 % gaussian gates for both lower and upper gate. This must be adjusted to what level you want to use for your data. Plots are made and if wanted saved in the same way as for Residuals. 
 
 ```{r}
 #update lower_gate_percent, upper_gate_percent
-offset_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Offset", lower_gate_percent = 7, upper_gate_percent = 7)
+offset_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Offset", lower_gate_percent = 18, upper_gate_percent = 18)
 
 time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = random_events_for_plotting, channel = "Offset", plot_title = file_names, lower_gate = offset_gates$lower_gate, upper_gate = offset_gates$upper_gate)
 plotSignal(plot_list = time_signal_plots)
 
-# tiff(fs::path(outFigPath, paste0("Signal_fig4_offset_gating.tiff")))
+# tiff(fs::path(outFigPath, "Signal_fig4_offset_gating.tiff"), width = 1800, height = 1200)
 # plotSignal(plot_list = time_signal_plots)
 # dev.off()
 
-density_plots <- density_plot(data = clean_up_data, "Offset", plot_title = file_names, lower_gate = offset_gates$lower_gate, upper_gate = offset_gates$upper_gate)
+density_plots <- density_plot(data = clean_up_data, "Offset", plot_title = file_names, lower_gate = offset_gates$lower_gate, upper_gate = offset_gates$upper_gate, maksCellsUsed = 25000)
 density_plots
 
-# tiff(fs::path(outFigPath, paste0("fig4_offset_gating.tiff")))
+# tiff(fs::path(outFigPath, "fig4_offset_gating.tiff"), width = 1200, height = 2000)
 # print(density_plots)
 # dev.off()
 ```
@@ -685,20 +684,20 @@ It takes the variables
 
   * data: here the arc sinh transformed clean_up_data are used
   * channel: which marker/channel you want to gate, here "Width".
-  * lower_gate_percent: tells where the lower gate is placed. See figure and explanation above, here 2.5 %
-  * upper_gate_percent: tells where the upper gate is placed. See figure and explanation above, here 4 %
+  * lower_gate_percent: tells where the lower gate is placed. See figure and explanation above, here 7 %
+  * upper_gate_percent: tells where the upper gate is placed. See figure and explanation above, here 7 %
 
 R code to fine the lower and upper residual gates:
 
 ```{r}
 #update lower_gate_percent, upper_gate_percent
-  width_gates <- find_gaussian_gates_highest_top(data = clean_up_data, channel = "Width", lower_gate_percent = 2.5, upper_gate_percent = 4)
+  width_gates <- find_gaussian_gates_highest_top(data = clean_up_data, channel = "Width", lower_gate_percent = 7, upper_gate_percent = 7)
 
-  density_plots <- density_plot(data = clean_up_data, "Width", plot_title = file_names, lower_gate = width_gates$lower_gate, upper_gate = width_gates$upper_gate)
+  density_plots <- density_plot(data = clean_up_data, "Width", plot_title = file_names, lower_gate = width_gates$lower_gate, upper_gate = width_gates$upper_gate, maksCellsUsed = 25000)
   density_plots
 
 
-  # tiff(fs::path(outFigPath, paste0("fig5_width_gating.tiff")))
+  # tiff(fs::path(outFigPath, "fig5_width_gating.tiff"), width = 1800, height = 1200)
   # print(density_plots)
   # dev.off()
   #time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = random_events_for_plotting, channel = "Width", plot_title = file_names, lower_gate = width_gates$lower_gate, upper_gate = width_gates$upper_gate)
@@ -706,7 +705,7 @@ R code to fine the lower and upper residual gates:
   #time_signal_plots[1] # to see first plot
   plotSignal(plot_list = time_signal_plots)
   
-# tiff(fs::path(outFigPath, paste0("Signal_fig5_width_gating.tiff")))
+# tiff(fs::path(outFigPath, "Signal_fig5_width_gating.tiff"), width = 1200, height = 2000)
 # plotSignal(plot_list = time_signal_plots)
 # dev.off()
 ```
@@ -750,11 +749,11 @@ Also event is gated by using the function find_gaussian_gates_second_top(). But 
 ```{r}
 #update lower_gate_percent, upper_gate_percent
   EventGates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Event_length", lower_gate_percent = 20, upper_gate_percent = 20)
-  density_plots <- density_plot(data = clean_up_data, "Event_length", plot_title = file_names, lower_gate = EventGates$lower_gate, upper_gate = EventGates$upper_gate)
+  density_plots <- density_plot(data = clean_up_data, "Event_length", plot_title = file_names, lower_gate = EventGates$lower_gate, upper_gate = EventGates$upper_gate, maksCellsUsed = 25000)
   density_plots
 
 
-  # tiff(fs::path(outFigPath, paste0("fig6_event_gating.tiff")))
+  # tiff(fs::path(outFigPath, "fig6_event_gating.tiff"), width = 1800, height = 1200)
   # print(density_plots)
   # dev.off()
   time_signal_plots <- time_signal_plot(data =  clean_up_data, random_events = random_events_for_plotting, channel = "Event_length", plot_title = file_names, lower_gate = EventGates$lower_gate, upper_gate = EventGates$upper_gate)
@@ -763,7 +762,7 @@ Also event is gated by using the function find_gaussian_gates_second_top(). But 
   
   plotSignal(plot_list = time_signal_plots)
   
-  # tiff(fs::path(outFigPath, paste0("Signal_fig6_event_gating.tiff")))
+  # tiff(fs::path(outFigPath, "Signal_fig6_event_gating.tiff"), width = 1200, height = 2000)
   # plotSignal(plot_list = time_signal_plots)
   # dev.off()
 
@@ -815,11 +814,11 @@ Also CIS is gated by using the function find_gaussian_gates_second_top(). But he
 #   cis_gates$lower_gates <- rep(tvungetLavereCISgate, length(cis_gates$lower_gates))
 # }
 
-  density_plots <- density_plot(data = clean_up_data, "Pt194Di", plot_title = file_names, lower_gate = cis_gates$lower_gate, upper_gate = cis_gates$upper_gate)
+  density_plots <- density_plot(data = clean_up_data, "Pt194Di", plot_title = file_names, lower_gate = cis_gates$lower_gate, upper_gate = cis_gates$upper_gate, maksCellsUsed = 25000)
   density_plots
 
 
-  # tiff(fs::path(outFigPath, paste0("fig7_cis_gating.tiff")))
+  # tiff(fs::path(outFigPath, "fig7_cis_gating.tiff"), width = 1800, height = 1200)
   # print(density_plots)
   # dev.off()
   time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = random_events_for_plotting, channel = "Pt194Di", plot_title = file_names, lower_gate = cis_gates$lower_gate, upper_gate = cis_gates$upper_gate)
@@ -830,7 +829,7 @@ Also CIS is gated by using the function find_gaussian_gates_second_top(). But he
   
    plotSignal(plot_list = time_signal_plots)
   
-  # tiff(fs::path(outFigPath, paste0("Signal_fig7_cis_gating.tiff")))
+  # tiff(fs::path(outFigPath, "Signal_fig7_cis_gating.tiff"), width = 1200, height = 2000)
   # plotSignal(plot_list = time_signal_plots)
   # dev.off()
 ```
@@ -875,10 +874,10 @@ Also, here gaussian gate for the second top is found, but instead of using the v
 ```{r, message=FALSE, warning=FALSE, comment=FALSE}
 Ir191di_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Ir191Di", lower_gate_percent = NA, upper_gate_percent = NA, perc_included = 0.99, main_top_to_left = F)
 
-density_plots <- density_plot(data = clean_up_data, "Ir191Di", plot_title = file_names, lower_gate = Ir191di_gates$lower_gate, upper_gate = Ir191di_gates$upper_gate)
+density_plots <- density_plot(data = clean_up_data, "Ir191Di", plot_title = file_names, lower_gate = Ir191di_gates$lower_gate, upper_gate = Ir191di_gates$upper_gate, maksCellsUsed = 25000)
 
 density_plots
-# tiff(fs::path(outFigPath, paste0("fig8_Ir191_gating.tiff")))
+# tiff(fs::path(outFigPath, "fig8_Ir191_gating.tiff"), width = 1800, height = 1200)
 # print(density_plots)
 # dev.off()
 time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = random_events_for_plotting, channel = "Ir191Di", plot_title = file_names, lower_gate = Ir191di_gates$lower_gate, upper_gate = Ir191di_gates$upper_gate)
@@ -888,7 +887,7 @@ time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = rand
 
 plotSignal(plot_list = time_signal_plots)
   
-# tiff(fs::path(outFigPath, paste0("Signal_fig8_Ir191_gating.tiff")))
+# tiff(fs::path(outFigPath, "Signal_fig8_Ir191_gating.tiff"), width = 1200, height = 2000)
 # plotSignal(plot_list = time_signal_plots)
 # dev.off()
 ```
@@ -933,11 +932,11 @@ Here we use another function called find_gaussian_gates_highest_top() which agai
   Ir193di_gates <- find_gaussian_gates_highest_top(data = clean_up_data, channel = "Ir193Di", lower_gate_percent = 15, upper_gate_percent = 5)
 
 
-density_plots <- density_plot(data = clean_up_data, "Ir193Di", plot_title = file_names, lower_gate = Ir193di_gates$lower_gate, upper_gate = Ir193di_gates$upper_gate)
+density_plots <- density_plot(data = clean_up_data, "Ir193Di", plot_title = file_names, lower_gate = Ir193di_gates$lower_gate, upper_gate = Ir193di_gates$upper_gate, maksCellsUsed = 25000)
 
 density_plots
 
-# tiff(fs::path(outFigPath, paste0("fig9_Ir193_gating.tiff")))
+# tiff(fs::path(outFigPath, "fig9_Ir193_gating.tiff"), width = 1800, height = 1200)
 # print(density_plots)
 # dev.off()#density_plots
 
@@ -949,7 +948,7 @@ time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = rand
 
 plotSignal(plot_list = time_signal_plots)
   
-# tiff(fs::path(outFigPath, paste0("Signal_fig9_Ir193_gating.tiff")))
+# tiff(fs::path(outFigPath, "Signal_fig9_Ir193_gating.tiff"), width = 1200, height = 2000)
 # plotSignal(plot_list = time_signal_plots)
 # dev.off()
 ```
