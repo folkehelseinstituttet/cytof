@@ -458,7 +458,7 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   Ir191di_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Ir191Di", lower_gate_percent = 25, upper_gate_percent = 25)
   Ir191di_gates$lower_gates[54] <- 5.1
   Ir191di_gates$upper_gates[54] <- 5.75
-  Ir191di_gates$upper_gates[58] <- 5.85
+  Ir191di_gates$lower_gates[58] <- 5.85
   
 
   
