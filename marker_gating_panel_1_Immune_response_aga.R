@@ -62,7 +62,7 @@ n_files <- length(file_names)
 filenumber <- 1:n_files
 
 
-result <- list()
+
 
 
 kanaler <- c("CD3","CD4", "CD5", "CD8", "CD19", "CD45", "CD57", "CD56", "CCR4",
@@ -79,6 +79,9 @@ fcs_data_with_info <- read_specific_data_from_folder(data_path = data_path, file
 fcs_data <- fcs_data_with_info$fcs_data
 file_names <- factor(fcs_data_with_info$file_names, levels = fcs_data_with_info$file_names)
 rm(fcs_data_with_info)
+
+result <- list()
+
 for(j in filene){
   mat <-  as.data.frame(matrix(NA, ncol = length(kanaler), nrow =  nrow(fcs_data[[j]])))
   colnames(mat) <- kanaler
