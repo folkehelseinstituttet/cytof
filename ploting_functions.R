@@ -363,26 +363,26 @@ density_plot <- function(data, channel, plot_title = NA, lower_gate = NA, upper_
   if(is.na(maksCellsUsed)){
     df <- data.frame(Values = data[[possible_i[1]]][,column], Sample = rep(plot_title[possible_i[1]], nrow(data[[possible_i[1]]])))
     for(i in possible_i[2:length(possible_i)]){
-      df <- rbind(df, data.frame(Values = data[[i]][,column], Sample = rep(plot_title[possible_i[i]], nrow(data[[i]]))))
+      df <- rbind(df, data.frame(Values = data[[i]][,column], Sample = rep(plot_title[i], nrow(data[[i]]))))
     }
   } else {
     n_used <- min(c(maksCellsUsed, nrow(data[[possible_i[1]]])))
-     tamed <- sample(nrow(data[[possible_i[1]]]), n_used)
+    tamed <- sample(nrow(data[[possible_i[1]]]), n_used)
     df <- data.frame(Values = data[[possible_i[1]]][tamed,column], Sample = rep(plot_title[possible_i[1]], length(tamed)))
     for(i in possible_i[2:length(possible_i)]){
       n_used <- min(c(maksCellsUsed, nrow(data[[possible_i[i]]])))
       tamed <- sample(nrow(data[[possible_i[i]]]), n_used)
       df <- rbind(df, data.frame(Values = data[[i]][tamed,column], Sample = rep(plot_title[i], length(tamed))))
     }
-    
   }
-  gg <- ggplot2::ggplot(df, ggplot2::aes(x = Values, y = Sample, col = Sample, fill = Sample))+
+
+  gg <- ggplot2::ggplot(df, ggplot2::aes(x = Values, y = Sample, col = Sample, fill = Sample, group = Sample))+
     ggjoy::geom_joy(scale = 2, alpha=0.5, show.legend= F) +
     ggplot2::scale_y_discrete(expand=c(0.01, 0)) +
     ggplot2::scale_x_continuous(expand=c(0.01, 0)) +
     ggplot2::ggtitle(channel) +
     ggplot2::ggtitle(main_title)+
-    ggjoy::theme_joy()
+    ggjoy::theme_joy() 
   
   if(!is.na(lower_gate[1]) ){
     gate_line <- data.frame(Sample = plot_title, x0 = lower_gate)
@@ -448,7 +448,7 @@ density_plot_without_neg <- function(data, channel, plot_title = NA, lower_gate 
     xx <- xx[xx > lower_gate[i]]
     df <- rbind(df, data.frame(Values = xx, Sample = rep(plot_title[i], length(xx))))
   }
-  gg <- ggplot2::ggplot(df, ggplot2::aes(x = Values, y = Sample, col = Sample, fill = Sample))+
+  gg <- ggplot2::ggplot(df, ggplot2::aes(x = Values, y = Sample, col = Sample, fill = Sample, group = Sample))+
     ggjoy::geom_joy(scale = 2, alpha=0.5, show.legend= F) +
     ggplot2::scale_y_discrete(expand=c(0.01, 0)) +
     ggplot2::ggtitle(main_title)+
