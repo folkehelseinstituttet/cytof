@@ -174,7 +174,7 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   
   
   #update lower_gate_percent, upper_gate_percent
-  residual_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Residual", lower_gate_percent = 25, upper_gate_percent = 35)
+  residual_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Residual", lower_gate_percent = 25, upper_gate_percent = 25)
   density_plots <- density_plot(data = clean_up_data, "Residual", plot_title = file_names_in_plot, lower_gate = residual_gates$lower_gate, upper_gate = residual_gates$upper_gate, maksCellsUsed = 25000)
   #density_plots
   time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = random_events_for_plotting, channel = "Residual", plot_title = file_names_in_plot,  lower_gate = residual_gates$lower_gate, upper_gate = residual_gates$upper_gate)
