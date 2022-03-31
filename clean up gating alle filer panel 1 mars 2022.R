@@ -2,6 +2,8 @@
 # https://www.fluidigm.com/binaries/content/documents/fluidigm/search/hippo%3Aresultset/approach-to-bivariate-analysis-of-data-acquired-using-the-maxpar-direct-immune-profiling-assay-technical-note/fluidigm%3Afile
 
 
+#les også https://www.vsh.com/publication/PathsetterCleanup.pdf
+
 
 # Example
 # 
