@@ -161,24 +161,7 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   clean_up_data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(clean_up_channels, extra_channels))
   
   
-  
-  posNeg <- list()
-  
-  
-  for(j in 1:n_files){
-    mat <-  as.data.frame(matrix(NA, ncol = 2, nrow =  nrow(clean_up_data[[j]])))
-    colnames(mat) <- c("CD3", "CD45")
-    posNeg[[j]] <- mat
-  }
-  
-  
-  
-  for(j in 1:n_files){
-    posNeg[[j]][,"CD3"] <- clean_up_data[[j]][, CD3] > 1
-    posNeg[[j]][,"CD45"] <- clean_up_data[[j]][, CD45] > 1
-
-  }
-  
+ 
   
 
   
@@ -386,8 +369,23 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   random_events_for_plotting <- random_events(number_of_events_before_cis_gating)
   
   
+  
+  
+  posNeg <- list()
+  for(j in 1:n_files){
+    mat <-  as.data.frame(matrix(NA, ncol = 2, nrow =  nrow(clean_up_data[[j]])))
+    colnames(mat) <- c("CD3", "CD45")
+    posNeg[[j]] <- mat
+  }
+  for(j in 1:n_files){
+    posNeg[[j]][,"CD3"] <- clean_up_data[[j]][, CD3] > 1
+    posNeg[[j]][,"CD45"] <- clean_up_data[[j]][, CD45] > 1
+    
+  }
+  
+  
   #update lower_gate_percent, upper_gate_percent
-  cis_gates <- find_gaussian_gates_second_top_top_selected_cells(data = clean_up_data, channel = "Pt194Di", lower_gate_percent = 2, upper_gate_percent = 40, include = posNeg, mark = "CD3")
+  cis_gates <- find_gaussian_gates_second_top_top_selected_cells(data = clean_up_data, channel = "Pt194Di", lower_gate_percent = 2, upper_gate_percent = 40, include = posNeg, mark = "CD45")
   # if you want to overwrite the gate found this could be done like this:
   cis_gates$lower_gate <- rep(0.5, length(cis_gates$lower_gate))  #do not want to gate for low values. This is all live cells. 
   
