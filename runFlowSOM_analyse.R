@@ -170,19 +170,21 @@ library(grid)
 
 orderPanel1 <- c("89Y_CD45", "116Cd_CD3", "145Nd_CD4", "113Cd_CD8", "111Cd_CD19", "152Sm_TCRgd", "166Er_TCRVa7.2", "149Sm_CD25", 
                  "158Gd_CD27", "160Gd_CD28", "143Nd_CD127", "172Yb_CD38", "167Er_CCR7", "155Gd_CD45RA", "114Cd_HLADR", "146Nd_IgD", "159Tb_IgG",
-                 "156Gd_CCR3", "153Eu_CCR4", "141Pr_CCR6", "171Yb_CCR5", "168Er_ICOS", "142Nd_KLRG1", "150Nd_CD134_O40", "154Sm_TIGIT",
-                 "161Dy_CD160", "164Dy_CD161", "162Dy_CD95", "163Dy_CRTH2", "165Ho_CD85j", "169Tm_NKG2A", "173Yb_CD141", "174Yb_CD279_PD.1",
+                 "156Gd_CXCR3", "153Eu_CCR4", "141Pr_CCR6", "171Yb_CXCR5", "168Er_ICOS", "142Nd_KLRG1", "150Nd_CD134_OX40", "154Sm_TIGIT",
+                 "161Dy_CD160", "164Dy_CD161", "162Dy_CD95", "163Dy_CRTH2", "165Ho_CD85j", "169Tm_NKG2A", "173Yb_CD141", "174Yb_CD279_PD-1",
                  "175Lu_CD14", "148Nd_CD16", "176Yb_CD56", "106Cd_CD57", "209Bi_CD11b", "147Sm_CD11c", "112Cd_CD5", "144Nd_CD15", "170Er_CD169", "151Eu_CD123")
 
-orderPanel2 <- c("89Y_CD45", "116Cd_CD3", "113Cd_CD8", "145Nd_CD4",  "111Cd_CD19",  "153Eu_CCR5.CD185", 
-                 "114Cd_HLADR", "175Lu_CD14", "209Bi_CD16",  "176Yb_CD56", "106Cd_CD57", "158Gd_CD27",
-                 "160Gd_CD28", "169Tm_CD25", "172Yb_CD38", "112Cd_CD44", "143Nd_CD127.IL7Ra",  "167Er_CCR7.CD197",
-                 "155Gd_CD45RA", "162Dy_FoP3", "170Er_CTLA.4.CD152", "163Dy_CD33",  "154Sm_CD272.BTLA", "110Cd_CD107a",
-                 "161Dy_IL.17A", "166Er_IL.10", "164Dy_Perforin", "171Yb_GranzymeB", "148Nd_CD274.PD.L1",  
-                 "173Yb_CD273.PD.L2", "159Tb_GM.CSF",   "168Er_CD154.CD40L", "174Yb_CD279.PD1", "141Pr_CD223.LAG3", 
-                 "147Sm_TIM.3",  "151Eu_CD137.4.1BB",  "165Ho_IFNg", "142Nd_IL.1b", "156Gd_IL.6", "166Er_IL.10", 
-                 "152Sm_TCRgd", "151Eu_CD137.4.1BB", "149Sm_IL.12p70", "150Nd_MIP.1b")
 
+#nb sjekk at navn stemmer over ens... spesielt _, . ,-
+# orderPanel2 <- c("89Y_CD45", "116Cd_CD3", "113Cd_CD8", "145Nd_CD4",  "111Cd_CD19",  "153Eu_CXCR5.CD185", 
+#                  "114Cd_HLADR", "175Lu_CD14", "209Bi_CD16",  "176Yb_CD56", "106Cd_CD57", "158Gd_CD27",
+#                  "160Gd_CD28", "169Tm_CD25", "172Yb_CD38", "112Cd_CD44", "143Nd_CD127.IL7Ra",  "167Er_CCR7.CD197",
+#                  "155Gd_CD45RA", "162Dy_FoxP3", "170Er_CTLA.4.CD152", "163Dy_CD33",  "154Sm_CD272.BTLA", "110Cd_CD107a",
+#                  "161Dy_IL.17A", "166Er_IL.10", "164Dy_Perforin", "171Yb_GranzymeB", "148Nd_CD274.PD.L1",  
+#                  "173Yb_CD273.PD.L2", "159Tb_GM.CSF",   "168Er_CD154.CD40L", "174Yb_CD279.PD1", "141Pr_CD223.LAG3", 
+#                  "147Sm_TIM.3",  "151Eu_CD137.4.1BB",  "165Ho_IFNg", "142Nd_IL.1b", "156Gd_IL.6", "166Er_IL.10", 
+#                  "152Sm_TCRgd", "151Eu_CD137.4.1BB", "149Sm_IL.12p70", "150Nd_MIP.1b")
+# 
 
 
 scriptPath <- fs::path("H:", "git", "cytof")
@@ -277,7 +279,7 @@ column_cluster <- FALSE
 
 source(fs::path(scriptPath, "FlowSOM_analyse.R"))
 
-seed <- 7503#nb må endres vil man vil gjøre et annet uttrekk
+seed <-4303#nb må endres vil man vil gjøre et annet uttrekk
 selectedEvents <- TRUE
 channel <- "CD3CD45CD8"
 n_per_file <- 4250
