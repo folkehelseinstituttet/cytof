@@ -22,7 +22,7 @@ arcSindataMatrix <- list_to_matrix_selected_events(data = fcs_data,
 colnames(arcSindataMatrix)[1:length(kanaler)] <- kanaler
 print("arcsin")
 
-if(column_cluster = TRUE){
+if(column_cluster == TRUE){
   o <- kanaler
 }
 
