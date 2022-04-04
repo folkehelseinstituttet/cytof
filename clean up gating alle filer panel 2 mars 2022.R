@@ -101,6 +101,8 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   
   #find upper_gate for noise gating based on Ce140Di
   upper_gate_Ce140Di <- find_gate_perc_height_upper_noise(data = beads_data, channel =  "Ce140Di", upper_perc_height = 0.001)
+  upper_gate_Ce140Di <- rep(4, length( upper_gate_Ce140Di))
+  
   time_signal_plots <- time_signal_plot(data = beads_data, random_events = random_events_for_plotting, 
                                         channel = "Ce140Di",  plot_title = file_names, upper_gate = upper_gate_Ce140Di)
   
@@ -162,7 +164,7 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   
   
   #update lower_gate_percent, upper_gate_percent
-  residual_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Residual", lower_gate_percent = 10, upper_gate_percent = 10)
+  residual_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Residual", lower_gate_percent = 25, upper_gate_percent = 25)
   residual_gates$upper_gates[residual_gates$upper_gates < 1] <- mean(residual_gates$upper_gates[residual_gates$upper_gates > 1])
   density_plots <- density_plot(data = clean_up_data, "Residual", plot_title = file_names, lower_gate = residual_gates$lower_gate, upper_gate = residual_gates$upper_gate, maksCellsUsed = 25000)
   #density_plots
@@ -199,7 +201,7 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   random_events_for_plotting <- random_events(number_of_events_before_center_gating)
   
   #update lower_gate_percent, upper_gate_percent
-  center_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Center", lower_gate_percent = 10, upper_gate_percent = 10)
+  center_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Center", lower_gate_percent = 25, upper_gate_percent = 25)
   density_plots <- density_plot(data = clean_up_data, "Center", plot_title = file_names, lower_gate = center_gates$lower_gate, upper_gate = center_gates$upper_gate, maksCellsUsed = 25000)
   #density_plots
   time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = random_events_for_plotting, channel = "Center", plot_title = file_names, lower_gate = center_gates$lower_gate, upper_gate = center_gates$upper_gate)
@@ -277,7 +279,7 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   
   
   #update lower_gate_percent, upper_gate_percent
-  width_gates <- find_gaussian_gates_highest_top(data = clean_up_data, channel = "Width", lower_gate_percent = 7, upper_gate_percent = 7)
+  width_gates <- find_gaussian_gates_highest_top(data = clean_up_data, channel = "Width", lower_gate_percent = 20, upper_gate_percent = 20)
   
   density_plots <- density_plot(data = clean_up_data, "Width", plot_title = file_names, lower_gate = width_gates$lower_gate, upper_gate = width_gates$upper_gate, maksCellsUsed = 25000)
   #density_plots
@@ -355,17 +357,29 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   random_events_for_plotting <- random_events(number_of_events_before_cis_gating)
   
   
-  #update lower_gate_percent, upper_gate_percent
-  cis_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Pt194Di", lower_gate_percent = 15, upper_gate_percent = 40)
- 
-  cis_gates$lower_gates[file_names == "FHI0016_T1_P2_01_2"] <- 3.25
-  cis_gates$upper_gates[file_names == "FHI0016_T1_P2_01_2"] <- 5
-  cis_gates$lower_gates[file_names == "FHI005_T1_P2_01_1"] <- 2.5
-  cis_gates$lower_gates[file_names == "K_K1560_Fe_A_78_T1_P2_01_1"] <- 3.4
-  cis_gates$upper_gates[file_names == "M_FHI004_Ma_B_43_T1_P2_01_2"] <- 4.4
-  cis_gates$lower_gates[file_names == "M_FHI100T1_Ma_A_26_T1_P2_01_4"] <- 3.4
-  cis_gates$lower_gates[file_names == "M_FHI155T1_Fe_B_20_T1_P2_01_4"] <- 3.5
+  posNeg <- list()
+  for(j in 1:n_files){
+    mat <-  as.data.frame(matrix(NA, ncol = 2, nrow =  nrow(clean_up_data[[j]])))
+    colnames(mat) <- c("CD3", "CD45")
+    posNeg[[j]] <- mat
+  }
+  for(j in 1:n_files){
+    posNeg[[j]][,"CD3"] <- clean_up_data[[j]][, CD3] > 1
+    posNeg[[j]][,"CD45"] <- clean_up_data[[j]][, CD45] > 1
+    
+  }
   
+  
+  #update lower_gate_percent, upper_gate_percent
+  cis_gates <- find_gaussian_gates_second_top_top_selected_cells(data = clean_up_data, channel = "Pt194Di", lower_gate_percent = 2, upper_gate_percent = 40, include = posNeg, mark = "CD45")
+  # 
+ 
+  # cis_gates$upper_gates[file_names == "FHI0016_T1_P2_01_2"] <- 5
+  # cis_gates$upper_gates[file_names == "M_FHI004_Ma_B_43_T1_P2_01_2"] <- 4.4
+  # 
+  # 
+  # if you want to overwrite the gate found this could be done like this:
+  cis_gates$lower_gate <- rep(0.5, length(cis_gates$lower_gate))  #do not want to gate for low values. This is all live cells. 
   
   density_plots <- density_plot(data = clean_up_data, "Pt194Di", plot_title = file_names, lower_gate = cis_gates$lower_gate, upper_gate = cis_gates$upper_gate, maksCellsUsed = 25000)
   #density_plots
@@ -405,12 +419,12 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   
   #update lower_gate_percent, upper_gate_percent
   #Ir191di_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Ir191Di", lower_gate_percent = NA, upper_gate_percent = NA, perc_included = 0.99995, main_top_to_left = F)
-  Ir191di_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Ir191Di", lower_gate_percent = 15, upper_gate_percent = 15)
+  Ir191di_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Ir191Di", lower_gate_percent = 25, upper_gate_percent = 25)
  
-  Ir191di_gates$lower_gates[file_names == "FHI0016_T1_P2_01_2"] <- 4.5
-  Ir191di_gates$upper_gates[file_names == "FHI0016_T1_P2_01_2"] <- 5.4
-  Ir191di_gates$lower_gates[file_names == "FHI005_T1_P2_01_1"] <- 3.9
-  Ir191di_gates$upper_gates[file_names == "FHI005_T1_P2_01_1"] <- 4.6
+  # Ir191di_gates$lower_gates[file_names == "FHI0016_T1_P2_01_2"] <- 4.5
+  # Ir191di_gates$upper_gates[file_names == "FHI0016_T1_P2_01_2"] <- 5.4
+  # Ir191di_gates$lower_gates[file_names == "FHI005_T1_P2_01_1"] <- 3.9
+  # Ir191di_gates$upper_gates[file_names == "FHI005_T1_P2_01_1"] <- 4.6
   
    # 
   density_plots <- density_plot(data = clean_up_data, "Ir191Di", plot_title = file_names, lower_gate = Ir191di_gates$lower_gate, upper_gate = Ir191di_gates$upper_gate, maksCellsUsed = 25000)
@@ -450,7 +464,7 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   random_events_for_plotting <- random_events(number_of_events_before_Ir193Di_gating)
   
   #update lower_gate_percent, upper_gate_percent
-  Ir193di_gates <- find_gaussian_gates_highest_top(data = clean_up_data, channel = "Ir193Di", lower_gate_percent = 20, upper_gate_percent = 20)
+  Ir193di_gates <- find_gaussian_gates_highest_top(data = clean_up_data, channel = "Ir193Di", lower_gate_percent = 25, upper_gate_percent = 25)
   
   
   density_plots <- density_plot(data = clean_up_data, "Ir193Di", plot_title = file_names, lower_gate = Ir193di_gates$lower_gate, upper_gate = Ir193di_gates$upper_gate, maksCellsUsed = 25000)
