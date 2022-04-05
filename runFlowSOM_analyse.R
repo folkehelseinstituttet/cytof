@@ -19,14 +19,14 @@ orderPanel1 <- c("89Y_CD45", "116Cd_CD3", "145Nd_CD4", "113Cd_CD8", "111Cd_CD19"
                  "161Dy_CD160", "164Dy_CD161", "162Dy_CD95", "163Dy_CRTH2", "165Ho_CD85j", "169Tm_NKG2A", "173Yb_CD141", "174Yb_CD279_PD-1",
                  "175Lu_CD14", "148Nd_CD16", "176Yb_CD56", "106Cd_CD57", "209Bi_CD11b", "147Sm_CD11c", "112Cd_CD5", "144Nd_CD15", "170Er_CD169", "151Eu_CD123")
 
-orderPanel2 <- c("X89Y_CD45", "X116Cd_CD3", "X113Cd_CD8", "X145Nd_CD4",  "X111Cd_CD19",  "X153Eu_CXCR5.CD185", 
-       "X114Cd_HLADR", "X175Lu_CD14", "X209Bi_CD16",  "X176Yb_CD56", "X106Cd_CD57", "X158Gd_CD27",
-       "X160Gd_CD28", "X169Tm_CD25", "X172Yb_CD38", "X112Cd_CD44", "X143Nd_CD127.IL7Ra",  "X167Er_CCR7.CD197",
-       "X155Gd_CD45RA", "X162Dy_FoxP3", "X170Er_CTLA.4.CD152", "X163Dy_CD33",  "X154Sm_CD272.BTLA", "X110Cd_CD107a",
-       "X161Dy_IL.17A", "X166Er_IL.10", "X164Dy_Perforin", "X171Yb_GranzymeB", "X148Nd_CD274.PD.L1",  
-       "X173Yb_CD273.PD.L2", "X159Tb_GM.CSF",   "X168Er_CD154.CD40L", "X174Yb_CD279.PD1", "X141Pr_CD223.LAG3", 
-       "X147Sm_TIM.3",  "X151Eu_CD137.4.1BB",  "X165Ho_IFNg", "X142Nd_IL.1b", "X156Gd_IL.6", "X166Er_IL.10", 
-       "X152Sm_TCRgd", "X151Eu_CD137.4.1BB", "X149Sm_IL.12p70", "X150Nd_MIP.1b")
+orderPanel2 <- c("89Y_CD45", "116Cd_CD3", "113Cd_CD8", "145Nd_CD4",  "111Cd_CD19",  "153Eu_CXCR5.CD185", 
+       "114Cd_HLADR", "175Lu_CD14", "209Bi_CD16",  "176Yb_CD56", "106Cd_CD57", "158Gd_CD27",
+       "160Gd_CD28", "169Tm_CD25", "172Yb_CD38", "112Cd_CD44", "143Nd_CD127.IL7Ra",  "167Er_CCR7.CD197",
+       "155Gd_CD45RA", "162Dy_FoxP3", "170Er_CTLA.4.CD152", "163Dy_CD33",  "154Sm_CD272.BTLA", "110Cd_CD107a",
+       "161Dy_IL.17A", "166Er_IL.10", "164Dy_Perforin", "171Yb_GranzymeB", "148Nd_CD274.PD.L1",  
+       "173Yb_CD273.PD.L2", "159Tb_GM.CSF",   "168Er_CD154.CD40L", "174Yb_CD279.PD1", "141Pr_CD223.LAG3", 
+       "147Sm_TIM.3",  "151Eu_CD137.4.1BB",  "165Ho_IFNg", "142Nd_IL.1b", "156Gd_IL.6", "166Er_IL.10", 
+       "152Sm_TCRgd", "151Eu_CD137.4.1BB", "149Sm_IL.12p70", "150Nd_MIP.1b")
 
 
 
@@ -298,5 +298,116 @@ column_cluster <- FALSE
 
 
 source(fs::path(scriptPath, "FlowSOM_analyse.R"))
+
+
+
+##panel 2 Tighter
+
+
+scriptPath <- fs::path("H:", "git", "cytof")
+#scriptPath <- fs::path("C:", "CyToF data", "fra github")
+
+
+source(fs::path(scriptPath, "readDataToAnalysePanel2TighterCleanUp.R"))
+
+tamed <- as.character(dInfo$filenames)
+tamed <- tamed[!grepl("FHI005", tamed)] #denne oppfører seg helt rart og tas ut av analysen.
+#tamed <- tamed[!grepl("514K1", tamed)] #denne oppfører seg helt rart og tas ut av analysen.
+tamed <- tamed[!grepl("Ref1", tamed)] #denne oppfører seg helt rart og tas ut av analysen.
+tamed
+
+ks <- c(40, 50, 60)
+n_per_file <- 25000
+xdim <- 14
+ydim <- 14
+
+
+utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "Resulta_Panel_1_ALLE", "TigtherCleanUp")
+seed <- 6892 #nb må endres vil man vil gjøre et annet uttrekk
+selectedEvents <- FALSE
+channel <- NULL
+o <- orderPanel1
+column_cluster <- FALSE
+
+source(fs::path(scriptPath, "FlowSOM_analyse.R"))
+
+
+seed <- 7856 #nb må endres vil man vil gjøre et annet uttrekk
+selectedEvents <- FALSE
+channel <- NULL
+o <- orderPanel1
+column_cluster <- FALSE
+
+source(fs::path(scriptPath, "FlowSOM_analyse.R"))
+
+
+
+
+for(j in 1:length(posNeg)){
+  posNeg[[j]]$CD3CD45CD4 <- posNeg[[j]]$CD3 & posNeg[[j]]$CD45 & posNeg[[j]]$CD4
+}
+
+utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "Resulta_Panel_1_ALLE_CD4", "TigtherCleanUp")
+seed <- 4903#nb må endres vil man vil gjøre et annet uttrekk
+selectedEvents <- TRUE
+channel <- "CD3CD45CD4"
+n_per_file <- 1250
+ks <- c(15, 20, 25, 30, 35, 40)
+xdim <- 10
+ydim <- 10
+o <- orderPanel1
+column_cluster <- FALSE
+
+
+source(fs::path(scriptPath, "FlowSOM_analyse.R"))
+
+seed <- 3803#nb må endres vil man vil gjøre et annet uttrekk
+selectedEvents <- TRUE
+channel <- "CD3CD45CD4"
+n_per_file <- 1250
+ks <- c(15, 20, 25, 30, 35, 40)
+xdim <- 10
+ydim <- 10
+o <- orderPanel1
+column_cluster <- FALSE
+
+
+source(fs::path(scriptPath, "FlowSOM_analyse.R"))
+
+
+
+
+
+for(j in 1:length(posNeg)){
+  posNeg[[j]]$CD3CD45CD8 <- posNeg[[j]]$CD3 & posNeg[[j]]$CD45 & posNeg[[j]]$CD8
+}
+
+utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "Resulta_Panel_1_ALLE_CD8", "TigtherCleanUp")
+seed <- 9003#nb må endres vil man vil gjøre et annet uttrekk
+selectedEvents <- TRUE
+channel <- "CD3CD45CD8"
+n_per_file <- 4250
+ks <- c(15, 20, 25, 30, 35, 40)
+xdim <- 10
+ydim <- 10
+o <- orderPanel1
+column_cluster <- FALSE
+
+
+source(fs::path(scriptPath, "FlowSOM_analyse.R"))
+
+seed <-4303#nb må endres vil man vil gjøre et annet uttrekk
+selectedEvents <- TRUE
+channel <- "CD3CD45CD8"
+n_per_file <- 4250
+ks <- c(15, 20, 25, 30, 35, 40)
+xdim <- 10
+ydim <- 10
+o <- orderPanel1
+column_cluster <- FALSE
+
+
+source(fs::path(scriptPath, "FlowSOM_analyse.R"))
+
 
 
