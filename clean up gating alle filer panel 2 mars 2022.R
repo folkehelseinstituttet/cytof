@@ -153,8 +153,10 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   #clean_up_data
   #************************************************
   clean_up_channels <- as.character(params$name[grep("Center|Offset|Width|Residual|Event|Ir191|Ir193|Pt195Di|Pt194Di", params$name)])  #Pt194Di og 195 tilsvarer Cis
-  number_of_events_before_clean_up_gating <-  number_of_events(data = fcs_data, file_names = file_names)
-  clean_up_data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = clean_up_channels)
+  as.character(params$desc[grep("CD3|CD45", params$desc)])  #Cd3 og CD45 is the two first in this list
+  extra_channels <- as.character(params$name[grep("CD3|CD45", params$desc)[1:2]])  #Cd3 og CD45 is the two first
+  CD3 <- extra_channels[2]
+  CD45 <- extra_channels[1]
   
   #************************************************
   #gating on Residual+ ----
