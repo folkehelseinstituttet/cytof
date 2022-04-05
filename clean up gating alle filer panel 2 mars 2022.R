@@ -380,14 +380,14 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   cis_gates <- find_gaussian_gates_second_top_top_selected_cells(data = clean_up_data, channel = "Pt194Di", lower_gate_percent = 2, upper_gate_percent = 40, include = posNeg, mark = "CD45")
   # 
  
-  # cis_gates$upper_gates[file_names == "FHI0016_T1_P2_01_2"] <- 5
-  # cis_gates$upper_gates[file_names == "M_FHI004_Ma_B_43_T1_P2_01_2"] <- 4.4
+  cis_gates$upper_gate[file_names == "FHI0016_T1_P2_01_2"] <- 4.1
+  cis_gates$upper_gate[file_names == "M_FHI004_Ma_B_43_T1_P2_01_2"] <- 4.4
   # 
   # 
   # if you want to overwrite the gate found this could be done like this:
   cis_gates$lower_gate <- rep(0.5, length(cis_gates$lower_gate))  #do not want to gate for low values. This is all live cells. 
-  
-  density_plots <- density_plot(data = clean_up_data, "Pt194Di", plot_title = file_names, lower_gate = cis_gates$lower_gate, upper_gate = cis_gates$upper_gate, maksCellsUsed = 25000)
+ 
+   density_plots <- density_plot(data = clean_up_data, "Pt194Di", plot_title = file_names, lower_gate = cis_gates$lower_gate, upper_gate = cis_gates$upper_gate, maksCellsUsed = 25000)
   #density_plots
   
   
@@ -404,7 +404,33 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   
   
   
-    events_to_keep_after_cis_gating <- events_to_keep(data = clean_up_data, channel = "Pt194Di",  lower_gate = cis_gates$lower_gate,  upper_gate = cis_gates$upper_gate)
+  
+  time_signal_plots <- signal_signal_plot(data = clean_up_data, random_events = random_events_for_plotting, channel2 = "Pt194Di", channel1 = CD3, 
+                                          xname = "CD3", yname = "CIS", ylim = c(0,7),
+                                          ylow = cis_gates$lower_gate, yhigh = cis_gates$upper_gate)
+  #time_signal_plots # to see all plots
+  #time_signal_plots[1] # to see first plot
+  
+  tiff(fs::path(outFigSignalPath, "Signal_signal_fig7_cis_CD3_gating.tiff"), width = 1800, height = 1200)
+  plotSignal(plot_list = time_signal_plots$plotList)
+  dev.off()
+  
+  
+  
+  
+  time_signal_plots <- signal_signal_plot(data = clean_up_data, random_events = random_events_for_plotting, channel2 = "Pt194Di", channel1 = CD45, 
+                                          xname = "CD45", yname = "CIS", ylim = c(0,7),
+                                           ylow = cis_gates$lower_gate, yhigh = cis_gates$upper_gate)
+  #time_signal_plots # to see all plots
+  #time_signal_plots[1] # to see first plot
+  
+  tiff(fs::path(outFigSignalPath, "Signal_signal_fig7_cis_CD45_gating.tiff"), width = 1800, height = 1200)
+  plotSignal(plot_list = time_signal_plots$plotList)
+  dev.off()
+  
+  
+  
+  events_to_keep_after_cis_gating <- events_to_keep(data = clean_up_data, channel = "Pt194Di",  lower_gate = cis_gates$lower_gate,  upper_gate = cis_gates$upper_gate)
   #percent_to_keep_this_gating(kept_events = events_to_keep_after_cis_gating, file_names = file_names)
   
   
