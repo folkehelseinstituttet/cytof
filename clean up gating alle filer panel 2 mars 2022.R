@@ -157,7 +157,11 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
   extra_channels <- as.character(params$name[grep("CD3|CD45", params$desc)[1:2]])  #Cd3 og CD45 is the two first
   CD3 <- extra_channels[2]
   CD45 <- extra_channels[1]
+
+  number_of_events_before_clean_up_gating <-  number_of_events(data = fcs_data, file_names = file_names)
+  clean_up_data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(clean_up_channels, extra_channels))
   
+    
   #************************************************
   #gating on Residual+ ----
   #************************************************
