@@ -2,7 +2,7 @@
 title: "Gating"
 author: "Anja Bråthen Kristoffersen"
 date: "28 2 2022"
-output: html_document
+output: word_document
 ---
 
 ```{r setup, include=FALSE}
