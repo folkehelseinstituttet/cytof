@@ -35,7 +35,7 @@ plotTiff <- function(signal, filnavn){
                           signal$plotList[[51]], signal$plotList[[52]], signal$plotList[[53]], signal$plotList[[54]], signal$plotList[[55]],
                           signal$plotList[[56]],  signal$plotList[[57]], signal$plotList[[58]], signal$plotList[[59]], signal$plotList[[60]],
                           signal$plotList[[61]], signal$plotList[[62]], signal$plotList[[63]], signal$plotList[[64]], signal$plotList[[65]],
-                          signal$plotList[[66]],  ncol = 11, nrow = 6)
+                          signal$plotList[[66]],   ncol = 11, nrow = 6)
   #print(signal$plotList[[i]])
   dev.off()
 }
