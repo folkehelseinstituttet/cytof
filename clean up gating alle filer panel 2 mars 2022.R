@@ -71,7 +71,7 @@ g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
              plot_list[[57]], plot_list[[58]], plot_list[[59]],
              plot_list[[60]], plot_list[[61]], plot_list[[62]],
              plot_list[[63]], plot_list[[64]], plot_list[[65]],
-             plot_list[[66]], plot_list[[67]],  ncol = 12, nrow = 6)
+             plot_list[[66]],  ncol = 11, nrow = 6)
    return(g)
 }
 
