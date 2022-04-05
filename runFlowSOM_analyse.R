@@ -323,7 +323,7 @@ ydim <- 14
 
 
 utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "Resulta_Panel_1_ALLE", "TigtherCleanUp")
-seed <- 6892 #nb må endres vil man vil gjøre et annet uttrekk
+seed <- 4392 #nb må endres vil man vil gjøre et annet uttrekk
 selectedEvents <- FALSE
 channel <- NULL
 o <- orderPanel1
@@ -332,7 +332,7 @@ column_cluster <- FALSE
 source(fs::path(scriptPath, "FlowSOM_analyse.R"))
 
 
-seed <- 7856 #nb må endres vil man vil gjøre et annet uttrekk
+seed <- 5678 #nb må endres vil man vil gjøre et annet uttrekk
 selectedEvents <- FALSE
 channel <- NULL
 o <- orderPanel1
@@ -348,7 +348,7 @@ for(j in 1:length(posNeg)){
 }
 
 utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "Resulta_Panel_1_ALLE_CD4", "TigtherCleanUp")
-seed <- 4903#nb må endres vil man vil gjøre et annet uttrekk
+seed <- 3049#nb må endres vil man vil gjøre et annet uttrekk
 selectedEvents <- TRUE
 channel <- "CD3CD45CD4"
 n_per_file <- 1250
@@ -361,7 +361,7 @@ column_cluster <- FALSE
 
 source(fs::path(scriptPath, "FlowSOM_analyse.R"))
 
-seed <- 3803#nb må endres vil man vil gjøre et annet uttrekk
+seed <- 4038#nb må endres vil man vil gjøre et annet uttrekk
 selectedEvents <- TRUE
 channel <- "CD3CD45CD4"
 n_per_file <- 1250
@@ -383,7 +383,7 @@ for(j in 1:length(posNeg)){
 }
 
 utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "Resulta_Panel_1_ALLE_CD8", "TigtherCleanUp")
-seed <- 9003#nb må endres vil man vil gjøre et annet uttrekk
+seed <- 2390#nb må endres vil man vil gjøre et annet uttrekk
 selectedEvents <- TRUE
 channel <- "CD3CD45CD8"
 n_per_file <- 4250
@@ -396,7 +396,7 @@ column_cluster <- FALSE
 
 source(fs::path(scriptPath, "FlowSOM_analyse.R"))
 
-seed <-4303#nb må endres vil man vil gjøre et annet uttrekk
+seed <-9143#nb må endres vil man vil gjøre et annet uttrekk
 selectedEvents <- TRUE
 channel <- "CD3CD45CD8"
 n_per_file <- 4250
