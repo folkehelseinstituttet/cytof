@@ -39,7 +39,7 @@ outFigSignalPath <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune re
 outFigDensityPath <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF","Analyse i R OUS", "CleanUpGatingMarch2022", "gating_results_Panel1_mars2022", "FigDensity")
 ```
 
-I have already made many functions that can be used for reading, transforming, gating and plotting in R. These functions can be found on github https://github.com/folkehelseinstituttet/cytof. Save the files gating_functions.R, ploting_functions, read_data_function.R, analysis_functions.R and transformation_functions.R into your script folder and source them into R so that you might use them later
+I have already made many functions that can be used for reading, transforming, gating, plotting and analysing in R. These functions can be found on github https://github.com/folkehelseinstituttet/cytof. Save the files gating_functions.R, ploting_functions, read_data_function.R, analysis_functions.R and transformation_functions.R into your script folder and source them into R so that you might use them later
 
 ```{r, include = F}
 #idea; maybe make one great file? 
@@ -61,7 +61,7 @@ file.info() and list.files() are functions in R that can be  used to find the na
 fcs_files <- fs::path(data_path, rownames(file.info(list.files(data_path))))
 ```
 
-I here choose to only look at the first 6 files, which is. 
+I here choose to only look at six files, which is. 
 
 ```{r}
 fcs_files[c(1, 11, 21, 31, 41, 51)]
