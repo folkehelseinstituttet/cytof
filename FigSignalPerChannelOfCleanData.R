@@ -83,7 +83,7 @@ number_of_events_data <-  number_of_events(data = data, file_names = file_names)
 random_events_for_plotting <- random_events(number_of_events_data, n = 10000)
 file_names_in_plot <- 1:length(data)
 
-for(i in 2:nrow(data[[1]])){
+for(i in 2:ncol(data[[1]])){
   navn <- params$kanal[grep(colnames(data[[1]])[i], params$name)]
   time_signal_plots <- time_signal_plot(data = data, random_events = random_events_for_plotting, 
                                         channel = colnames(data[[1]])[i],  plot_title = file_names_in_plot)
