@@ -37,7 +37,7 @@ prepare_data <- function(){
  # summary(antallPerFil)
 
   #make % add 1 to each sample, and i (number of clusters) to each samplesum so no-one get 0 %, for further analysis 
-  klu <- (klu + 1)/matrix(rep(antallPerFil + ant_klu_i, nrow(klu)), ncol = length(antallPerFil), byrow = T)
+  klu <- (klu + 1)/matrix(rep(antallPerFil + ant_klu_i, ncol(klu)), ncol = length(antallPerFil), byrow = T)
  # summary(apply(klu, 1, sum))
   klu$Pat <- NA
   #find patient from filename 
@@ -64,6 +64,8 @@ prepare_data <- function(){
     
       }
      klu$Pat[klu$Pat =="Ko _55"] <- "Ko 550"
+     klu$Pat[klu$Pat =="Ko _50"] <- "Ko 507"
+     klu$Pat[klu$Pat =="Ko NA"] <- "Ko 580"
      klu$Pat[klu$Pat =="FHI 81T"] <- "FHI 081"
      klu$Pat[klu$Pat =="FHI 84T"] <- "FHI 084"
      klu$Pat[klu$Pat =="FHI 95_"] <- "FHI 095"
@@ -212,7 +214,7 @@ violinPlotT2Kontroll <- function(dat, i){
 
 
 
-```{r, echo = F, comment= FALSE, message= FALSE, warning= FALSE, fig.width= 12, fig.height=8}
+```{r, echo = F, comment= FALSE, message= FALSE, warning= FALSE, fig.width= 15, fig.height=8}
 for(ant_klu_i in params$muligeK){
   print("#######################################################")
   print(paste0("# number of clusters, ", ant_klu_i))
@@ -358,6 +360,7 @@ for(ant_klu_i in params$muligeK){
   
  for(i in mulige){
    print(i)
+   rm(g)
    res <- summary(betareg(d[,i] ~ StatusTid + Sex + Alder, data = d ))
   # print(res)
    if(res$coefficients$mean["Alder", "Pr(>|z|)" ] < 0.05 ){
@@ -438,10 +441,12 @@ for(ant_klu_i in params$muligeK){
         }
      } 
    }
+   if(exists("g")){
     g <- g + theme(axis.text = element_text(size = 20), axis.title = element_text(size = 20), title  = element_text(size = 20)) + 
     ylab("proportion") 
     g <- g + ggtitle(paste0("kluster ", i, ": antall i kluster = ", antallPerKluster[i]))
     print(g)
+   }
  }
 }
 
