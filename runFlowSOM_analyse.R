@@ -61,7 +61,7 @@ for(j in 1:length(posNeg)){
   posNeg[[j]]$CD3CD45CD4 <- posNeg[[j]]$CD3 & posNeg[[j]]$CD45 & posNeg[[j]]$CD4
 }
 
-utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "Resulta_Panel_2_ALLE_CD4_test")
+utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "Resultat_Panel_2_ALLE_CD4_test")
 seed <- 45903#nb må endres vil man vil gjøre et annet uttrekk
 selectedEvents <- TRUE
 channel <- "CD3CD45CD4"
@@ -82,7 +82,7 @@ for(j in 1:length(posNeg)){
   posNeg[[j]]$CD3CD45CD8 <- posNeg[[j]]$CD3 & posNeg[[j]]$CD45 & posNeg[[j]]$CD8
 }
 
-utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "Resulta_Panel_2_ALLE_CD8")
+utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "Resultat_Panel_2_ALLE_CD8")
 seed <- 45902#nb må endres vil man vil gjøre et annet uttrekk
 selectedEvents <- TRUE
 channel <- "CD3CD45CD8"
@@ -304,6 +304,18 @@ source(fs::path(scriptPath, "FlowSOM_analyse.R"))
 ##panel 2 Tighter
 
 
+
+orderPanel2 <- c("89Y_CD45", "116Cd_CD3", "113Cd_CD8", "145Nd_CD4",  "111Cd_CD19",  "153Eu_CXCR5-CD185",
+                 "114Cd_HLADR", "175Lu_CD14", "209Bi_CD16",  "176Yb_CD56", "106Cd_CD57", "158Gd_CD27",
+                 "160Gd_CD28", "169Tm_CD25", "172Yb_CD38", "112Cd_CD44", "143Nd_CD127-IL7Ra",  "167Er_CCR7-CD197",
+                 "155Gd_CD45RA", "162Dy_FoxP3", "170Er_CTLA-4-CD152", "163Dy_CD33",  "154Sm_CD272-BTLA", "110Cd_CD107a",
+                 "161Dy_IL-17A", "166Er_IL-10", "164Dy_Perforin", "171Yb_GranzymeB", "148Nd_CD274-PD-L1",
+                 "173Yb_CD273-PD-L2", "159Tb_GM-CSF",   "168Er_CD154-CD40L", "174Yb_CD279-PD1", "141Pr_CD223-LAG3",
+                 "147Sm_TIM-3",  "151Eu_CD137-4-1BB",  "165Ho_IFNg", "142Nd_IL-1b", "156Gd_IL-6", "166Er_IL-10",
+                 "152Sm_TCRgd", "151Eu_CD137-4-1BB", "149Sm_IL-12p70", "150Nd_MIP-1b", "144Nd_IL-2", "146Nd_TNFa")
+
+
+
 scriptPath <- fs::path("H:", "git", "cytof")
 #scriptPath <- fs::path("C:", "CyToF data", "fra github")
 
@@ -322,11 +334,11 @@ xdim <- 14
 ydim <- 14
 
 
-utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "Resulta_Panel_1_ALLE", "TigtherCleanUp")
+utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "Resultat_Panel_2_ALLE", "TigtherCleanUp")
 seed <- 4392 #nb må endres vil man vil gjøre et annet uttrekk
 selectedEvents <- FALSE
 channel <- NULL
-o <- orderPanel1
+o <- orderPanel2
 column_cluster <- FALSE
 
 source(fs::path(scriptPath, "FlowSOM_analyse.R"))
@@ -335,7 +347,7 @@ source(fs::path(scriptPath, "FlowSOM_analyse.R"))
 seed <- 5678 #nb må endres vil man vil gjøre et annet uttrekk
 selectedEvents <- FALSE
 channel <- NULL
-o <- orderPanel1
+o <- orderPanel2
 column_cluster <- FALSE
 
 source(fs::path(scriptPath, "FlowSOM_analyse.R"))
@@ -347,7 +359,7 @@ for(j in 1:length(posNeg)){
   posNeg[[j]]$CD3CD45CD4 <- posNeg[[j]]$CD3 & posNeg[[j]]$CD45 & posNeg[[j]]$CD4
 }
 
-utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "Resulta_Panel_1_ALLE_CD4", "TigtherCleanUp")
+utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "Resulta_Panel_2_ALLE_CD4", "TigtherCleanUp")
 seed <- 3049#nb må endres vil man vil gjøre et annet uttrekk
 selectedEvents <- TRUE
 channel <- "CD3CD45CD4"
@@ -355,7 +367,7 @@ n_per_file <- 1250
 ks <- c(15, 20, 25, 30, 35, 40)
 xdim <- 10
 ydim <- 10
-o <- orderPanel1
+o <- orderPanel2
 column_cluster <- FALSE
 
 
@@ -368,7 +380,7 @@ n_per_file <- 1250
 ks <- c(15, 20, 25, 30, 35, 40)
 xdim <- 10
 ydim <- 10
-o <- orderPanel1
+o <- orderPanel2
 column_cluster <- FALSE
 
 
@@ -382,7 +394,7 @@ for(j in 1:length(posNeg)){
   posNeg[[j]]$CD3CD45CD8 <- posNeg[[j]]$CD3 & posNeg[[j]]$CD45 & posNeg[[j]]$CD8
 }
 
-utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "Resulta_Panel_1_ALLE_CD8", "TigtherCleanUp")
+utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "Resulta_Panel_2_ALLE_CD8", "TigtherCleanUp")
 seed <- 2390#nb må endres vil man vil gjøre et annet uttrekk
 selectedEvents <- TRUE
 channel <- "CD3CD45CD8"
@@ -390,7 +402,7 @@ n_per_file <- 4250
 ks <- c(15, 20, 25, 30, 35, 40)
 xdim <- 10
 ydim <- 10
-o <- orderPanel1
+o <- orderPanel2
 column_cluster <- FALSE
 
 
@@ -403,7 +415,7 @@ n_per_file <- 4250
 ks <- c(15, 20, 25, 30, 35, 40)
 xdim <- 10
 ydim <- 10
-o <- orderPanel1
+o <- orderPanel2
 column_cluster <- FALSE
 
 
