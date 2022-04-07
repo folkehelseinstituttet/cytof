@@ -654,25 +654,25 @@ signal_signal_plot <- function(data, random_events, channel1, channel2, xname = 
       gate_line <- data.frame(x0 = xlow[i], ymax = ylim[2], ymin = ylim[1] )
       gg <- gg + ggplot2::geom_segment(data = gate_line, 
                                        ggplot2::aes(x = x0, xend = x0, y = ymin, yend = ymax), 
-                                       color = "black") 
+                                       color = "blue", size = 1.5) 
     }
     if(!is.na(xhigh[1]) ){
       gate_line <- data.frame(x0 = xhigh[i], ymax = ylim[2], ymin = ylim[1] )
       gg <- gg + ggplot2::geom_segment(data = gate_line, 
                                        ggplot2::aes(x = x0, xend = x0, y = ymin, yend = ymax), 
-                                       color = "black") 
+                                       color = "blue", size = 1.5) 
     }    
     if(!is.na(ylow[1]) ){
       gate_line <- data.frame(y0 = ylow[i], xmax = xlim[2], xmin = xlim[1] )
       gg <- gg + ggplot2::geom_segment(data = gate_line, 
                                        ggplot2::aes(x = xmin, xend = xmax, y = y0, yend = y0), 
-                                       color = "black") 
+                                       color = "blue", size = 1.5) 
     }
     if(!is.na(yhigh[1]) ){
       gate_line <- data.frame(y0 = yhigh[i], xmax = xlim[2], xmin = xlim[1] )
       gg <- gg + ggplot2::geom_segment(data = gate_line, 
                                        ggplot2::aes(x = xmin, xend = xmax, y = y0, yend = y0), 
-                                       color = "black") 
+                                       color = "blue", size = 1.5) 
     }    
     #   stat_ellipse(level = 0.8)
     plotList[[i]] <- gg
