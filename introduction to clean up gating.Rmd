@@ -1,12 +1,18 @@
 ---
 title: "Clean up gating"
 author: "Anja Bråthen Kristoffersen"
-date: "08 March 2022"
 output: word_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+last updated
+
+```{r}
+date()
 ```
 
 This document describes the different lines of the file "example clean up gating alle filer.R". To perform your own gating save the file "example clean up gating alle filer.R" from github https://github.com/folkehelseinstituttet/cytof give it a new name and change the necessary paths and values throughout the document to use it on your own data. 
@@ -422,13 +428,13 @@ abline(h = dens$y[cutoff_n_upper], col = "green")
 
 
 
-The function find_gaussian_gates_second_top() are used to find lower and upper gate for the positiv signal of the residuals.
+The function find_gaussian_gates_second_top() are used to find lower and upper gate for the positiv signal of the residuals. The higher the percentages used the tighter the gates. 
 It takes the variables
 
   * data: here the arc sinh transformed clean_up_data are used
   * channel: which marker/channel you want to gate, here "Residual".
-  * lower_gate_percent: tells where the lower gate is placed. See figure and explanation above, here 10 %
-  * upper_gate_percent: tells where the upper gate is placed. See figure and explanation above, here 10 %
+  * lower_gate_percent: tells where the lower gate is placed. See figure and explanation above, here 25 %
+  * upper_gate_percent: tells where the upper gate is placed. See figure and explanation above, here 25 %
 
 
 
@@ -436,7 +442,7 @@ It takes the variables
 R code to fine the lower and upper residual gates:
 
 ```{r}
- residual_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Residual", lower_gate_percent = 10, upper_gate_percent = 10)
+ residual_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Residual", lower_gate_percent = 25, upper_gate_percent = 25)
  
 ```
 
@@ -522,12 +528,12 @@ First the number of events left before this gating are found and a new set rando
   
 ```
 
-Center is gated in the same way as Residuals by using the function find_gaussian_gates_second_top(). Also, here we have chosen to use 10% gaussian gates for both lower and upper gate. This must be adjusted to what level you want to use for your data. Plots are made and if wanted saved in the same way as for Residuals. 
+Center is gated in the same way as Residuals by using the function find_gaussian_gates_second_top(). Also, here we have chosen to use 25% gaussian gates for both lower and upper gate. This must be adjusted to what level you want to use for your data. Plots are made and if wanted saved in the same way as for Residuals. 
 
 
 
 ```{r, echo = FALSE, message= FALSE, comment= FALSE}
-center_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Center", lower_gate_percent = 10, upper_gate_percent = 10)
+center_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Center", lower_gate_percent = 25, upper_gate_percent = 25)
 
 time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = random_events_for_plotting, channel = "Center", plot_title = file_names, lower_gate = center_gates$lower_gate, upper_gate = center_gates$upper_gate)
 plotSignal(plot_list = time_signal_plots)
@@ -581,11 +587,11 @@ number_of_events_before_offset_gating <-  number_of_events_after_center_gating
 random_events_for_plotting <- random_events(number_of_events_before_offset_gating)
 ```
 
-Also offset is gated in the same way as Residuals and Center by using the function find_gaussian_gates_second_top(). But here we have chosen to using 18 % gaussian gates for both lower and upper gate. This must be adjusted to what level you want to use for your data. Plots are made and if wanted saved in the same way as for Residuals. 
+Also offset is gated in the same way as Residuals and Center by using the function find_gaussian_gates_second_top().  Here we have chosen to using 25 % gaussian gates for both lower and upper gate. This must be adjusted to what level you want to use for your data. Plots are made and if wanted saved in the same way as for Residuals. 
 
 ```{r}
 #update lower_gate_percent, upper_gate_percent
-offset_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Offset", lower_gate_percent = 18, upper_gate_percent = 18)
+offset_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Offset", lower_gate_percent = 25, upper_gate_percent = 25)
 
 time_signal_plots <- time_signal_plot(data = clean_up_data, random_events = random_events_for_plotting, channel = "Offset", plot_title = file_names, lower_gate = offset_gates$lower_gate, upper_gate = offset_gates$upper_gate)
 plotSignal(plot_list = time_signal_plots)
@@ -684,14 +690,14 @@ It takes the variables
 
   * data: here the arc sinh transformed clean_up_data are used
   * channel: which marker/channel you want to gate, here "Width".
-  * lower_gate_percent: tells where the lower gate is placed. See figure and explanation above, here 7 %
-  * upper_gate_percent: tells where the upper gate is placed. See figure and explanation above, here 7 %
+  * lower_gate_percent: tells where the lower gate is placed. See figure and explanation above, here 20 %
+  * upper_gate_percent: tells where the upper gate is placed. See figure and explanation above, here 20 %
 
 R code to fine the lower and upper residual gates:
 
 ```{r}
 #update lower_gate_percent, upper_gate_percent
-  width_gates <- find_gaussian_gates_highest_top(data = clean_up_data, channel = "Width", lower_gate_percent = 7, upper_gate_percent = 7)
+  width_gates <- find_gaussian_gates_highest_top(data = clean_up_data, channel = "Width", lower_gate_percent = 20, upper_gate_percent = 20)
 
   density_plots <- density_plot(data = clean_up_data, "Width", plot_title = file_names, lower_gate = width_gates$lower_gate, upper_gate = width_gates$upper_gate, maksCellsUsed = 25000)
   density_plots
@@ -803,11 +809,11 @@ First the number of events left before this gating are found and a new set rando
   random_events_for_plotting <- random_events(number_of_events_before_cis_gating)
 ```
 
-Also CIS is gated by using the function find_gaussian_gates_second_top(). But here we have chosen to use 5 % gaussian gates for the lower gate and 20 % for the upper gate. This must be adjusted to what level you want to use for your data. Plots are made and if wanted saved in the same way as for Residuals. 
+Also CIS is gated by using the function find_gaussian_gates_second_top(). But here we have chosen to use 2 % gaussian gates for the lower gate and 40 % for the upper gate. This must be adjusted to what level you want to use for your data. Plots are made and if wanted saved in the same way as for Residuals. 
 
 ```{r}
 #update lower_gate_percent, upper_gate_percent
-  cis_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Pt194Di", lower_gate_percent = 5, upper_gate_percent = 30)
+  cis_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Pt194Di", lower_gate_percent = 2, upper_gate_percent = 40)
 # if you want to overwrite the gate found this could be done like this:
  # tvungetLavereCISgate <- 0.5 #sett inn NA hvis du heller vil bruke gaussian gate for CIS. evt annet tall..
  # if(!is.na(tvungetLavereCISgate)){
@@ -868,12 +874,13 @@ First the number of events left before this gating are found and a new set rando
   random_events_for_plotting <- random_events(number_of_events_before_Ir191Di_gating)
 ```
 
+Also CIS is gated by using the function find_gaussian_gates_second_top(). But here we have chosen to use 25 % gaussian gates for the lower gate and 25 % for the upper gate. This must be adjusted to what level you want to use for your data. Plots are made and if wanted saved in the same way as for Residuals. 
 
-Also, here gaussian gate for the second top is found, but instead of using the variables lower_gate_percent and upper_gate_percent another variable is used. This is perc_include. In this version of the function, we assume the signals to come from two normal distribution and that we want to find the gate that include 99 % of the normal distribution with the highest top. This way of finding the gates involves some computation and will take some time. The best approach is to test on some files and then run it for all files later. 
 
 ```{r, message=FALSE, warning=FALSE, comment=FALSE}
-Ir191di_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Ir191Di", lower_gate_percent = NA, upper_gate_percent = NA, perc_included = 0.99, main_top_to_left = F)
 
+Ir191di_gates <- find_gaussian_gates_second_top(data = clean_up_data, channel = "Ir191Di", lower_gate_percent = 25, upper_gate_percent = 25)
+ 
 density_plots <- density_plot(data = clean_up_data, "Ir191Di", plot_title = file_names, lower_gate = Ir191di_gates$lower_gate, upper_gate = Ir191di_gates$upper_gate, maksCellsUsed = 25000)
 
 density_plots
@@ -929,7 +936,7 @@ Here we use another function called find_gaussian_gates_highest_top() which agai
 
 ```{r}
 #update lower_gate_percent, upper_gate_percent
-  Ir193di_gates <- find_gaussian_gates_highest_top(data = clean_up_data, channel = "Ir193Di", lower_gate_percent = 15, upper_gate_percent = 5)
+  Ir193di_gates <- find_gaussian_gates_highest_top(data = clean_up_data, channel = "Ir193Di", lower_gate_percent = 25, upper_gate_percent = 25)
 
 
 density_plots <- density_plot(data = clean_up_data, "Ir193Di", plot_title = file_names, lower_gate = Ir193di_gates$lower_gate, upper_gate = Ir193di_gates$upper_gate, maksCellsUsed = 25000)
