@@ -1,13 +1,20 @@
 ---
 title: "Gating"
 author: "Anja Bråthen Kristoffersen"
-date: "28 2 2022"
 output: word_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 ```
+
+last updated
+
+```{r}
+date()
+```
+
+
 
 ```{r, include=FALSE, message= FALSE, comment= FALSE}
 data_path <- fs::path("C:", "CyToF data", "immun_aga", "panel1")
@@ -136,9 +143,6 @@ density_plots
 signal <- signal_signal_plot(data = data, random_events = random_event_for_plotting, channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names_short, title_size = 10)
 plot_multiple_signals(signal)
 
-
-#violin_per_sample(data_mat = data_mat, x = kanal, y = "dataset", line = NA)
-
 ```
 where the gate is placed varies a little from file to file. 
 
@@ -150,18 +154,20 @@ The result of the gating is here saved per cell as either 0 or 1 where 0 means l
 ```{r}
 result <- list()
 
+#this for loop makes a list of data frame to store the result in. All values stored by now is NA
 for(j in 1:length(data)){
   mat <-  as.data.frame(matrix(NA, ncol = 1, nrow =  nrow(data[[j]])))
   colnames(mat) <- c("above high gate")
   result[[j]] <- mat
 }
 
+#this for loop store the information for each cell, if it is positive (above the gate) as TRUE (1) or below the gate as FALSE (0)
 for(j in 1:length(data)){
   result[[j]][,"above high gate"] <- data[[j]][, kanal] > split$lower_gates[j]
 }
 ```
 
-The percentage of each file that are of a given level can be calucated from the result. Here you find the percent that are higher than the found gate.
+The percentage of each file that are of a given level can be calculated from the result by using the function prosent_per_channel(). Here you find the percent that are higher than the found gate.
 
 ```{r}
 percents <- data.frame(prosent_per_channel(result, values = 1))
@@ -173,9 +179,9 @@ percents
 
 ### if R have problem finding the gate you want.
 
-* you can try to use the variable minimum in find_gaussian_gates_second_top(). That will force the dataset to either use this value as the minimum or find the first minimum after this value as the minimum.
+* you can try to use the variable minimum in find_gaussian_gates_second_top(). That will force the dataset to either use this value as the minimum or find the first minimum above this value as the minimum.
 
-* you might also just define your own gate. By using the same value fro all files. 
+* you might also just define your own gate. By using the same value for all files or only overwrite the gate with a value for some selected files. 
 
 
 ## Function find_gaussian_gates_first_top()
@@ -230,7 +236,7 @@ abline(h = dens$y[gate_n], col = "green")
 upper_gate
 ```
 
-The density plot of the lower signal is here plotted in black. Then the first top are found. Here shown with red horizontal lines. The hight h between this line and 0 are calculated, here shown in blue. The green horizontal line is found based on the upper percentage, so it is  upper_gate_percent/100 *  h. Where the green horizontal line first crosses the density curve after the top here shown with a green vertical line. The green vertical line is the upper gate produced by the function find_gaussian_gates_first_top() 
+The density plot of the lower signal is here plotted in black. Then the first top is found. Here shown with red horizontal lines. The hight h between this line and 0 are calculated, here shown in blue. The green horizontal line is found based on the upper percentage, so it is  upper_gate_percent/100 *  h. Where the green horizontal line first crosses the density curve after the top here shown with a green vertical line. The green vertical line is the upper gate produced by the function find_gaussian_gates_first_top() 
 
 
 This will then be done for many files simultaneously and plotted together either as a density plot or as a signal-signal plot
@@ -252,11 +258,7 @@ plot_multiple_signals(signal)
 
 ```
 
-Unfortunately it looks like the gate is placed in the middel of the top. This is "just" a smoothing and visualisation problem. If we count how many cells that are above the upper gate found here we get..
-
-
-
-
+Unfortunately, it looks like the gate is placed in the middle of the top. This is "just" a smoothing and visualisation problem. If we count how many cells that are above the upper gate found here we save the result of the gating in the list result and use the function prosent_per_channel() to find how many percent of the cells in each file that are above the gate. 
 
 
 ```{r}
@@ -275,18 +277,28 @@ for(j in 1:length(data)){
 
 
 percents <- data.frame(prosent_per_channel(result, values = 1))
+percents$above.first.gate
 ```
 
-
-
-this means that the area between the two gates consist of
+Since we now have the percentages above each of the gates we can also calculate the percentages between the gates. 
 
 ```{r}
 
 percents$above.second.gate - percents$above.first.gate
 
 ```
-## Function find_gaussian_gates_first_top()
+
+## Function find_split_first_second_top()
+
+If you rather want to place the gates based on the minimum between the first and second top you can use the function find_split_first_second_top(). It takes the variables:
+
+
+  * data: here arc sinh transformed data are used
+  * channel: which marker/channel you want to gate, here CD3
+  * minimum: which is the minimum value that you want the gate to have, if not used the default is 0
+
+
+Here the gates are found as the minimum between the first and second top as shown in the figure below.
 
 ```{r, echo = F}
  xx <- data[[1]][, column]
@@ -301,9 +313,7 @@ abline(v = bunn1, col = "red")
 ```
 
 
-```{r}
-find_split_first_second_top(data = data, channel = kanal)
-```
+The code for doing this is, where also density plot and signal-signal plots are made. 
 
 
 ```{r, fig.width= 12, fig.height=12}
@@ -323,7 +333,7 @@ plot_multiple_signals(signal)
 ```
 
 
-
+The data is then stored in result.
 
 ```{r}
 result <- list()
@@ -338,9 +348,11 @@ for(j in 1:length(data)){
   result[[j]][,"above second gate"] <- data[[j]][, kanal] > result_second_gating[j]
   result[[j]][,"above third gate"] <- data[[j]][, kanal] > result_third_gating[j]
 }
+```
 
+And the percentages above each of the gates found by using the function prosent_per_channel()
 
-
+```{r}
 percents <- data.frame(prosent_per_channel(result, values = c(1, 1, 1)))
 percents
 ```
