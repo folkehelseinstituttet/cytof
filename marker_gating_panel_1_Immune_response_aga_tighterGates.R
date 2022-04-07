@@ -351,12 +351,12 @@ kanal <- params$name[grep(x, params$desc)][1]
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = kanal) 
 
 
+splitLow <-  find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
+splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001)
+splitHigh$lower_gates[is.na(splitHigh$lower_gates)] <- mean(splitHigh$lower_gates[!is.na(splitHigh$lower_gates)])
+splitHigh$lower_gates[splitHigh$lower_gates < 1] <- mean(splitHigh$lower_gates[splitHigh$lower_gates > 1])
 
-split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001)
-split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
-split$lower_gates[split$lower_gates < 1] <- mean(split$lower_gates[split$lower_gates > 1])
-
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = splitLow$upper_gates, upper_gate = splitHigh$upper_gates, main_title = x)
 #density_plots # to see the plots
 
 tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
@@ -370,15 +370,17 @@ kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
   kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
 }
-signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
+signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = splitLow$upper_gates, yhigh =splitHigh$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
-
 for(j in filene){
-  result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
+  result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
+  result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j], x] <- 2
 }
 
-split <- NA
+splitHigh <- NA
+splitLow <- NA
+
 #***************************************************
 #pos/neg CCR4 ---- 8 feb ok , 9 feb ok
 #***************************************************
@@ -462,21 +464,17 @@ kanal <- params$name[grep(x, params$desc)][1]
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = kanal) 
 
 
-split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 0.8)
-split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
-split$lower_gates[split$lower_gates > 2.5] <- mean(split$lower_gates[split$lower_gates < 2.5])
+splitLow <-  find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
+splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001)
+splitHigh$lower_gates[is.na(splitHigh$lower_gates)] <- mean(splitHigh$lower_gates[!is.na(splitHigh$lower_gates)])
+splitHigh$lower_gates[splitHigh$lower_gates > 2.5] <- mean(splitHigh$lower_gates[splitHigh$lower_gates < 2.5])
 
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = splitLow$upper_gates, upper_gate = splitHigh$upper_gates, main_title = x)
 #density_plots # to see the plots
 
 tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
 print(density_plots)
 dev.off()
-
-
-for(j in filene){
-  result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
-}
 
 
 
@@ -485,13 +483,16 @@ kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
   kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
 }
-signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
+signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = splitLow$upper_gates, yhigh =splitHigh$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
+for(j in filene){
+  result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
+  result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j], x] <- 2
+}
 
-
-split <- NA
-
+splitHigh <- NA
+splitLow <- NA
 
 #***************************************************
 #pos/neg CD15 ---- OK    8 feb. lavt signal overalt. Ta ut av datasettet? SJEKK. Har endret til 0.5, 9 feb setter fast grense på 2. ikke noe er positivt, ble ok
@@ -574,9 +575,10 @@ params$desc[grep(x, params$desc)]#må sjekke at vi får riktig kanal.
 kanal <- params$name[grep(x, params$desc)][1] 
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = kanal) 
 
-split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 3)
-split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)] )
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
+splitLow <- find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
+splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 3)
+splitHigh$lower_gates[is.na(splitHigh$lower_gates)] <- mean(splitHigh$lower_gates[!is.na(splitHigh$lower_gates)] )
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = splitLow$upper_gates, upper_gate = splitHigh$lower_gates, main_title = x)
 #density_plots # to see the plots
 
 tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
@@ -589,16 +591,19 @@ kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
   kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
 }
-signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
+signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = splitLow$upper_gates, yhigh = splitHigh$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
 
 for(j in filene){
-  result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
+  result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
+  result[[j]][data[[j]][, kanal] > splitLow$upper_gates[j],x] <- 2
 }
 
 
-split <- NA
+splitHigh <- NA
+splitLow <- NA
+
 #***************************************************
 #pos/neg CD16 ---- OK  8 feb- endr til minimum 1.5 SJEKK, 9 feb.lever med det ikke helt topp.
 #*************************************************** 
@@ -608,11 +613,12 @@ kanal <- params$name[grep(x, params$desc)][1]
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = kanal) 
 
 
+splitLow <- find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
+splitLow$upper_gates[splitLow$upper_gates > 0.2] <- 0.2
+splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1.5)
+splitHigh$lower_gates[is.na(split$lower_gates)] <- mean(splitHigh$lower_gates[!is.na(splitHigh$lower_gates)])
 
-split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1.5)
-split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
-
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = splitLow$upper_gates, upper_gate = splitHigh$lower_gates, main_title = x)
 #density_plots # to see the plots
 
 tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
@@ -625,14 +631,17 @@ kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
   kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
 }
-signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
+signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = splitLow$upper_gates, yhigh = splitHigh$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
 for(j in filene){
-  result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
+  result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
+  result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j], x] <- 2
 }
 
-split <- NA
+splitHigh <- NA
+splitLow <- NA
+
 #***************************************************
 #pos/neg CD25 ---- her tror jeg at vi m? sette en nedre grense p? 1  8 feb endret minimum til 1. SJEKK om man trenger grense?, 9 feb: fast grense på 1  ble ok
 #***************************************************
@@ -641,6 +650,38 @@ x <- "CD25"
 params$desc[grep(x, params$desc)]#må sjekke at vi får riktig kanal.
 kanal <- params$name[grep(x, params$desc)][1] 
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = kanal) 
+
+
+splitLow <-  find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
+splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001)
+splitHigh$lower_gates <- rep(1, splitHigh$lower_gates)
+
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = splitLow$upper_gates, upper_gate = splitHigh$upper_gates, main_title = x)
+#density_plots # to see the plots
+
+tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
+print(density_plots)
+dev.off()
+
+
+
+data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
+kanal_max <- max(data[[1]][,kanal])
+for(i in 1:n_files){
+  kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
+}
+signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = splitLow$upper_gates, yhigh =splitHigh$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
+plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
+
+for(j in filene){
+  result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
+  result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j], x] <- 2
+}
+
+splitHigh <- NA
+splitLow <- NA
+
+
 
 split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1)
 split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
@@ -900,12 +941,13 @@ kanal <- params$name[grep(x, params$desc)][1]
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = kanal) 
 
 
-split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1)
-split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
-split$lower_gates[split$lower_gates > 6] <- mean(split$lower_gates[split$lower_gates < 6])
-split$lower_gates[split$lower_gates < 1.2] <- mean(split$lower_gates[split$lower_gates > 1.2])
+splitLow <-  find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
+splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001)
+splitHigh$lower_gates[is.na(splitHigh$lower_gates)] <- mean(splitHigh$lower_gates[!is.na(splitHigh$lower_gates)])
+splitHigh$lower_gates[splitHigh$lower_gates < 1.2] <- mean(splitHigh$lower_gates[splitHigh$lower_gates > 1.2])
+splitHigh$lower_gates[splitHigh$lower_gates > 6] <- mean(splitHigh$lower_gates[splitHigh$lower_gates < 6])
 
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = splitLow$upper_gates, upper_gate = splitHigh$upper_gates, main_title = x)
 #density_plots # to see the plots
 
 tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
@@ -913,21 +955,23 @@ print(density_plots)
 dev.off()
 
 
+
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
 kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
   kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
 }
-signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
+signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = splitLow$upper_gates, yhigh =splitHigh$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
 for(j in filene){
-  result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
+  result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
+  result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j], x] <- 2
 }
 
+splitHigh <- NA
+splitLow <- NA
 
-
-split <- NA
 #***************************************************
 #pos/neg IgG---- OK 9 feb øker mini til 2.3, ble ok
 #***************************************************
@@ -1125,6 +1169,36 @@ kanal <- params$name[grep(x, params$desc)][1]
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = kanal) 
 
 
+splitLow <-  find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
+splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001)
+splitHigh$lower_gates[is.na(splitHigh$lower_gates)] <- mean(splitHigh$lower_gates[!is.na(splitHigh$lower_gates)])
+splitHigh$lower_gates[splitHigh$lower_gates > 4] <- mean(splitHigh$lower_gates[splitHigh$lower_gates < 4])
+
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = splitLow$upper_gates, upper_gate = splitHigh$upper_gates, main_title = x)
+#density_plots # to see the plots
+
+tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
+print(density_plots)
+dev.off()
+
+
+
+data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
+kanal_max <- max(data[[1]][,kanal])
+for(i in 1:n_files){
+  kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
+}
+signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = splitLow$upper_gates, yhigh =splitHigh$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
+plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
+
+for(j in filene){
+  result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
+  result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j], x] <- 2
+}
+
+splitHigh <- NA
+splitLow <- NA
+
 
 split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1)
 split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
@@ -1200,13 +1274,10 @@ kanal <- params$name[grep(x, params$desc)][1]
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = kanal) 
 
 
-
-split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1)
-split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
-split$lower_gates[split$lower_gates > 4] <- mean(split$lower_gates[split$lower_gates < 4])
-split$lower_gates[split$lower_gates < 1.15] <- mean(split$lower_gates[split$lower_gates > 1.15])
-split$lower_gates <- rep(2, length(split$lower_gates))
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
+splitLow <-  find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
+splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001)
+splitHigh$lower_gates <- rep(2, length(splitHigh$lower_gates))
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = splitLow$upper_gates, upper_gate = splitHigh$upper_gates, main_title = x)
 #density_plots # to see the plots
 
 tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
@@ -1214,20 +1285,25 @@ print(density_plots)
 dev.off()
 
 
+
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
 kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
   kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
 }
-signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
+signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = splitLow$upper_gates, yhigh =splitHigh$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
 for(j in filene){
-  result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
+  result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
+  result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j], x] <- 2
 }
 
+splitHigh <- NA
+splitLow <- NA
 
-split <- NA
+
+
 
 #***************************************************
 #pos/neg CCR7---- 8 feb, 9 febok
@@ -1398,11 +1474,10 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = ka
 
 
 
-split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 2)
-split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
-split$lower_gates[split$lower_gates > 4] <- mean(split$lower_gates[split$lower_gates < 4])
-split$lower_gates <- rep(2, length(split$lower_gates))
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
+splitLow <-  find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
+splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001)
+splitHigh$lower_gates <- rep(2, length(splitHigh$lower_gates))
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = splitLow$upper_gates, upper_gate = splitHigh$upper_gates, main_title = x)
 #density_plots # to see the plots
 
 tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
@@ -1410,20 +1485,22 @@ print(density_plots)
 dev.off()
 
 
+
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
 kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
   kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
 }
-signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
+signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = splitLow$upper_gates, yhigh =splitHigh$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
 for(j in filene){
-  result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
+  result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
+  result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j], x] <- 2
 }
 
-
-split <- NA
+splitHigh <- NA
+splitLow <- NA
 
 #***************************************************
 #pos/neg CD141---- OK   9 feb alle over 3 middels av de under.  ble ok
@@ -1516,11 +1593,12 @@ kanal <- params$name[grep(x, params$desc)][2]
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = kanal) 
 
 
+splitLow <- find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
 
-split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1)
-split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
-split$lower_gates <- rep(1, length(split$lower_gates))
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
+splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1)
+splitHigh$lower_gates[is.na(splitHigh$lower_gates)] <- mean(splitHigh$lower_gates[!is.na(splitHigh$lower_gates)])
+splitHigh$lower_gates <- rep(1, length(splitHigh$lower_gates))
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = splitLow$upper_gates, upper_gate = splitHigh$lower_gates, main_title = x)
 #density_plots # to see the plots
 
 tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
@@ -1533,17 +1611,18 @@ kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
   kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
 }
-signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
+signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = splitLow$upper_gates, yhigh = splitHigh$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
 for(j in filene){
-  result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
+  result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
+  result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j],x] <- 2
 }
 
 
 
-split <- NA
-
+splitHigh <- NA
+splitLow <- NA
 #***************************************************
 #pos/neg CD11b---- her velger vi den lille toppen helt til h?yre ca 4, resten negativt, feb 8 prøv minim 3, sjekk... 9 feb ok nå
 #***************************************************
@@ -1666,14 +1745,11 @@ kanal <- params$name[grep(x, params$desc)][1]
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = kanal) 
 
 
+splitLow <-  find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
+splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001)
+splitHigh$lower_gates <- rep(2.4, length(splitHigh$lower_gates))
 
-split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1)
-split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
-split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
-split$lower_gates <- rep(2.4, length(split$lower_gates))
-
-
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = splitLow$upper_gates, upper_gate = splitHigh$upper_gates, main_title = x)
 #density_plots # to see the plots
 
 tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
@@ -1681,20 +1757,22 @@ print(density_plots)
 dev.off()
 
 
+
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
 kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
   kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
 }
-signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
+signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = splitLow$upper_gates, yhigh =splitHigh$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
 for(j in filene){
-  result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
+  result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
+  result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j], x] <- 2
 }
 
-
-split <- NA
+splitHigh <- NA
+splitLow <- NA
 
 
 #***************************************************
