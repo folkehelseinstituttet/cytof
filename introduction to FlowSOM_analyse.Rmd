@@ -1,12 +1,17 @@
 ---
 title: "Introduction to FlowSOM analyse"
 author: "Anja Bråthen Kristoffersen"
-date: "23 March 2022"
 output: word_document
 ---
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
+```
+
+last updated
+
+```{r}
+date()
 ```
 
 This document describes the different lines of the file "FlowSOM_analyse.R". To perform your own flowSOM analysis save the file "FlowSOM_analyse.R" from github https://github.com/folkehelseinstituttet/cytof give it a new name and change the necessary paths and values throughout the document to use it on your own data. The file "FlowSOM_analyse.R" is sourced from the file "runFlowSOM_analyse.R" which also can be found on github together with an explanatory file called "Introduction to runFlowSOM_analyse.R". These documents only make a clustering of your data and some additional files that later will be used when analysing the flowSOM data together with metadata, examples of analysing of the clustering data together with metadata can be found in resultater_Regression_clusters.Rmd which is sourced from runResults_Regression_Clusters.R. 
