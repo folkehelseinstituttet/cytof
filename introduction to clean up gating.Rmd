@@ -15,7 +15,7 @@ last updated
 date()
 ```
 
-This document describes the different lines of the file "example clean up gating alle filer.R". To perform your own gating save the file "example clean up gating alle filer.R" from github https://github.com/folkehelseinstituttet/cytof give it a new name and change the necessary paths and values throughout the document to use it on your own data. 
+This document describes the different lines of the file "example clean up gating alle filer.R". To perform your own gating save the file "clean up gating all files panel 1 mars 2022.R" from github https://github.com/folkehelseinstituttet/cytof give it a new name and change the necessary paths and values throughout the document to use it on your own data. 
 
 
 You start with defining a variable data_path that contains the path of the folder where all your uncleaned files are saved. I prefer using the function path from the library fs. When using a function from a given library the way to get the function is by library_name::function_name so in this case fs::path 
