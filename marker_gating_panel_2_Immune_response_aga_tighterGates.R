@@ -101,6 +101,8 @@ for(j in filene){
 CD107a <- params$name[grep( "CD107a", params$desc)][1] 
 
 x <- "CD45"
+print(x)
+
 params$desc[grep(x, params$desc)]#må sjekke at vi får riktig kanal.
 kanal <- params$name[grep(x, params$desc)][1] 
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = kanal) 
@@ -134,6 +136,8 @@ split <- NA
 CD45 <- params$name[grep("CD45", params$desc)][1] 
 
 x <- "CD57"
+print(x)
+
 params$desc[grep(x, params$desc)]#må sjekke at vi får riktig kanal.
 kanal <- params$name[grep(x, params$desc)][1] 
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
@@ -159,6 +163,8 @@ split <- NA
 #pos/neg CD19 ---- 
 #***************************************************
 x <- "CD19"
+print(x)
+
 
 params$desc[grep(x, params$desc)]#må sjekke at vi får riktig kanal.
 kanal <- params$name[grep(x, params$desc)][1] 
@@ -190,6 +196,8 @@ split <- NA
 #pos/neg CD8 ----  
 #***************************************************
 x <- "CD8"
+print(x)
+
 kanal <- params$name[grep(x, params$desc)][1] 
 
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
@@ -222,6 +230,8 @@ proc.time() - ptm
 #pos/neg HLADR ----  
 #***************************************************
 x <- "HLADR"
+print(x)
+
 kanal <- params$name[grep(x, params$desc)][1] 
 
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
@@ -263,6 +273,8 @@ splitLow <- NA
 #pos/neg CD3 ----  
 #***************************************************
 x <- "CD3"
+print(x)
+
 kanal <- params$name[grep(x, params$desc)][1] 
 
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
@@ -289,6 +301,8 @@ split <- NA
 #pos/neg CD4 ----  
 #***************************************************
 x <- "CD4"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][3] 
 
@@ -303,10 +317,11 @@ for(i in 1:n_files){
   kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
 }
 signal <- signal_signal_plot(data = data, random_events = random_events(number_of_events(data)), channel1 = CD45, channel2 = kanal, ylow = split$lower_gates, xname = "CD45", yname = x, plot_title = file_names, ylim = c(0, kanal_max), title_size = 10)
+
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
 
-density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split, main_title = x, xlim = c(0, kanal_max))
+density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x, xlim = c(0, kanal_max))
 #density_plots # to see the plots
 
 tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
@@ -325,6 +340,9 @@ split <- NA
 #pos/neg CD25 ----  
 #***************************************************
 x <- "CD25"
+print(x)
+
+print(x)
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -368,6 +386,8 @@ splitLow <- NA
 #pos/neg TCRgd ----  
 #***************************************************
 x <- "TCRgd"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -393,6 +413,8 @@ split <- NA
 #pos/neg CXCR5 ----  14 feb Velger fast på 2
 #***************************************************
 x <- "CXCR5"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -421,6 +443,8 @@ split <- NA
 #pos/neg CD45RA ----  
 #***************************************************
 x <- "CD45RA"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -450,6 +474,8 @@ split <- NA
 #pos/neg CD27 ----  
 #***************************************************
 x <- "CD27"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][3] 
 
@@ -514,6 +540,8 @@ split <- NA
 #pos/neg CD28 ----  
 #***************************************************
 x <- "CD28"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -541,6 +569,8 @@ split <- NA
 #pos/neg CCR7 ----  14 feb inkl >3.5
 #***************************************************
 x <- "CCR7"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -569,6 +599,8 @@ split <- NA
 #pos/neg CD25 ----  
 #***************************************************
 x <- "CD25"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -604,6 +636,8 @@ split <- NA
 #pos/neg CD38 ----  
 #***************************************************
 x <- "CD38"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -647,6 +681,8 @@ splitLow <- NA
 #pos/neg PD1 ----  15 feb fix 1
 #***************************************************
 x <- "PD1"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -674,6 +710,8 @@ split <- NA
 #pos/neg CD14 ----  
 #***************************************************
 x <- "CD14"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -745,6 +783,8 @@ split <- NA
 #pos/neg CD56 ----  
 #***************************************************
 x <- "CD56"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -788,6 +828,8 @@ splitLow <- NA
 #pos/neg CD16 ----  
 #***************************************************
 x <- "CD16"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -830,6 +872,8 @@ splitLow <- NA
 #pos/neg CD107a ----  
 #***************************************************
 x <- "CD107a"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -857,6 +901,8 @@ split <- NA
 #pos/neg CD44 ----  
 #***************************************************
 x <- "CD44"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -884,6 +930,8 @@ split <- NA
 #pos/neg CD223 ----  
 #***************************************************
 x <- "CD223"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -911,6 +959,8 @@ split <- NA
 #pos/neg IL-1b ----  #14 feb fast grense på 3
 #***************************************************
 x <- "IL-1b"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -941,6 +991,8 @@ split <- NA
 #pos/neg CD127 ----  #legg inn upper ... 15 feb
 #***************************************************
 x <- "CD127"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -972,6 +1024,8 @@ split <- NA
 #pos/neg  IL-2 ----  14 feb, fast grense på 2.5
 #***************************************************
 x <- "IL-2"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -1001,6 +1055,8 @@ split <- NA
 #pos/neg TNFa ----  15 feb fix 2
 #***************************************************
 x <- "TNFa"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -1036,6 +1092,8 @@ split <- NA
 #pos/neg TIM-3 ----  15 feb fix 0.25
 #***************************************************
 x <- "TIM-3"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -1074,6 +1132,8 @@ split <- NA
 #pos/neg PD-L1 ----  15 feb fix 1
 #***************************************************
 x <- "PD-L1"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -1110,6 +1170,8 @@ split <- NA
 #pos/neg IL-12p70 ----  15 feb fix grense på 2.4
 #***************************************************
 x <- "IL-12p70"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -1137,6 +1199,8 @@ split <- NA
 #pos/neg MIP-1b ----  
 #***************************************************
 x <- "MIP-1b"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -1164,6 +1228,8 @@ split <- NA
 #pos/neg CD137 ----  fast grense på 0.5
 #***************************************************
 x <- "CD137"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -1202,6 +1268,8 @@ split <- NA
 #pos/neg CD272 ----  14 feb fast grense på 1
 #***************************************************
 x <- "CD272"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -1239,6 +1307,8 @@ split <- NA
 #pos/neg IL-6 ----  # 14 feb fast grense på 1.5
 #***************************************************
 x <- "IL-6"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -1275,6 +1345,8 @@ split <- NA
 #pos/neg GM-CSF ----  14 feb, fast grense på 1
 #***************************************************
 x <- "GM-CSF"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -1302,6 +1374,8 @@ split <- NA
 #pos/neg IL-17A ----  15 feb fix på 1-6
 #***************************************************
 x <- "IL-17A"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -1329,6 +1403,8 @@ split <- NA
 #pos/neg FoxP3 ----  14 feb fast grense på 0.3
 #***************************************************
 x <- "FoxP3"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -1370,6 +1446,8 @@ splitLow <- NA
 #pos/neg CD33 ----  fast grense 1
 #***************************************************
 x <- "CD33"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -1406,6 +1484,8 @@ split <- NA
 #pos/neg Perforin ----  15 feb fix 2.3
 #***************************************************
 x <- "Perforin"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -1441,6 +1521,8 @@ split <- NA
 #pos/neg IFNg ----  14 feb fast 2.5
 #***************************************************
 x <- "IFNg"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -1477,6 +1559,8 @@ split <- NA
 #pos/neg IL-10 ----  15 feb fix grense på 2
 #***************************************************
 x <- "IL-10"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -1513,6 +1597,8 @@ split <- NA
 #pos/neg CD154 ----  
 #***************************************************
 x <- "CD154"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -1548,6 +1634,8 @@ split <- NA
 #pos/neg CTLA-4 ----  fast på 1.4
 #***************************************************
 x <- "CTLA-4"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -1584,6 +1672,8 @@ split <- NA
 #pos/neg GranzymeB ----  14 feb øker minimum til 3
 #***************************************************
 x <- "GranzymeB"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
@@ -1611,6 +1701,8 @@ split <- NA
 #pos/neg PD-L2 ----  
 #***************************************************
 x <- "PD-L2"
+print(x)
+
 params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
