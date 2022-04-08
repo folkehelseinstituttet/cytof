@@ -458,12 +458,12 @@ density_plot_without_neg <- function(data, channel, plot_title = NA, lower_gate 
   
   if(!is.na(lower_gate[1]) ){
     gate_line <- data.frame(Sample = plot_title, x0 = lower_gate)
-    gg <- gg + ggplot2::geom_segment(data = gate_line, ggplot2::aes(x = x0, xend = x0, y = as.numeric(Sample), yend = as.numeric(Sample) + 0.9), color = "black") 
+    gg <- gg + ggplot2::geom_segment(data = gate_line, ggplot2::aes(x = x0, xend = x0, y = as.numeric(Sample), yend = as.numeric(Sample) + 0.9), color = "blue", size = 1.3) 
     # gg <- gg + ggplot2::geom_vline(data = gate_line, xintercept = x0, col = Sample)
   }
   if(!is.na(upper_gate[1])){
     gate_line <- data.frame(Sample = plot_title,  x1 = upper_gate)
-    gg <- gg + ggplot2::geom_segment(data = gate_line, ggplot2::aes(x = x1, xend = x1, y = as.numeric(Sample), yend = as.numeric(Sample) + 0.9), color = "black") 
+    gg <- gg + ggplot2::geom_segment(data = gate_line, ggplot2::aes(x = x1, xend = x1, y = as.numeric(Sample), yend = as.numeric(Sample) + 0.9), color = "blue", size = 1.3) 
     #  gg <- gg + ggplot2::geom_vline(data = gate_line, ggplot2::aes(xintercept = x1, color = Sample))
   }
   
@@ -654,25 +654,25 @@ signal_signal_plot <- function(data, random_events, channel1, channel2, xname = 
       gate_line <- data.frame(x0 = xlow[i], ymax = ylim[2], ymin = ylim[1] )
       gg <- gg + ggplot2::geom_segment(data = gate_line, 
                                        ggplot2::aes(x = x0, xend = x0, y = ymin, yend = ymax), 
-                                       color = "blue", size = 1.5) 
+                                       color = "blue", size = 1.3) 
     }
     if(!is.na(xhigh[1]) ){
       gate_line <- data.frame(x0 = xhigh[i], ymax = ylim[2], ymin = ylim[1] )
       gg <- gg + ggplot2::geom_segment(data = gate_line, 
                                        ggplot2::aes(x = x0, xend = x0, y = ymin, yend = ymax), 
-                                       color = "blue", size = 1.5) 
+                                       color = "blue", size = 1.3) 
     }    
     if(!is.na(ylow[1]) ){
       gate_line <- data.frame(y0 = ylow[i], xmax = xlim[2], xmin = xlim[1] )
       gg <- gg + ggplot2::geom_segment(data = gate_line, 
                                        ggplot2::aes(x = xmin, xend = xmax, y = y0, yend = y0), 
-                                       color = "blue", size = 1.5) 
+                                       color = "blue", size = 1.3) 
     }
     if(!is.na(yhigh[1]) ){
       gate_line <- data.frame(y0 = yhigh[i], xmax = xlim[2], xmin = xlim[1] )
       gg <- gg + ggplot2::geom_segment(data = gate_line, 
                                        ggplot2::aes(x = xmin, xend = xmax, y = y0, yend = y0), 
-                                       color = "blue", size = 1.5) 
+                                       color = "blue", size = 1.3) 
     }    
     #   stat_ellipse(level = 0.8)
     plotList[[i]] <- gg
@@ -763,25 +763,25 @@ signal_signal_plot_selected_cells <- function(data, number_random_events = 10000
       gate_line <- data.frame(x0 = xlow[i], ymax = ylim[2], ymin = ylim[1] )
       gg <- gg + ggplot2::geom_segment(data = gate_line, 
                                        ggplot2::aes(x = x0, xend = x0, y = ymin, yend = ymax), 
-                                       color = "black") 
+                                       color = "blue", size = 1.3) 
     }
     if(!is.na(xhigh[1]) ){
       gate_line <- data.frame(x0 = xhigh[i], ymax = ylim[2], ymin = ylim[1] )
       gg <- gg + ggplot2::geom_segment(data = gate_line, 
                                        ggplot2::aes(x = x0, xend = x0, y = ymin, yend = ymax), 
-                                       color = "black") 
+                                       color = "blue", size = 1.3) 
     }    
     if(!is.na(ylow[1]) ){
       gate_line <- data.frame(y0 = ylow[i], xmax = xlim[2], xmin = xlim[1] )
       gg <- gg + ggplot2::geom_segment(data = gate_line, 
                                        ggplot2::aes(x = xmin, xend = xmax, y = y0, yend = y0), 
-                                       color = "black") 
+                                       color = "blue", size = 1.3) 
     }
     if(!is.na(yhigh[1]) ){
       gate_line <- data.frame(y0 = yhigh[i], xmax = xlim[2], xmin = xlim[1] )
       gg <- gg + ggplot2::geom_segment(data = gate_line, 
                                        ggplot2::aes(x = xmin, xend = xmax, y = y0, yend = y0), 
-                                       color = "black") 
+                                       color = "blue", size = 1.3) 
     }    
     #   stat_ellipse(level = 0.8)
     plotList[[i]] <- gg
