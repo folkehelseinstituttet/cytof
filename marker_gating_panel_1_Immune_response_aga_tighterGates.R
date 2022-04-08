@@ -270,6 +270,7 @@ split <- NA
 #***************************************************
 #pos/neg CD45 ----  OK Velger 01
 #***************************************************
+CD3 <- params$name[grep( "CD3", params$desc)][1] 
 x <- "CD45"
 params$desc[grep(x, params$desc)]#må sjekke at vi får riktig kanal.
 kanal <- params$name[grep(x, params$desc)][1] 
@@ -288,7 +289,7 @@ print(density_plots)
 dev.off()
 
 
-data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
+data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD3))
 kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
   kanal_max <- max(kanal_max, max(data[[i]][,kanal]))
@@ -616,7 +617,7 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = ka
 splitLow <- find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
 splitLow$upper_gates[splitLow$upper_gates > 0.2] <- 0.2
 splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1.5)
-splitHigh$lower_gates[is.na(split$lower_gates)] <- mean(splitHigh$lower_gates[!is.na(splitHigh$lower_gates)])
+splitHigh$lower_gates[is.na(splitHigh$lower_gates)] <- mean(splitHigh$lower_gates[!is.na(splitHigh$lower_gates)])
 
 density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = splitLow$upper_gates, upper_gate = splitHigh$lower_gates, main_title = x)
 #density_plots # to see the plots
@@ -654,7 +655,7 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = ka
 
 splitLow <-  find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
 splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001)
-splitHigh$lower_gates <- rep(1, splitHigh$lower_gates)
+splitHigh$lower_gates <- rep(1, length(splitHigh$lower_gates))
 
 density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = splitLow$upper_gates, upper_gate = splitHigh$upper_gates, main_title = x)
 #density_plots # to see the plots
