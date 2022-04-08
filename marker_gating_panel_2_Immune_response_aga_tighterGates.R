@@ -326,11 +326,11 @@ split <- NA
 #***************************************************
 x <- "CD25"
 params$desc[grep(x, params$desc)]
-kanal <- params$name[grep(x, params$desc)][3] 
+kanal <- params$name[grep(x, params$desc)][1] 
 
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
 
-
+ 
 splitLow <- find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
 
 splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1)
