@@ -664,7 +664,7 @@ tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800,
 print(density_plots)
 dev.off()
 
-
+ 
 
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
 kanal_max <- max(data[[1]][,kanal])
