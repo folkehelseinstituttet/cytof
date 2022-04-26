@@ -26,18 +26,18 @@ analyseSti <- "F:/Forskningsprosjekter/PDB 2794 - Immune responses aga_/Forsknin
 
 ```{r, echo = F}
 prepare_data <- function(){
-    klu <- read.csv2(fs::path(params$utSti, paste0("antallPerClusterOgPat_k_", ant_klu_i , "_seed", params$seed, params$selcected_name,  ".csv")))
+    klu_temp <- read.csv2(fs::path(params$utSti, paste0("antallPerClusterOgPat_k_", ant_klu_i , "_seed", params$seed, params$selcected_name,  ".csv")))
   
-  rownames(klu) <- klu$X
+  rownames(klu_temp) <- klu_temp$X
    
-  klu <- klu[,-(which(colnames(klu) == "X"))]
+  klu_temp <- klu_temp[,-(which(colnames(klu_temp) == "X"))]
  
-  antallPerKluster <- apply(klu, 2, sum)
-  antallPerFil <- apply(klu, 1, sum)
+  antallPerKluster <- apply(klu_temp, 2, sum)
+  antallPerFil <- apply(klu_temp, 1, sum)
  # summary(antallPerFil)
 
   #make % add 1 to each sample, and i (number of clusters) to each samplesum so no-one get 0 %, for further analysis 
-  klu <- (klu + 1)/matrix(rep(antallPerFil + ant_klu_i, ncol(klu)), ncol = length(antallPerFil), byrow = T)
+  klu <- (klu_temp + 1)/t(matrix(rep(antallPerFil + ant_klu_i, ncol(klu_temp)), ncol = length(antallPerFil), byrow = T))
  # summary(apply(klu, 1, sum))
   klu$Pat <- NA
   #find patient from filename 
@@ -122,7 +122,7 @@ d$StatusTid[d$Status == "Severe" & d$Tid == "T2"] <- "Severe, T2"
 d$StatusTid <- factor(d$StatusTid, levels = c("Severe, T1", "Moderat, T1", "Severe, T2", "Moderat, T2","Control" ))
 table(d$StatusTid)
 d$StatusTidSex <- paste(d$StatusTid, d$Sex)
-d$StatusTidSex <- factor(d$StatusTidSex, levels = c("Severe, T1 F", "Severe, T1 M", "Moderat, T1 F", "Moderat, T1 M",  "Severe, T2 M", "Moderat, T2 F", "Moderat, T2 M", "Control F",  "Control M"  ))
+d$StatusTidSex <- factor(d$StatusTidSex, levels = c( "Severe, T1 M", "Severe, T1 F", "Moderat, T1 M",  "Moderat, T1 F",  "Severe, T2 M",  "Moderat, T2 M", "Moderat, T2 F",  "Control M"  , "Control F"))
 
 d$StatusTidCol <- "green"
 d$StatusTidCol[d$StatusTid == "Moderat, T1"] <- "red"
@@ -163,7 +163,7 @@ return(list(klu = klu, d = d, ddT1 = ddT1, ddT2 = ddT2, dK = dK, dd = dd, antall
 ```{r,echo = F}
 #some functions defined for this dataset. 
 pairedPlot <- function(i){ 
-  plot( rep(1, nrow(ddT1)), ddT1[,i], xlim = c(0.5,3.5), axes = F, cex = 2,  main = paste("kluster", i, ", antall i kluster = ", antallPerKluster[i]), xlab = "Time", col = ddT1$col, ylim = c(min(min(dK[,i]), min(dd[,i])), c(max(max(dK[,i]), max(dd[,i])))), pch = 16 )
+  plot( rep(1, nrow(ddT1)), ddT1[,i], xlim = c(0.5,3.5), axes = F,  main = paste("kluster", i, ", antall i kluster = ", antallPerKluster[i]), xlab = "Time", col = ddT1$col, ylim = c(min(min(dK[,i]), min(dd[,i])), c(max(max(dK[,i]), max(dd[,i])))), pch = 16 )
   axis(side = 1, at = c(3, 1,2), labels = c("Control", "T1", "T2"), cex = 2)
   axis(2, cex = 2)
   points( rep(2, nrow(ddT2)), ddT2[,i], col = ddT2$col, pch = 16)
@@ -186,9 +186,10 @@ violinPlot <- function(dat, i){
   x <- dat$Status
   y <- dat[,i]
   group <- dat$StatusTidCol
-  d <- data.frame(x = x, y = y, group = group)
+  Sex <- dat$Sex
+  d <- data.frame(x = x, y = y, group = group, Sex = Sex)
   
-  g <- ggplot(d, aes(x = x, y = y, group = group)) + 
+  g <- ggplot(d, aes(x = x, y = y, group = group, col = Sex)) + 
     geom_violin() + geom_jitter( size = 2, alpha=0.3, position=position_jitter(0.2)) + 
     ggtitle(paste("kluster", i, ", antall i kluster = ", antallPerKluster[i], "p =", round(p_mat[i,1],3), "adj.p =", round(adj_p[i,1],3)))
   g <- g + theme(axis.text = element_text(size = 20), axis.title = element_text(size = 20), title  = element_text(size = 20))
@@ -201,9 +202,10 @@ violinPlotT2Kontroll <- function(dat, i){
   x <- dat$Tid
   y <- dat[,i]
   group <- dat$Tid
-  d <- data.frame(x = x, y = y, group = group)
+  Sex <- dat$Sex
+   d <- data.frame(x = x, y = y, group = group, Sex = Sex)
   
-  g <- ggplot(d, aes(x = x, y = y, group = group)) + 
+  g <- ggplot(d, aes(x = x, y = y, group = group, col = Sex)) + 
     geom_violin() + geom_jitter(size = 2, alpha=0.3, position=position_jitter(0.2)) + 
     ggtitle(paste("kluster", i, ", antall i kluster = ", antallPerKluster[i], "adj.p =", round(adj_p[i,1],3))) + ylab(paste("kluster", i))
   g <- g + theme(axis.text = element_text(size = 20), axis.title = element_text(size = 20), title  = element_text(size = 20))
@@ -215,7 +217,16 @@ violinPlotT2Kontroll <- function(dat, i){
 
 
 ```{r, echo = F, comment= FALSE, message= FALSE, warning= FALSE, fig.width= 15, fig.height=8}
+resExcel <- data.frame(matrix(NA, ncol = 8, nrow =2))
+colnames(resExcel) <- c("kluster", "antall", "T1-T2", "T1", "T2", "T2-kontroll", "Regresjon", "Samme som")
+resK <- resExcel
+
+
 for(ant_klu_i in params$muligeK){
+  resKForrige <- resK
+  resK <- - data.frame(matrix(NA, ncol = 8, nrow =ant_klu_i))
+  colnames(resK) <- c("kluster", "antall", "T1-T2", "T1", "T2", "T2-kontroll", "Regresjon", "Samme som")
+
   print("#######################################################")
   print(paste0("# number of clusters, ", ant_klu_i))
   
@@ -253,6 +264,9 @@ for(ant_klu_i in params$muligeK){
 
   for(i in mulige){
     pairedPlot(i)
+    resK[i,"kluster"] <- i
+    resK[i,"antall"] <- antallPerKluster[i]
+    resK[i, "T1-T2"] <- "X"
   }
 
 
@@ -279,6 +293,9 @@ for(ant_klu_i in params$muligeK){
 
   for(i in mulige){
     print(violinPlot(d[d$Tid == "T1",], i))
+    resK[i,"kluster"] <- i
+    resK[i,"antall"] <- antallPerKluster[i]
+    resK[i, "T1"] <- "X"
   }
 
 
@@ -307,6 +324,10 @@ for(ant_klu_i in params$muligeK){
 
   for(i in mulige){
     print(violinPlot(d[d$Tid == "T2",], i))
+        resK[i,"kluster"] <- i
+    resK[i,"antall"] <- antallPerKluster[i]
+    resK[i, "T2"] <- "X"
+
   }
 
 
@@ -331,6 +352,10 @@ for(ant_klu_i in params$muligeK){
   mulige <-  which(adj_p < params$adj_p)
   for(i in mulige){
     print(violinPlotT2Kontroll(d[d$Tid %in% c("T2", "Control"),], i))
+    resK[i,"kluster"] <- i
+    resK[i,"antall"] <- antallPerKluster[i]
+    resK[i, "T2-kontroll"] <- "X"
+
   }
 
   print("")
@@ -423,7 +448,7 @@ for(ant_klu_i in params$muligeK){
            print(paste0("kluster ", i))
            print(res)
            
-           g <- ggplot(d, aes(x = StatusTidSex, y = d[,i])) +
+           g <- ggplot(d, aes(x = StatusTidSex, y = d[,i], col = Sex)) +
               geom_boxplot(outlier.shape = NA)+ 
               geom_jitter(size = 2, alpha=0.3, position=position_jitter(0.2))
         }
@@ -436,20 +461,32 @@ for(ant_klu_i in params$muligeK){
            
            g <- ggplot(d, aes(x = StatusTid, y = d[,i])) +
               geom_boxplot(outlier.shape = NA)+ 
-              geom_jitter(size = 2, alpha=0.3, position=position_jitter(0.2)) 
+              geom_jitter(aes(col = Sex), size = 2, alpha=0.3, position=position_jitter(0.2)) 
           
         }
      } 
    }
    if(exists("g")){
-    g <- g + theme(axis.text = element_text(size = 20), axis.title = element_text(size = 20), title  = element_text(size = 20)) + 
+    g <- g + theme(axis.text = element_text(size = 14), axis.title = element_text(size = 20), title  = element_text(size = 20)) + 
     ylab("proportion") 
     g <- g + ggtitle(paste0("kluster ", i, ": antall i kluster = ", antallPerKluster[i]))
     print(g)
+    resK[i,"kluster"] <- i
+    resK[i,"antall"] <- antallPerKluster[i]
+    resK[i,"Regresjon"] <- "X"
    }
  }
+  resK <- resK[!is.na(resK$kluster),]
+  rownames(resK) <- paste(paste("k", antall_klu, "i", sep = "_"), resK$kluster, sep = "_") 
+  
+  resK[which(resK$antall %in% resKForrige$antall), "Samme som"] <- "X"
+  
+  resExcel <- rbind(resExcel, resK)
+
 }
 
+resExcel <- resExcel[-c(1,2),]
+write.csv2(resExcel, fs::path(params$utSti, paste0("Result_auto_", params$seed, "_V2.csv")))
 
 
 ```
