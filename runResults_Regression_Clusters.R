@@ -8,7 +8,7 @@ params$panel <- 1
 params$adj_p <- 0.1
 params$adj_p_methods <- "fdr" # see help(p.adjust) for other methods
 
-rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, ".docx")))
+rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, "_V2.docx")))
 
 
 params <- list()
@@ -20,21 +20,7 @@ params$panel <- 1
 params$adj_p <- 0.1
 params$adj_p_methods <- "fdr" # see help(p.adjust) for other methods
 
-rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, ".docx")))
-
-
-
-params <- list()
-params$utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "Resulta_Panel_1_ALLE", "TigtherCleanUp")
-params$seed <- 7856 #nb må endres vil man vil gjøre et annet uttrekk
-params$muligeK <- c(40, 50 , 60)
-params$selcected_name <- "all"
-params$panel <- 1
-params$adj_p <- 0.1
-params$adj_p_methods <- "fdr" # see help(p.adjust) for other methods
-
-rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, ".docx")))
-
+rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, "_V2.docx")))
 
 
 
@@ -47,7 +33,7 @@ params$panel <- 1
 params$adj_p <- 0.1
 params$adj_p_methods <- "fdr" # see help(p.adjust) for other methods
 
-rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, ".docx")))
+rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, "_V2.docx")))
 
 
 
@@ -62,7 +48,7 @@ params$panel <- 1
 params$adj_p <- 0.1
 params$adj_p_methods <- "fdr" # see help(p.adjust) for other methods
 
-rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, ".docx")))
+rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, "_V2.docx")))
 
 
 
@@ -75,7 +61,7 @@ params$panel <- 1
 params$adj_p <- 0.1
 params$adj_p_methods <- "fdr" # see help(p.adjust) for other methods
 
-rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, ".docx")))
+rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, "_V2.docx")))
 
 
 
@@ -90,7 +76,7 @@ params$panel <- 1
 params$adj_p <- 0.1
 params$adj_p_methods <- "fdr" # see help(p.adjust) for other methods
 
-rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, ".docx")))
+rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, "_V2.docx")))
 
 
 #panel 2
@@ -105,7 +91,7 @@ params$panel <- 2
 params$adj_p <- 0.1
 params$adj_p_methods <- "fdr" # see help(p.adjust) for other methods
 
-rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, ".docx")))
+rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, "_V2.docx")))
 
 
 params <- list()
@@ -117,7 +103,7 @@ params$panel <- 2
 params$adj_p <- 0.1
 params$adj_p_methods <- "fdr" # see help(p.adjust) for other methods
 
-rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, ".docx")))
+rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, "_V2.docx")))
 
 
 
@@ -130,7 +116,7 @@ params$panel <- 2
 params$adj_p <- 0.1
 params$adj_p_methods <- "fdr" # see help(p.adjust) for other methods
 
-rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, ".docx")))
+rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, "_V2.docx")))
 
 
 
@@ -145,7 +131,7 @@ params$panel <- 2
 params$adj_p <- 0.1
 params$adj_p_methods <- "fdr" # see help(p.adjust) for other methods
 
-rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, ".docx")))
+rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, "_V2.docx")))
 
 
 
@@ -159,7 +145,7 @@ params$panel <- 2
 params$adj_p <- 0.1
 params$adj_p_methods <- "fdr" # see help(p.adjust) for other methods
 
-rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, ".docx")))
+rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, "_V2.docx")))
 
 
 
@@ -174,7 +160,7 @@ params$panel <- 2
 params$adj_p <- 0.1
 params$adj_p_methods <- "fdr" # see help(p.adjust) for other methods
 
-rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, ".docx")))
+rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, "_V2.docx")))
 
 
 
