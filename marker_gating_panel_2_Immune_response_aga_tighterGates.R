@@ -272,7 +272,7 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(
 
 splitLow <- find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
 
-splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1)
+splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 2, upper_gate_percent = 0.001, minimum = 1)
 splitHigh$lower_gates[is.na(splitHigh$lower_gates)] <- mean(splitHigh$lower_gates[!is.na(splitHigh$lower_gates)])
 
 density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = splitLow$upper_gates, upper_gate = splitHigh$lower_gates, main_title = x)
@@ -391,7 +391,7 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(
  
 splitLow <- find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
 
-splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1)
+splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 2, upper_gate_percent = 0.001, minimum = 1)
 splitHigh$lower_gates[is.na(splitHigh$lower_gates)] <- mean(splitHigh$lower_gates[!is.na(splitHigh$lower_gates)])
 splitHigh$lower_gates[splitHigh$lower_gates < 0.1] <- mean(splitHigh$lower_gates[splitHigh$lower_gates > 0.1])
 
@@ -546,7 +546,7 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(
 
 splitLow <- find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
 
-splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1)
+splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 2, upper_gate_percent = 0.001, minimum = 1)
 splitHigh$lower_gates[is.na(splitHigh$lower_gates)] <- mean(splitHigh$lower_gates[!is.na(splitHigh$lower_gates)])
 
 
@@ -684,7 +684,7 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(
 
 splitLow <- find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
 
-splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1)
+splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 2, upper_gate_percent = 0.001, minimum = 1)
 splitHigh$lower_gates <- rep(0.8, length(splitHigh$lower_gates))
 
 
@@ -765,7 +765,7 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(
 
 splitLow <- find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
 
-splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1)
+splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 2, upper_gate_percent = 0.001, minimum = 1)
 splitHigh$lower_gates <- rep(1.5, length(splitHigh$lower_gates))
 
 
@@ -809,7 +809,7 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(
 
 splitLow <- find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
 
-splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1)
+splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 2, upper_gate_percent = 0.001, minimum = 1)
 splitHigh$lower_gates[is.na(splitHigh$lower_gates)] <- mean(splitHigh$lower_gates[!is.na(splitHigh$lower_gates)])
 
 
@@ -854,7 +854,7 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(
 
 splitLow <- find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
 
-splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1)
+splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 2, upper_gate_percent = 0.001, minimum = 1)
 splitHigh$lower_gates <- rep(1.5, length(splitHigh$lower_gates))
 
 
@@ -1504,7 +1504,7 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(
 
 splitLow <- find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
 
-splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1)
+splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 2, upper_gate_percent = 0.001, minimum = 1)
 splitHigh$lower_gates <- rep(0.3, length(splitHigh$lower_gates))
 
 
