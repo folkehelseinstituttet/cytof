@@ -1,14 +1,17 @@
-posNegPath <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF","Analyse i R OUS", "Resultat_Panel_1", "Data")
-posNeg <- readRDS(fs::path(posNegPath, "posNeg.rds"))
+#posNegPath <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF","Analyse i R OUS", "Resultat_Panel_1", "Data")
+posNegPath <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF","Analyse i R OUS", "CleanUpGatingMarch2022", "gating_results_Panel1_mars2022", "posNeg", "Data")
+
+resultposNeg <- readRDS(fs::path(posNegPath, "posNeg.rds"))
 posNegFileName <- readRDS(fs::path(posNegPath, "posNegFilnavn.rds"))
 
-outPath <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF","Analyse i R OUS", "Resultat_Panel_1")
+#outPath <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF","Analyse i R OUS", "Resultat_Panel_1")
+outPath <-fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF","Analyse i R OUS", "CleanUpGatingMarch2022", "gating_results_Panel1_mars2022", "posNeg", "surrface")
 
 scriptPath <- fs::path("H:", "git", "cytof")
 
 source(fs::path(scriptPath, "analysis_functions.R"))
 
-surrface <- readxl::read_excel(fs::path(scriptPath, "Gating surrface in R.xlsx"))
+surrface <- as.data.frame(readxl::read_excel(fs::path(outPath, "Gating surface i R.xlsx")))
 surrface <- surrface[!is.na(surrface$Population),]
 if(any(duplicated(surrface))){
   surrface <- surrface[-duplicated(surrface),]
@@ -40,7 +43,9 @@ if(length(extra_col) > 0){
   surrface <- surrface[,!colnames(surrface) %in% extra_col]
 }
 
-
+if(any(rownames(surrface) == "possible combinations")){
+  surrface <- surrface[-which(rownames(surrface) == "possible combinations"), ]
+}
 
 result <- matrix(NA, nrow = length(posNeg), ncol = nrow(surrface))
 rownames(result) <- posNegFileName
@@ -48,7 +53,9 @@ colnames(result) <- rownames(surrface)
 for(i in 1:nrow(surrface)){
   pos_i <- colnames(surrface)[which(surrface[i,] == 1)]
   neg_i <- colnames(surrface)[which(surrface[i,] == 0)]
-  either_or_i <- colnames(surrface)[which(surrface[i,] == 2)]
+  pos12_i <- colnames(surrface)[which(surrface[i,] == 12)] 
+  neg_01_i <- colnames(surrface)[which(surrface[i,] == 10)] 
+  either_or_i <- colnames(surrface)[which(surrface[i,] == 99)]
   markers_i <- c(pos_i, neg_i)
   markersPosNeg_i <- c(rep(1, length(pos_i)), rep(0, length(neg_i)))
   if(length(markers_i) > 0){
