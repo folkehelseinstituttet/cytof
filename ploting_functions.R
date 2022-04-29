@@ -242,12 +242,12 @@ random_events_vector <- function(datasetvector, n = 10000){
 #' @return list of vectors with position for the random events for each sub dataset
 #' 
 
-random_events_from_selected_events <- function(posNeg, marker, n = 10000){
+random_events_from_selected_events <- function(posNeg, marker, n = 10000, values = 1){
 #browser()
-    number_of_files <- length(posNeg)
+  number_of_files <- length(posNeg)
   rand_events <- NULL
   for (i in 1:number_of_files){
-    possible <- which(posNeg[[i]][,marker])
+    possible <- which(posNeg[[i]][,marker] == values)
     rand_events[i] <- list(sort(sample(possible, min(length(possible), n))))
   }
   return(rand_events)
