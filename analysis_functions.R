@@ -1,7 +1,7 @@
 #' prosent_senario
 #' @param posneg, result per senario from channel gating 
 #' @param channels, which channels to select
-#' @param values, the values for the channels in the same order, 0 = neg, 1 = pos (or low), 2 = high, 3 = pos (high and low), -1 = neg og low  
+#' @param values, the values for the channels in the same order, 0 = neg, 1 = pos (or low), 2 = high, 12 = pos (high and low), 10 = neg og low  
 #' @return vector with prosent that have the asked combination.
 
 
@@ -14,17 +14,19 @@ prosent_senario <- function(posneg, channels, values){
     xx <- rep(1, nrow(posneg[[i]]))
     for(j in 1:length(channels)){
       column_j <- which(colnames(posneg[[i]]) == channels[j]) 
-      if(!(values[j] == 3 | values[j] == -1)){
+      if(!(values[j] == 12 | values[j] == 10)){
         if(values[j] %in% c(0,1,2)){
           x <- posneg[[i]][, column_j] == values[j]
         } else {
-          print("ugyldig valg av verdi, gyldige verdier er: -1 = c(0,1), 0 = 0, 1 = 1, 2 = 2, 3 = c(1,2")
+          print("ugyldig valg av verdi, gyldige verdier er: 10 = c(0,1), 0 = 0, 1 = 1, 2 = 2, 12 = c(1,2")
         }
       } else{
-        if(values[j] == 3){
+        if(values[j] == 12){
           x <- posneg[[i]][, column_j] %in% c(1,2)
         } else {
-          x <- posneg[[i]][, column_j] %in% c(0,1)
+          if(values[j] == 10){
+            x <- posneg[[i]][, column_j] %in% c(0,1)
+          }
         }
       }  
       xx <- x & xx
@@ -36,12 +38,31 @@ prosent_senario <- function(posneg, channels, values){
 }
 
 
+any_value <- function(x, value){
+  res <- 0
+  if(value == 1){
+    res <- any(x == 1)
+  } else {
+    if(value == 0){
+      res <- any(x == 0)
+    } else  {
+      if(value == 12){
+        res <- any(x %in% c(1,2))
+      } else {
+        if(value == 10){
+          res <- any(x %in% c(0, 1))
+        }
+      }
+    }
+  }
+  return(res)
+}
 
 
 #' prosent_senario_with_atleat_one_of_some_channels
 #' @param posneg, result per senario from channel gating 
 #' @param channels, which channels to select
-#' @param values, the values for the channels in the same order, 0 = neg, 1 = pos (or low), 2 = high, 3 = pos (high and low), -1 = neg og low  
+#' @param values, the values for the channels in the same order, 0 = neg, 1 = pos (or low), 2 = high, 12 = pos (high and low), 10 = neg og low  
 #' @return vector with prosent that have the asked combination.
 
 
@@ -53,23 +74,27 @@ prosent_senario_with_atleat_one_of_some_channels <- function(posneg, channels, v
   for(i in 1:length(posneg)){
     columns <-  which(colnames(posneg[[i]]) %in% atleast_one_of)
     if(value_atleast_one_of == 1){
-      xx <- apply(posneg[[i]][, columns], 1, max)
-    } else {
-      xx <- apply(posneg[[i]][, columns], 1, min)
+      xx <- apply(posneg[[i]][, columns], 1, any_value, value = value_atleast_one_of)
+    #   xx <- apply(posneg[[i]][, columns], 1, max)
+    # } else {
+    #   xx <- apply(posneg[[i]][, columns], 1, min)
     }
+    
     for(j in 1:length(channels)){
       column_j <- which(colnames(posneg[[i]]) == channels[j]) 
-      if(!(values[j] == 3 | values[j] == -1)){
+      if(!(values[j] == 12 | values[j] == 10)){
         if(values[j] %in% c(0,1,2)){
           x <- posneg[[i]][, column_j] == values[j]
         } else {
-          print("ugyldig valg av verdi, gyldige verdier er: -1 = c(0,1), 0 = 0, 1 = 1, 2 = 2, 3 = c(1,2")
+          print("ugyldig valg av verdi, gyldige verdier er: 10 = c(0,1), 0 = 0, 1 = 1, 2 = 2, 12 = c(1,2")
         }
       } else{
-        if(values[j] == 3){
+        if(values[j] == 12){
           x <- posneg[[i]][, column_j] %in% c(1,2)
         } else {
-          x <- posneg[[i]][, column_j] %in% c(0,1)
+          if(values[j] == 10){
+            x <- posneg[[i]][, column_j] %in% c(0,1)
+          }
         }
       }  
       xx <- x & xx
