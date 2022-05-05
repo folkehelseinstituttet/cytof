@@ -274,7 +274,7 @@ splitLow <- find_gaussian_gates_first_top(data = data, channel = kanal, lower_ga
 
 splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 2, upper_gate_percent = 0.001, minimum = 1)
 splitHigh$lower_gates[is.na(splitHigh$lower_gates)] <- mean(splitHigh$lower_gates[!is.na(splitHigh$lower_gates)])
-
+splitHigh$lower_gates <- rep(1.8, length(splitHigh$lower_gates))
 density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = splitLow$upper_gates, upper_gate = splitHigh$lower_gates, main_title = x)
 #density_plots # to see the plots
 
@@ -390,10 +390,11 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(
 
  
 splitLow <- find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
-
+splitLow$upper_gates[splitLow$upper_gates > 0.1] <- 0.1
 splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 2, upper_gate_percent = 0.001, minimum = 1)
+splitHigh$lower_gates[splitHigh$lower_gates > 4] <- mean(splitHigh$lower_gates[splitHigh$lower_gates < 4], na.rm = T)
+splitHigh$lower_gates[splitHigh$lower_gates < 0.1] <- mean(splitHigh$lower_gates[splitHigh$lower_gates > 0.1], na.rm = T)
 splitHigh$lower_gates[is.na(splitHigh$lower_gates)] <- mean(splitHigh$lower_gates[!is.na(splitHigh$lower_gates)])
-splitHigh$lower_gates[splitHigh$lower_gates < 0.1] <- mean(splitHigh$lower_gates[splitHigh$lower_gates > 0.1])
 
 density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = splitLow$upper_gates, upper_gate = splitHigh$lower_gates, main_title = x)
 #density_plots # to see the plots
@@ -432,12 +433,13 @@ params$desc[grep(x, params$desc)]
 kanal <- params$name[grep(x, params$desc)][1] 
 
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
-split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = 1)
+split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 2, upper_gate_percent = 0.001, minimum = 1)
+split$lower_gates[split$lower_gates > 1.8] <- 1.8 
 split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
 # split$lower_gates[split$lower_gates < 0.1] <- mean(split$lower_gates[split$lower_gates > 0.1])
 
 density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
-#density_plots # to see the plots
+#density_plots #g to see the plots
 
 tiff(fs::path(outFigPath, paste0("fig_", x, "_gating", ".tiff")), height = 1800, width = 600)
 print(density_plots)
@@ -609,7 +611,7 @@ kanal <- params$name[grep(x, params$desc)][1]
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
 split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001, minimum = NA)
 split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
-# split$lower_gates[split$lower_gates < 0.1] <- mean(split$lower_gates[split$lower_gates > 0.1])
+split$lower_gates[split$lower_gates < 0.5] <- mean(split$lower_gates[split$lower_gates > 0.5])
 
 
 density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
@@ -683,9 +685,10 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(
 
 
 splitLow <- find_gaussian_gates_first_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 15)
+splitLow$upper_gates <- rep(0.8, length(splitLow$upper_gates))
 
 splitHigh <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 2, upper_gate_percent = 0.001, minimum = 1)
-splitHigh$lower_gates <- rep(0.8, length(splitHigh$lower_gates))
+splitHigh$lower_gates <- rep(2, length(splitHigh$lower_gates))
 
 
 density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = splitLow$upper_gates, upper_gate = splitHigh$lower_gates, main_title = x)
@@ -885,7 +888,7 @@ splitHigh <- NA
 splitLow <- NA
 
 #***************************************************
-#pos/neg CD107a ----  
+#pos/neg CD107a ---- NB ser ut som 2 pop???  
 #***************************************************
 x <- "CD107a"
 print(x)
@@ -993,7 +996,7 @@ for(j in filene){
 split <- NA
 
 #***************************************************
-#pos/neg IL-1b ----  #14 feb fast grense på 3
+#pos/neg IL-1b ----  #14 feb fast grense på 3,, 4/5 satt den på 0.1
 #***************************************************
 x <- "IL-1b"
 print(x)
@@ -1005,7 +1008,7 @@ data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(
 split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001)#, minimum = 1.4)
 split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
 #split$lower_gates[split$lower_gates > 3] <- mean(split$lower_gates[split$lower_gates < 3])
-split$lower_gates <- rep(3, length(split$lower_gates))
+split$lower_gates <- rep(0.1, length(split$lower_gates))
 
 
 density_plots <- density_plot(data = data, channel = kanal, plot_title = file_names, lower_gate = split$lower_gates, main_title = x)
