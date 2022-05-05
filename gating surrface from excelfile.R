@@ -56,14 +56,14 @@ for(i in 1:nrow(surrface)){
   pos12_i <- colnames(surrface)[which(surrface[i,] == 12)] 
   neg_01_i <- colnames(surrface)[which(surrface[i,] == 10)] 
   either_or_i <- colnames(surrface)[which(surrface[i,] == 99)]
-  markers_i <- c(pos_i, neg_i)
-  markersPosNeg_i <- c(rep(1, length(pos_i)), rep(0, length(neg_i)))
+  markers_i <- c(pos_i, neg_i, pos12_i, neg_01_i)
+  markersPosNeg_i <- c(rep(1, length(pos_i)), rep(0, length(neg_i)), rep(12, length(pos12_i)), rep(10, length(neg_01_i)))
   if(length(markers_i) > 0){
     if(length(either_or_i) == 0){
       result[,i] <- prosent_senario(posneg = posNeg, channels = markers_i, values = markersPosNeg_i)
     } else {
       result[,i] <- prosent_senario_with_atleat_one_of_some_channels(posneg = posNeg, channels = markers_i, 
-                                                                     values = markersPosNeg_i, atleast_one_of = either_or_i, value_atleast_one_of = 1)		
+                                                                     values = markersPosNeg_i, atleast_one_of = either_or_i, value_atleast_one_of = 12)		
     }
   }
   
