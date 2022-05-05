@@ -164,4 +164,32 @@ rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), o
 
 
 
+scriptPath <- fs::path("H:", "git", "cytof")
+params <- list()
+params$utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "CleanUpGatingMarch2022", "gating_results_Panel1_mars2022", "posNeg", "surrface")
+#params$seed <- 6892 #nb må endres vil man vil gjøre et annet uttrekk
+#params$muligeK <- c(40, 50 , 60)
+params$fil <- "Prosent_Gating_Surrface_Panel1.csv"
+params$selcected_name <- "surrface"
+params$panel <- 1
+params$adj_p <- 0.1
+params$adj_p_methods <- "fdr" # see help(p.adjust) for other methods
+
+rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters_manuel.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$fil, ".docx")))
+
+
+
+
+scriptPath <- fs::path("H:", "git", "cytof")
+params <- list()
+params$utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "CleanUpGatingMarch2022", "gating_results_Panel2_mars2022", "posNeg", "surrface")
+#params$seed <- 6892 #nb må endres vil man vil gjøre et annet uttrekk
+#params$muligeK <- c(40, 50 , 60)
+params$fil <- "Prosent_Gating_Surrface_Panel2.csv"
+params$selcected_name <- "surrface"
+params$panel <- 2
+params$adj_p <- 0.1
+params$adj_p_methods <- "fdr" # see help(p.adjust) for other methods
+
+rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters_manuel.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$fil, ".docx")))
 
