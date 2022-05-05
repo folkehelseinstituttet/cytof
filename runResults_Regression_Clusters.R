@@ -183,8 +183,6 @@ rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters_manuel.R
 scriptPath <- fs::path("H:", "git", "cytof")
 params <- list()
 params$utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "CleanUpGatingMarch2022", "gating_results_Panel2_mars2022", "posNeg", "surrface")
-#params$seed <- 6892 #nb må endres vil man vil gjøre et annet uttrekk
-#params$muligeK <- c(40, 50 , 60)
 params$fil <- "Prosent_Gating_Surrface_Panel2.csv"
 params$selcected_name <- "surrface"
 params$panel <- 2
