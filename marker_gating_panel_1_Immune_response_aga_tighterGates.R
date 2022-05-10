@@ -90,6 +90,10 @@ for(j in filene){
 # get the parameters of fcs_data and store them in params.
 params <- get_params_fcs_data(fcs_data[[1]])
 
+gater <- as.data.frame(matrix(NA, nrow = length(kanaler), ncol = 2))
+rownames(gater) <- kanaler
+colnames(gater) <- c("low", "high")
+
 
 #***************************************************
 #pos/neg CD3 ---- OK  8 feb ok, feb 9 ok
@@ -127,6 +131,9 @@ for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
 
+gater[x,1] <- mean(split$lower_gates)
+
+
 split <- NA
 #***************************************************
 #pos/neg CD4 ---- OK
@@ -151,6 +158,7 @@ dev.off()
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
+gater[x,1] <- mean(split$lower_gates)
 
 split <- NA
 
@@ -178,6 +186,7 @@ dev.off()
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
+gater[x,1] <- mean(split$lower_gates)
 
 
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
@@ -214,6 +223,7 @@ dev.off()
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
+gater[x,1] <- mean(split$lower_gates)
 
 
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
@@ -251,6 +261,7 @@ dev.off()
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
+gater[x,1] <- mean(split$lower_gates)
 
 
 
@@ -300,6 +311,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
+gater[x,1] <- mean(split$lower_gates)
 
 
 
@@ -341,6 +353,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
+gater[x,1] <- mean(split$lower_gates)
 
 split <- NA
 #***************************************************
@@ -378,6 +391,8 @@ for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
   result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j], x] <- 2
 }
+gater[x,1] <- mean(splitLow$upper_gates)
+gater[x,2] <- mean(splitHigh$lower_gates)
 
 splitHigh <- NA
 splitLow <- NA
@@ -406,7 +421,7 @@ dev.off()
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 
 
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
@@ -442,7 +457,7 @@ dev.off()
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 
 
 
@@ -491,6 +506,8 @@ for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
   result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j], x] <- 2
 }
+gater[x,1] <- mean(splitLow$upper_gates)
+gater[x,2] <- mean(splitHigh$lower_gates)
 
 splitHigh <- NA
 splitLow <- NA
@@ -528,7 +545,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 split <- NA
 #***************************************************
 #pos/neg IgD ---- OK
@@ -553,7 +570,7 @@ dev.off()
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 
 
 
@@ -598,8 +615,10 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
-  result[[j]][data[[j]][, kanal] > splitLow$upper_gates[j],x] <- 2
+  result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j],x] <- 2
 }
+gater[x,1] <- mean(splitLow$upper_gates)
+gater[x,2] <- mean(splitHigh$lower_gates)
 
 
 splitHigh <- NA
@@ -639,6 +658,8 @@ for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
   result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j], x] <- 2
 }
+gater[x,1] <- mean(splitLow$upper_gates)
+gater[x,2] <- mean(splitHigh$lower_gates)
 
 splitHigh <- NA
 splitLow <- NA
@@ -678,6 +699,8 @@ for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
   result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j], x] <- 2
 }
+gater[x,1] <- mean(splitLow$upper_gates)
+gater[x,2] <- mean(splitHigh$lower_gates)
 
 splitHigh <- NA
 splitLow <- NA
@@ -715,6 +738,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
+gater[x,1] <- mean(split$lower_gates)
 
 split <- NA
 #***************************************************
@@ -750,7 +774,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 
 
 split <- NA
@@ -788,7 +812,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 
 split <- NA
 #***************************************************
@@ -829,7 +853,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 
 split <- NA
 #***************************************************
@@ -866,7 +890,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 
 split <- NA
 #***************************************************
@@ -904,7 +928,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 split <- NA
 #***************************************************
 #pos/neg CD27---- OK  8 feb beholder min grense på 1, 9 feb snitt av de under 1.2 på de over ble ok. 
@@ -942,6 +966,8 @@ for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
   result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j], x] <- 2
 }
+gater[x,1] <- mean(splitLow$upper_gates)
+gater[x,2] <- mean(splitHigh$lower_gates)
 
 splitHigh <- NA
 splitLow <- NA
@@ -978,7 +1004,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 
 
 split <- NA
@@ -1016,7 +1042,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 
 split <- NA
 #***************************************************
@@ -1054,7 +1080,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 
 split <- NA
 #***************************************************
@@ -1092,7 +1118,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 
 split <- NA
 #***************************************************
@@ -1130,7 +1156,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 
 split <- NA
 #***************************************************
@@ -1169,6 +1195,8 @@ for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
   result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j], x] <- 2
 }
+gater[x,1] <- mean(splitLow$upper_gates)
+gater[x,2] <- mean(splitHigh$lower_gates)
 
 splitHigh <- NA
 splitLow <- NA
@@ -1208,7 +1236,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 
 split <- NA
 
@@ -1246,6 +1274,8 @@ for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
   result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j], x] <- 2
 }
+gater[x,1] <- mean(splitLow$upper_gates)
+gater[x,2] <- mean(splitHigh$lower_gates)
 
 splitHigh <- NA
 splitLow <- NA
@@ -1290,7 +1320,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 
 split <- NA
 
@@ -1328,7 +1358,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 
 split <- NA
 
@@ -1366,7 +1396,7 @@ for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
 
-
+gater[x,1] <- mean(split$lower_gates)
 
 split <- NA
 
@@ -1407,7 +1437,7 @@ for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
 
-
+gater[x,1] <- mean(split$lower_gates)
 
 
 split <- NA
@@ -1446,6 +1476,8 @@ for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
   result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j], x] <- 2
 }
+gater[x,1] <- mean(splitLow$upper_gates)
+gater[x,2] <- mean(splitHigh$lower_gates)
 
 splitHigh <- NA
 splitLow <- NA
@@ -1484,7 +1516,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 
 split <- NA
 
@@ -1516,7 +1548,7 @@ for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
 
-
+gater[x,1] <- mean(split$lower_gates)
 
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
 kanal_max <- max(data[[1]][,kanal])
@@ -1567,6 +1599,8 @@ for(j in filene){
   result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j],x] <- 2
 }
 
+gater[x,1] <- mean(splitLow$upper_gates)
+gater[x,2] <- mean(splitHigh$lower_gates)
 
 
 splitHigh <- NA
@@ -1605,7 +1639,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 
 
 split <- NA
@@ -1643,7 +1677,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 split <- NA
 #***************************************************
 #pos/neg CD 160 OK positiv=topp til h?yre  9 feb ok
@@ -1680,7 +1714,7 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 
 split <- NA
 #***************************************************
@@ -1718,6 +1752,8 @@ for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > splitLow$upper_gates[j]
   result[[j]][data[[j]][, kanal] > splitHigh$lower_gates[j], x] <- 2
 }
+gater[x,1] <- mean(splitLow$upper_gates)
+gater[x,2] <- mean(splitHigh$lower_gates)
 
 splitHigh <- NA
 splitLow <- NA
@@ -1756,11 +1792,12 @@ plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 for(j in filene){
   result[[j]][,x] <- data[[j]][, kanal] > split$lower_gates[j]
 }
-
+gater[x,1] <- mean(split$lower_gates)
 
 
 
 saveRDS(result, fs::path(outDataPath, "posNeg.rds"))
 saveRDS(file_names, fs::path(outDataPath, "posNegFilnavn.rds"))
+write.csv2(gater, fs::path(outDataPath, "gater.csv"))
 
 proc.time() - ptm
