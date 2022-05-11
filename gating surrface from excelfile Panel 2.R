@@ -80,5 +80,5 @@ for(i in 1:nrow(surrface)){
 }
 
 
-write.csv2(as.data.frame(result), fs::path(outPath, "Prosent_Gating_Surrface_Panel2.csv"))
+write.csv2(as.data.frame(result), fs::path(outPath, "Prosent_Gating_Stim_panel2.csv"))
 
