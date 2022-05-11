@@ -102,9 +102,10 @@ gater <- as.data.frame(matrix(NA, nrow = length(kanaler), ncol = 2))
 rownames(gater) <- kanaler
 colnames(gater) <- c("low", "high")
 
-#gater <- read.csv2(fs::path(outDataPath, "gater.csv"))
-#rownames(gater) <- gater$X
-#gater$X <- NULL
+# gater <- read.csv2(fs::path(outDataPath, "gater.csv"))
+# rownames(gater) <- gater$X
+# gater$X <- NULL
+# CD45 <- params$name[grep("CD45", params$desc)][1] 
 
 
 #***************************************************
@@ -1261,8 +1262,8 @@ kanal <- params$name[grep(x, params$desc)][1]
 data <-  arc_sinh_transform_selected_channels(fcs_data = fcs_data, channels = c(kanal, CD45))
 split <- find_gaussian_gates_second_top(data = data, channel = kanal, lower_gate_percent = 15, upper_gate_percent = 0.001)#, minimum = 1.4)
 split$lower_gates[is.na(split$lower_gates)] <- mean(split$lower_gates[!is.na(split$lower_gates)])
-split$lower_gates[split$lower_gates > 0.2] <- 0.2
-#split$lower_gates <- rep(1, length(split$lower_gates))
+
+split$lower_gates <- rep(0.6, length(split$lower_gates))
 
 kanal_max <- max(data[[1]][,kanal])
 for(i in 1:n_files){
