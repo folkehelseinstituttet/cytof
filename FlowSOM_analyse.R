@@ -53,18 +53,19 @@ for(k in ks){
   cluster_FlowSOM_k <- out_k[cluster_FlowSOM_pre]
   cluster_FlowSOM_k_factor <- factor(cluster_FlowSOM_k, levels = 1:k)
 print("cluster")
-  q5_k <- q_per_cluster_marker(data = params$data[,params$kanaler], kluster = cluster_FlowSOM_k, probs = 0.05)
-  write.csv2(q5_k, fs::path(utSti, paste0("q5_per_kluster_k_", k, "_seed", params$seed, ext_name, ".csv")))
+# ved å inkludere disse ble ikke datasettet likt. 
+#  q5_k <- q_per_cluster_marker(data = params$data[,params$kanaler], kluster = cluster_FlowSOM_k, probs = 0.05)
+#  write.csv2(q5_k, fs::path(utSti, paste0("q5_per_kluster_k_", k, "_seed", params$seed, ext_name, ".csv")))
   q10_k <- q_per_cluster_marker(data = params$data[,params$kanaler], kluster = cluster_FlowSOM_k, probs = 0.1)
   write.csv2(q10_k, fs::path(utSti, paste0("q10_per_kluster_k_", k, "_seed", params$seed, ext_name, ".csv")))
-  q25_k <- q_per_cluster_marker(data = params$data[,params$kanaler], kluster = cluster_FlowSOM_k, probs = 0.25)
-  write.csv2(q25_k, fs::path(utSti, paste0("q25_per_kluster_k_", k, "_seed", params$seed, ext_name, ".csv")))
-  q75_k <- q_per_cluster_marker(data = params$data[,params$kanaler], kluster = cluster_FlowSOM_k, probs = 0.75)
-  write.csv2(q75_k, fs::path(utSti, paste0("q75_per_kluster_k_", k, "_seed", params$seed, ext_name, ".csv")))
+#  q25_k <- q_per_cluster_marker(data = params$data[,params$kanaler], kluster = cluster_FlowSOM_k, probs = 0.25)
+#  write.csv2(q25_k, fs::path(utSti, paste0("q25_per_kluster_k_", k, "_seed", params$seed, ext_name, ".csv")))
+#  q75_k <- q_per_cluster_marker(data = params$data[,params$kanaler], kluster = cluster_FlowSOM_k, probs = 0.75)
+#  write.csv2(q75_k, fs::path(utSti, paste0("q75_per_kluster_k_", k, "_seed", params$seed, ext_name, ".csv")))
   q90_k <- q_per_cluster_marker(data = params$data[,params$kanaler], kluster = cluster_FlowSOM_k, probs = 0.9)
   write.csv2(q90_k, fs::path(utSti, paste0("q90_per_kluster_k_", k, "_seed", params$seed, ext_name, ".csv")))
-  q95_k <- q_per_cluster_marker(data = params$data[,params$kanaler], kluster = cluster_FlowSOM_k, probs = 0.95)
-  write.csv2(q95_k, fs::path(utSti, paste0("q95_per_kluster_k_", k, "_seed", params$seed, ext_name, ".csv")))
+#  q95_k <- q_per_cluster_marker(data = params$data[,params$kanaler], kluster = cluster_FlowSOM_k, probs = 0.95)
+#  write.csv2(q95_k, fs::path(utSti, paste0("q95_per_kluster_k_", k, "_seed", params$seed, ext_name, ".csv")))
   
 print("q")
 
