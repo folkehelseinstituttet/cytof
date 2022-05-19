@@ -194,15 +194,6 @@ rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters_manuel.R
 
 
 
-scriptPath <- fs::path("H:", "git", "cytof")
-params <- list()
-params$utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "CleanUpGatingMarch2022", "gating_results_Panel2_mars2022", "posNeg", "result FlowSOM")
-params$fil <- "Prosent_Gating_klustre_Panel2.csv"
-params$selcected_name <- "surrface"
-params$panel <- 2
-
-rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters_fraFlowSOM.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$fil, ".docx")))
-
 
 
 scriptPath <- fs::path("H:", "git", "cytof")
@@ -212,7 +203,7 @@ params$fil <- "Prosent_Gating_klustre_Panel2.csv"
 params$selcected_name <- "surrface"
 params$panel <- 2
 
-rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters_fraFlowSOM.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$fil, ".docx")))
+rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters_fraFlowSOM.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", gsub(".csv", "",  params$fil), ".docx")))
 
 
 
@@ -224,7 +215,7 @@ params$fil <- "Prosent_Gating_klustre_Panel2_Kopi av sjekk disse JB.csv"
 params$selcected_name <- "surrface"
 params$panel <- 2
 
-rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters_fraFlowSOM.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$fil, ".docx")))
+rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters_fraFlowSOM.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", "kopi_JB", ".docx")))
 
 
 
@@ -235,7 +226,7 @@ params$fil <- "Prosent_Gating_klustre_Panel2_CD8.csv"
 params$selcected_name <- "surrface"
 params$panel <- 2
 
-rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters_fraFlowSOM.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$fil, ".docx")))
+rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters_fraFlowSOM.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", gsub(".csv", "",  params$fil), ".docx")))
 
 
 
