@@ -56,6 +56,9 @@ for(i in 1:nrow(surrface)){
   pos12_i <- colnames(surrface)[which(surrface[i,] == 12)] 
   neg_01_i <- colnames(surrface)[which(surrface[i,] == 10)] 
   either_or_i <- colnames(surrface)[which(surrface[i,] == 99)]
+  if(length(either_or_i) == 1){
+    either_or_i <- NULL
+  }
   markers_i <- c(pos_i, neg_i, pos12_i, neg_01_i)
   markersPosNeg_i <- c(rep(1, length(pos_i)), rep(0, length(neg_i)), rep(12, length(pos12_i)), rep(10, length(neg_01_i)))
   if(length(markers_i) > 0){
@@ -69,6 +72,6 @@ for(i in 1:nrow(surrface)){
   
 }
 
-
+summary(result)
 write.csv2(as.data.frame(result), fs::path(outPath, "Prosent_Gating_Surrface_Panel1.csv"))
 
