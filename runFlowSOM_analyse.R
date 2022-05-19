@@ -79,7 +79,7 @@ source(fs::path(scriptPath, "FlowSOM_analyse.R"))
 
 
 for(j in 1:length(posNeg)){
-  posNeg[[j]]$CD3CD45CD8 <- posNeg[[j]]$CD3 & posNeg[[j]]$CD45 & posNeg[[j]]$CD8
+  posNeg[[j]]$CD3CD45CD8 <- posNeg[[j]]$CD3 & posNeg[[j]]$CD45 & (posNeg[[j]]$CD8 == 2)
 }
 
 utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "Resultat_Panel_2_ALLE_CD8")
@@ -145,7 +145,7 @@ source(fs::path(scriptPath, "FlowSOM_analyse.R"))
 
 
 for(j in 1:length(posNeg)){
-  posNeg[[j]]$CD3CD45CD8 <- posNeg[[j]]$CD3 & posNeg[[j]]$CD45 & posNeg[[j]]$CD8
+  posNeg[[j]]$CD3CD45CD8 <- posNeg[[j]]$CD3 & posNeg[[j]]$CD45 & (posNeg[[j]]$CD8 == 2)
 }
 
 utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "Resulta_Panel_1_ALLE_CD8")
