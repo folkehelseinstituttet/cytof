@@ -11,10 +11,10 @@ scriptPath <- fs::path("H:", "git", "cytof")
 
 source(fs::path(scriptPath, "analysis_functions.R"))
 
-klustre <- as.data.frame(read.csv2(fs::path(outPath, "sjekk disse.csv")))
+#klustre <- as.data.frame(read.csv2(fs::path(outPath, "sjekk disse.csv")))
 #klustre <- as.data.frame(read.csv2(fs::path(outPath, "Kopi av sjekk disse JB.csv")))
 #klustre <- as.data.frame(read.csv2(fs::path(outPath, "sjekk disse CD8.csv")))
-#
+klustre <- as.data.frame(read.csv2(fs::path(outPath, "sjekk disse CD8_1og2.csv")))
 klustre <- klustre[!is.na(klustre$Population),]
 klustre <- klustre[!klustre$CD45 == "0, 1",]
 alleNA <- function(x){
@@ -100,7 +100,7 @@ for(i in 1:nrow(klustre)){
 }
 
 
-write.csv2(as.data.frame(result), fs::path(outPath, "Prosent_Gating_klustre_Panel2_.csv"))
+#write.csv2(as.data.frame(result), fs::path(outPath, "Prosent_Gating_klustre_Panel2_.csv"))
 #write.csv2(as.data.frame(result), fs::path(outPath, "Prosent_Gating_klustre_Panel2_Kopi av sjekk disse JB.csv"))
 #write.csv2(as.data.frame(result), fs::path(outPath, "Prosent_Gating_klustre_Panel2_CD8.csv"))
-
+write.csv2(as.data.frame(result), fs::path(outPath, "Prosent_Gating_klustre_Panel2_CD8_1og2.csv"))
