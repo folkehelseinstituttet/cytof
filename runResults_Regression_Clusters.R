@@ -233,6 +233,18 @@ rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters_fraFlowS
 
 
 
+scriptPath <- fs::path("H:", "git", "cytof")
+params <- list()
+params$utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "CleanUpGatingMarch2022", "gating_results_Panel2_mars2022", "posNeg", "result FlowSOM")
+params$fil <- "Prosent_Gating_klustre_Panel2_CD8_1og2.csv"
+               
+params$panel <- 2
+
+rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters_fraFlowSOM.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", gsub(".csv", "",  params$fil), ".docx")))
+
+
+
+
 
 
 
