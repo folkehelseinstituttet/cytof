@@ -266,3 +266,30 @@ params$adj_p_methods <- "fdr" # see help(p.adjust) for other methods
 
 rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, "_V2.docx")))
 
+
+
+scriptPath <- fs::path("H:", "git", "cytof")
+params <- list()
+params$utSti <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "Resultat_Panel1_ALLE_CD8_1og2", "TigtherCleanUp")
+
+params$seed <- 7003 #nb må endres vil man vil gjøre et annet uttrekk
+params$muligeK <- c(15, 20, 25, 30, 35, 40)
+params$selcected_name <- "CD3CD45CD8"
+params$panel <- 1
+params$adj_p <- 0.1
+params$adj_p_methods <- "fdr" # see help(p.adjust) for other methods
+
+rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, "_V2.docx")))
+
+
+
+params$seed <- 7733 #nb må endres vil man vil gjøre et annet uttrekk
+params$muligeK <- c(15, 20, 25, 30, 35, 40)
+params$selcected_name <- "CD3CD45CD8"
+params$panel <- 1
+params$adj_p <- 0.1
+params$adj_p_methods <- "fdr" # see help(p.adjust) for other methods
+
+rmarkdown::render(fs:::path(scriptPath, "resultater_Regression_clusters.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, "_V2.docx")))
+
+
