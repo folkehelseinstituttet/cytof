@@ -59,6 +59,7 @@ colnames(klustre)[colnames(klustre) == "IL.17A"] <- "IL-17A"
 colnames(klustre)[colnames(klustre) == "IL.10"] <- "IL-10"
 colnames(klustre)[colnames(klustre) == "CTLA.4"] <- "CTLA-4"
 colnames(klustre)[colnames(klustre) == "PD.L2"] <- "PD-L2"
+colnames(klustre)[colnames(klustre) == "CD40L"] <- "CD154"
 
 
 
