@@ -22,9 +22,6 @@ arcSindataMatrix <- list_to_matrix_selected_events(data = fcs_data,
 colnames(arcSindataMatrix)[1:length(kanaler)] <- kanaler
 print("arcsin")
 
-if(column_cluster == TRUE){
-  o <- kanaler
-}
 
 params <- list(seed = seed,
                data = arcSindataMatrix[arcSindataMatrix$dataset %in% tamed, ],
@@ -32,10 +29,14 @@ params <- list(seed = seed,
                kanaler = kanaler,
                scaling = TRUE,
                column_cluster = column_cluster, 
-               o <- o,
+               o = NULL,
                ydim = xdim,  
                xdim = ydim
 )
+
+if(is.null(params$o)){
+  params$o <- params$kanaler
+}
 
 set.seed(params$seed) # to ensure same plot every time
 out <- FlowSOM::ReadInput(as.matrix(params$data[,params$kanaler]), transform = F, scale = params$scaling)
@@ -45,10 +46,10 @@ print(2)
 out <- FlowSOM::BuildMST(out)
 print(3)
 cluster_FlowSOM_pre <- out$map$mapping[, 1]
-set.seed(params$seed)
 
 for(k in ks){
   print(k)
+  set.seed(params$seed)
   out_k <- FlowSOM::metaClustering_consensus(out$map$codes, k = k, seed = params$seed)
   cluster_FlowSOM_k <- out_k[cluster_FlowSOM_pre]
   cluster_FlowSOM_k_factor <- factor(cluster_FlowSOM_k, levels = 1:k)
@@ -76,7 +77,7 @@ print("median")
 
 
   tiff(fs::path(utSti, paste0("heatmap_median_k_", k, "_cluster_seed", seed, ext_name, ".tiff")), width = 1000, height = 800)
-    print(Heatmap(as.matrix(medians_k[,o], cluster_columns = params$column_cluster)))
+    print(Heatmap(as.matrix(medians_k[,params$kanaler], cluster_columns = params$column_cluster)))
   dev.off()
 print("heatmap")
 
