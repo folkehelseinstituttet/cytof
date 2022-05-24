@@ -30,7 +30,8 @@ This file is as explained sourced from "runFlowSOM_analyse.R". In "runFlowSOM_an
  * kanaler is a vector of the same length as kanalnavn, but this vector has names that correspond to the names in kanalnavn, but they are easier to remember.
  * xdim and ydim are two variables indication how many nodes that will be made in the pre clustering done by flowSOM. When less than 30 cluster are expected there could be enough with 100 nodes (which give xdim = ydim = 10). While for more clusters more nodes are needed here 14*14 = 196 nodes are used.
  * ks is a vector of number of clusters that you want to make of the clustering with this seed. 
- * utSti which is the path to the folder where you want to save the clustering result.  * o is optional, but must be included if  
+ * utSti which is the path to the folder where you want to save the clustering result.  
+ * o is optional, but must be included if  you want a different order of your channels in the heatmap. 
  * 
  * tamed a list of which filenames to use in the clustering
 
@@ -68,21 +69,21 @@ print("arcsin")
 then all parameters are stored together in a list called params
 
 ```{r, eval=F, echo=T}
-if(column_cluster = TRUE){
-  o <- kanaler
-}
 
 params <- list(seed = seed,
                data = arcSindataMatrix[arcSindataMatrix$dataset %in% tamed, ],
                n_random_for_plotting_per_fil = 5000,
                kanaler = kanaler,
                scaling = TRUE,
-               column_cluster = column_cluster, 
-               o <- o,
+               column_cluster = column_cluster,
+               o = NULL,
                ydim = xdim,  
                xdim = ydim
 )
 
+if(is.null(params$o)){
+  params$o <- params$kanaler
+}
 ```
 
 The seed is again set to make sure the FlowSOM analysis are done similarly each time repeated for the same seed. And the initial FlowSOM analysis are run assigning each event in the arcSindataMatrix to a node in the xdim times ydim node network. 
@@ -101,17 +102,25 @@ cluster_FlowSOM_pre <- out$map$mapping[, 1]
 Then for each value k in the vector ks the clustering of nodes to k clusters are done, the 10 and 90 % quantiles together with the median signal of all events in the clusters are calculated and written to a file in the folder utSti for every channel used. A heatmap is calculated and saved. The total number of events in each cluster is calculated and saved to a file. The total number of events per file is also calculated and saved. 
 
 ```{r, eval=F, echo=T}
-set.seed(params$seed)
 for(k in ks){
   print(k)
+  set.seed(params$seed)
   out_k <- FlowSOM::metaClustering_consensus(out$map$codes, k = k, seed = params$seed)
   cluster_FlowSOM_k <- out_k[cluster_FlowSOM_pre]
   cluster_FlowSOM_k_factor <- factor(cluster_FlowSOM_k, levels = 1:k)
 print("cluster")
+  q5_k <- q_per_cluster_marker(data = params$data[,params$kanaler], kluster = cluster_FlowSOM_k, probs = 0.05)
+  write.csv2(q5_k, fs::path(utSti, paste0("q5_per_kluster_k_", k, "_seed", params$seed, ext_name, ".csv")))
   q10_k <- q_per_cluster_marker(data = params$data[,params$kanaler], kluster = cluster_FlowSOM_k, probs = 0.1)
   write.csv2(q10_k, fs::path(utSti, paste0("q10_per_kluster_k_", k, "_seed", params$seed, ext_name, ".csv")))
+  q25_k <- q_per_cluster_marker(data = params$data[,params$kanaler], kluster = cluster_FlowSOM_k, probs = 0.25)
+  write.csv2(q25_k, fs::path(utSti, paste0("25_per_kluster_k_", k, "_seed", params$seed, ext_name, ".csv")))
+  q75_k <- q_per_cluster_marker(data = params$data[,params$kanaler], kluster = cluster_FlowSOM_k, probs = 0.75)
+  write.csv2(q75_k, fs::path(utSti, paste0("q75_per_kluster_k_", k, "_seed", params$seed, ext_name, ".csv")))
   q90_k <- q_per_cluster_marker(data = params$data[,params$kanaler], kluster = cluster_FlowSOM_k, probs = 0.9)
   write.csv2(q90_k, fs::path(utSti, paste0("q90_per_kluster_k_", k, "_seed", params$seed, ext_name, ".csv")))
+  q95_k <- q_per_cluster_marker(data = params$data[,params$kanaler], kluster = cluster_FlowSOM_k, probs = 0.95)
+  write.csv2(q95_k, fs::path(utSti, paste0("q95_per_kuster_k_", k, "_seed", params$seed, ext_name, ".csv")))
 print("q")
 
   medians_k <- median_per_cluster_marker(data = params$data[,params$kanaler], kluster = cluster_FlowSOM_k)
@@ -121,7 +130,7 @@ print("median")
 
 
   tiff(fs::path(utSti, paste0("heatmap_median_k_", k, "_cluster_seed", seed, ext_name, ".tiff")), width = 1000, height = 800)
-    Heatmap(as.matrix(medians_k[,o], cluster_columns = params$column_cluster))
+    Heatmap(as.matrix(medians_k[,params$o], cluster_columns = params$column_cluster))
   dev.off()
 print("heatmap")
 
