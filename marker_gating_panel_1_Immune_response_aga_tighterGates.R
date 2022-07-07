@@ -1345,9 +1345,12 @@ signal <- signal_signal_plot(data = data, random_events = random_events(number_o
 plotTiff(signal = signal, filnavn = paste0("fig_", x, "_gating", ".tiff"))
 
 for(j in filene){
-  result[[j]][,x] <- data[[j]][, kanal] > split0
-  result[[j]][data[[j]][, kanal] > split$lower_gates[j]] <- 2
+  result[[j]][,x] <- data[[j]][, kanal] > split0[j]
+  result[[j]][data[[j]][, kanal] > split$lower_gates[j], x] <- 2
 }
+
+
+
 gater[x, 1] <- mean(split0)
 gater[x,2] <- mean(split$lower_gates)
 
