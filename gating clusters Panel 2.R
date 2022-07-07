@@ -14,9 +14,13 @@ source(fs::path(scriptPath, "analysis_functions.R"))
 #klustre <- as.data.frame(read.csv2(fs::path(outPath, "sjekk disse.csv")))
 #klustre <- as.data.frame(read.csv2(fs::path(outPath, "Kopi av sjekk disse JB.csv")))
 #klustre <- as.data.frame(read.csv2(fs::path(outPath, "sjekk disse CD8.csv")))
-klustre <- as.data.frame(read.csv2(fs::path(outPath, "sjekk disse CD8_1og2.csv")))
-klustre <- klustre[!is.na(klustre$Population),]
-klustre <- klustre[!klustre$CD45 == "0, 1",]
+#klustre <- as.data.frame(read.csv2(fs::path(outPath, "sjekk disse CD8_1og2.csv")))
+#klustre <- as.data.frame(read.csv2(fs::path(outPath, "sjekk disse fra Summary.csv")))
+#klustre <- as.data.frame(read.csv2(fs::path(outPath, "gjennskapt.csv")))
+klustre <- as.data.frame(read.csv2(fs::path(outPath, "gjennskapt kun less markers.csv")))
+klustre <- klustre[-1,]
+#klustre <- klustre[!is.na(klustre$Population),]
+##klustre <- klustre[!klustre$CD45 == "0, 1",]
 alleNA <- function(x){
   all(is.na(x))
 }
@@ -103,4 +107,7 @@ for(i in 1:nrow(klustre)){
 #write.csv2(as.data.frame(result), fs::path(outPath, "Prosent_Gating_klustre_Panel2_.csv"))
 #write.csv2(as.data.frame(result), fs::path(outPath, "Prosent_Gating_klustre_Panel2_Kopi av sjekk disse JB.csv"))
 #write.csv2(as.data.frame(result), fs::path(outPath, "Prosent_Gating_klustre_Panel2_CD8.csv"))
-write.csv2(as.data.frame(result), fs::path(outPath, "Prosent_Gating_klustre_Panel2_CD8_1og2.csv"))
+#write.csv2(as.data.frame(result), fs::path(outPath, "Prosent_Gating_klustre_Panel2_CD8_1og2.csv"))
+#write.csv2(as.data.frame(result), fs::path(outPath, "Prosent_Gating_klustre_Panel2_fra_Summary.csv"))
+#write.csv2(as.data.frame(result), fs::path(outPath, "Prosent_Gating_klustre_Panel2_Gjenskapt.csv"))
+write.csv2(as.data.frame(result), fs::path(outPath, "Prosent_Gating_klustre_Panel2_Gjenskapt_less_markers.csv"))
