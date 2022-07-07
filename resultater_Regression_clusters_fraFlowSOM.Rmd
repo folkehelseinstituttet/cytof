@@ -9,6 +9,9 @@ This script was run:
 ```{r, echo = F}
 date()
 print(params$seed)
+nedre <- ((100 - params$intervall)/2)/100
+ovre <- 1 - nedre
+
 ```
 
 
@@ -17,10 +20,13 @@ library(ggplot2)
 library(betareg)
 
 analyseSti <- "F:/Forskningsprosjekter/PDB 2794 - Immune responses aga_/Forskningsfiler/JOBO/CyTOF/Analyse i R OUS/"
- meta <- readxl::read_xlsx(fs::path(analyseSti, "STATAfil OUS pasienter FINAL 270121.xlsx"))
- kontrol <- data.frame(readxl::read_xlsx(fs::path(analyseSti, "oversikt_kontroller030221.xlsx")))
- kontrol$Sex <- kontrol$`kjønn (kvinne=1, mann = 2)`
- kontrol$kont <- kontrol$Løpenummer...1
+ meta <- read.csv2(fs::path(analyseSti,"Ous_pasientopplysning_mindre.csv")) #readxl::read_xlsx(fs::path(analyseSti, "STATAfil OUS pasienter FINAL 270121.xlsx"))
+ # kontrol <- readxl::read_xlsx(fs::path(analyseSti, "oversikt_kontroller030221.xlsx"))
+ # kontrol$Sex <- kontrol$`kjønn (kvinne=1, mann = 2)`
+ # kontrol$kont <- kontrol$Løpenummer...1
+ # kontrol$alder <- kontrol$Alder...2
+ # write.csv2(kontrol[,c("kont", "Sex", "alder")], fs::path(analyseSti, "kontroller_mindre.csv"))
+ kontrol <- read.csv2(fs::path(analyseSti, "kontroller_mindre.csv"))
 ```
 
 
@@ -32,6 +38,8 @@ prepare_data <- function(){
   andel_temp <- andel_temp[,!is.na(andel_temp[1,])]
   antall_surr <- ncol(andel_temp)
   andel <- andel_temp/100
+  andel[andel == 0] <- 0.000001
+
  # summary(apply(andel, 1, sum))
   andel$Pat <- NA
   #find patient from filename 
@@ -95,7 +103,7 @@ prepare_data <- function(){
  
  for(i in 1:nrow(d)){
     if(substr(d$Pat[i],1,1) == "F"){
-       radi <- which(meta$Pasientnr == d$Pat[i])
+            radi <- which(meta$Pasientnr == d$Pat[i])
        d$Alder[i] <- meta$Alder[radi]
        d$Sex[i] <- ifelse(meta$Female[radi] == 1, "F", "M")
        d$Status[i] <- "Moderat"
@@ -103,8 +111,8 @@ prepare_data <- function(){
     } else{
       if(substr(d$Pat[i],1, 1) == "K"){
        radi <- which(kontrol$kont == substr(d$Pat[i],4,6))
-       d$Alder[i] <- kontrol$Alder...2[radi]
-       d$Sex[i] <- ifelse(kontrol$kjønn..kvinne.1..mann...2.[radi] == 1, "F", "M")
+       d$Alder[i] <- kontrol$alder[radi] #as.numeric(kontrol[radi, grep("Alder", colnames(kontrol))[1]])
+       d$Sex[i] <- ifelse(kontrol$Sex[radi] == 1, "F", "M") #ifelse(kontrol$`kjønn (kvinne=1, mann = 2)`[radi] == 1, "F", "M")
        d$Status[i] <- "Control"
       }
     }
@@ -122,6 +130,10 @@ d$StatusTid <- factor(d$StatusTid, levels = c("Severe, T1", "Moderat, T1", "Seve
 table(d$StatusTid)
 d$StatusTidSex <- paste(d$StatusTid, d$Sex)
 d$StatusTidSex <- factor(d$StatusTidSex, levels = c( "Severe, T1 M", "Severe, T1 F", "Moderat, T1 M",  "Moderat, T1 F",  "Severe, T2 M",  "Moderat, T2 M", "Moderat, T2 F",  "Control M"  , "Control F"))
+
+d$StatusTidSexF <- as.character(d$StatusTidSex)
+d$StatusTidSexF <- factor(d$StatusTidSexF, levels = c(  "Severe, T1 F", "Severe, T1 M", "Moderat, T1 F", "Moderat, T1 M",    "Severe, T2 M",  "Moderat, T2 F",  "Moderat, T2 M" , "Control F", "Control M" ))
+
 
 d$StatusTidCol <- "green"
 d$StatusTidCol[d$StatusTid %in% "Moderat, T1"] <- "red"
@@ -187,7 +199,7 @@ return(list(andel = andel, d = d, ddT1 = ddT1, ddT2 = ddT2, dK = dK, dd = dd, an
   d <- d[!substr(d$Pat,1,1) == "R",]
   g <- NA
 
-  mulige <- grep("panel", colnames(d))
+  mulige <- 1:(grep("Pat", colnames(d))-1)
  for(i in mulige){
    if(exists("g")){
      rm(g)
@@ -198,6 +210,10 @@ return(list(andel = andel, d = d, ddT1 = ddT1, ddT2 = ddT2, dK = dK, dd = dd, an
    print(colnames(d)[i])
    
    print(summary(d[,i]))
+   if(sort(d[,i], decreasing = T)[5] < 0.0005){
+     print("almost all equal to 0, 5 largest values:")
+     print(sort(d[,i], decreasing = T)[1:5])
+   } else {
    if(max(d[,i]) > 0.001){
    d$y <- d[,i] + min(d[d[,i] > 0,i])/100
    res <- summary(betareg(y ~ StatusTid + Sex + Alder, data = d ))
@@ -206,9 +222,12 @@ return(list(andel = andel, d = d, ddT1 = ddT1, ddT2 = ddT2, dK = dK, dd = dd, an
      if(res$coefficients$mean["SexM", "Pr(>|z|)" ] < 0.05){
         fit <- betareg(y ~ StatusTidSex + Alder, data = d )
         res <- summary(fit)
-        if(any(res$coefficients$mean[2:9, "Pr(>|z|)"] < 0.05)){
+        fitF <- betareg(y ~ StatusTidSexF + Alder, data = d )
+        resF <- summary(fitF)
+        if(any(res$coefficients$mean[2:9, "Pr(>|z|)"] < 0.05)|any(resF$coefficients$mean[2:9, "Pr(>|z|)"] < 0.05)){
            print(paste0(colnames(d)[i]))
            print(res)
+           print(resF)
            predData <- expand.grid(Alder= min(d$Alder):max(d$Alder), StatusTidSex = levels(d$StatusTidSex))
            for(n in levels(d$StatusTidSex)){
               min_n <- min(d$Alder[d$StatusTidSex == n])
@@ -218,7 +237,9 @@ return(list(andel = andel, d = d, ddT1 = ddT1, ddT2 = ddT2, dK = dK, dd = dd, an
            }
            predData <- predData[!is.na(predData$Alder),]
 
-           predData$predict <- predict(fit, newdata = predData) #usikker på hvordan jeg får konfidensintervall. Vent til det skal brukes
+           predData$predict <- predict(fit, newdata = predData)
+            predData$pred_lower <- predict(fit, newdata = predData, type = "quantile", at = nedre)
+           predData$pred_upper <- predict(fit, newdata = predData, type = "quantile", at = ovre)
            predData$navn <- predData$predict
            predData <- data.frame(predData)
            i_alder <- which(colnames(d) == "Alder")
@@ -227,7 +248,8 @@ return(list(andel = andel, d = d, ddT1 = ddT1, ddT2 = ddT2, dK = dK, dd = dd, an
            colnames(d2) <- c("navn", "Alder", "StatusTidSex")
            g <- ggplot(data = d2, aes(x = Alder, y = navn, col= StatusTidSex)) +
               geom_point(size = 2) + 
-              geom_line(data = predData, aes(x=Alder, y = navn, col = StatusTidSex), size = 2) 
+              geom_line(data = predData, aes(x=Alder, y = navn, col = StatusTidSex), size = 2) + 
+             geom_ribbon(data = predData, aes(ymin = pred_lower, ymax = pred_upper, fill = StatusTidSex, color = NULL), alpha = 0.1)
          }
      } else{
         fit <- betareg(y ~ StatusTid + Alder, data = d )
@@ -247,6 +269,8 @@ return(list(andel = andel, d = d, ddT1 = ddT1, ddT2 = ddT2, dK = dK, dd = dd, an
 
            predData$predict <- predict(fit, newdata = predData) #usikker på hvordan jeg får konfidensintervall. Vent til det skal brukes
            predData$navn <- predData$predict
+            predData$pred_lower <- predict(fit, newdata = predData, type = "quantile", at = nedre)
+           predData$pred_upper <- predict(fit, newdata = predData, type = "quantile", at = ovre)
            predData <- data.frame(predData)
            i_alder <- which(colnames(d) == "Alder")
            i_statusTid <- which(colnames(d) == "StatusTid")
@@ -254,32 +278,57 @@ return(list(andel = andel, d = d, ddT1 = ddT1, ddT2 = ddT2, dK = dK, dd = dd, an
            colnames(d2) <- c("navn", "Alder", "StatusTid")
            g <- ggplot(data = d2, aes(x = Alder, y = navn, col= StatusTid)) +
               geom_point(size = 2) + 
-              geom_line(data = predData, aes(x=Alder, y = navn, col = StatusTid), size = 2) 
+              geom_line(data = predData, aes(x=Alder, y = navn, col = StatusTid), size = 2) +
+             geom_ribbon(data = predData, aes(ymin = pred_lower, ymax = pred_upper, fill = StatusTid, color = NULL), alpha = 0.1)
          }
      }
    } else{
      if(res$coefficients$mean["SexM", "Pr(>|z|)" ] < 0.05){
+        fit <- betareg(d[,i] ~ StatusTidSex, data = d )
         res <- summary(betareg(y ~ StatusTidSex, data = d ))
-        if(any(res$coefficients$mean[2:9, "Pr(>|z|)"] < 0.05)){
+        resF <- summary(betareg(y ~ StatusTidSexF, data = d ))
+
+        if(any(res$coefficients$mean[2:9, "Pr(>|z|)"] < 0.05) | any(resF$coefficients$mean[2:9, "Pr(>|z|)"] < 0.05)){
      #      print(paste0("andelster ", i))
             print(paste0( colnames(d)[i]))
           print(res)
+           print(resF)
+           ekte_data <- data.frame(StatusTidSex = d$StatusTidSex, Sex = d$Sex, kluster = d[,i])
+           predData <- expand.grid( StatusTidSex = levels(d$StatusTidSex))
+           predData$Sex <- "M"
+           predData$Sex[grep("F", predData$StatusTidSex)] <- "F"
+           predData$kluster <- predict(fit, newdata = predData) #usikker på hvordan jeg får konfidensintervall. Vent til det skal brukes
+           predData$pred_lower <- predict(fit, newdata = predData, type = "quantile", at = nedre)
+           predData$pred_upper <- predict(fit, newdata = predData, type = "quantile", at = ovre)
            
-           g <- ggplot(d, aes(x = StatusTidSex, y = d[,i], col = Sex)) +
-              geom_boxplot(outlier.shape = NA)+ 
-              geom_jitter(size = 2, alpha=0.3, position=position_jitter(0.2))
+           g <- ggplot(ekte_data , aes(x = StatusTidSex, y = kluster, col = Sex)) +
+              geom_boxplot(outlier.shape = NA) + 
+              geom_jitter(size = 2, alpha=0.3, position=position_jitter(0.2)) +
+             geom_errorbar(data = predData, aes(ymin = pred_lower, ymax = pred_upper, col = paste("pred int", params$intervall)), width = 0.2, position = position_dodge(0.9)) + 
+             geom_point(data = predData, aes(x = StatusTidSex, y = kluster, col = paste("pred int", params$intervall)), size = 3) 
+           
         }
  
      } else{
-        res <- summary(betareg(y ~ StatusTid, data = d ))
+         fit <- betareg(d[,i] ~ StatusTid, data = d )
+      res <- summary(betareg(y ~ StatusTid, data = d ))
         if(any(res$coefficients$mean[2:5, "Pr(>|z|)"] < 0.05)){
      #      print(paste0("andelster ", i))
           print(paste0( colnames(d)[i]))
             print(res)
            
-           g <- ggplot(d, aes(x = StatusTid, y = d[,i])) +
-              geom_boxplot(outlier.shape = NA)+ 
-              geom_jitter(aes(col = Sex), size = 2, alpha=0.3, position=position_jitter(0.2)) 
+          ekte_data <- data.frame(StatusTid = d$StatusTid, Sex = d$Sex, kluster = d[,i])
+           predData <- expand.grid( StatusTid = levels(d$StatusTid))
+           predData$kluster <- predict(fit, newdata = predData) #usikker på hvordan jeg får konfidensintervall. Vent til det skal brukes
+           predData$pred_lower <- predict(fit, newdata = predData, type = "quantile", at = nedre)
+           predData$pred_upper <- predict(fit, newdata = predData, type = "quantile", at = ovre)
+        
+           g <- ggplot(ekte_data , aes(x = StatusTid, y = kluster)) +
+              geom_boxplot(outlier.shape = NA) + 
+              geom_jitter(aes(col = Sex), size = 2, alpha=0.3, position=position_jitter(0.2)) +
+             geom_errorbar(data = predData, aes(ymin = pred_lower, ymax = pred_upper, col = paste("pred int", params$intervall)), width = 0.2, position = position_dodge(0.9)) + 
+             geom_point(data = predData, aes(x = StatusTid, y = kluster, col = paste("pred int", params$intervall)), size = 3)
+          
           
         }
      } 
@@ -291,11 +340,17 @@ return(list(andel = andel, d = d, ddT1 = ddT1, ddT2 = ddT2, dK = dK, dd = dd, an
  
     g <- g + theme(axis.text = element_text(size = 14), axis.title = element_text(size = 20), title  = element_text(size = 20)) + 
     ylab("proportion") 
-    g <- g + ggtitle(paste0(colnames(d)[i])) #, ": antall i andelster = ", antallPerandelster[i]))
+    g <- g + ggtitle(paste0(colnames(d)[i], ", pred. intervall = ", params$intervall#, ": antall i andelster = ", antallPerandelster[i]
+    ))
     print(g)
+    d_resid <- data.frame(fitted = fitted(fit), residuals = residuals(fit)) 
+    
+    g_resid <- ggplot(d_resid, aes(x = fitted, y = residuals)) +
+      geom_point() + ggtitle("residual plot") + geom_abline(slope = 0, intercept = 0) + theme(axis.text = element_text(size = 14), axis.title = element_text(size = 20), title  = element_text(size = 20))
+    print(g_resid)
    
    }
-   
+   }
  }
 }
 
