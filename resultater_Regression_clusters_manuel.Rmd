@@ -376,9 +376,9 @@ resK <- resExcel
  
   for(i in 1:antall_surr){
     d[,i] <- d[,i] + 0.00001
-    if(sd(d[,i]) > 0.001){
+    #if(sd(d[,i]) > 0.001){
      p_mat[i,1] <-min(summary(betareg(d[,i] ~ StatusTid + Sex + Alder, data = d ))$coef$mean[2:5,4])
-    }
+    #}
   }
  
   print("summary av p verdier:")
