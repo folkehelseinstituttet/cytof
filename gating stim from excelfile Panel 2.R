@@ -11,8 +11,10 @@ scriptPath <- fs::path("H:", "git", "cytof")
 
 source(fs::path(scriptPath, "analysis_functions.R"))
 
-surrface <- as.data.frame(readxl::read_excel(fs::path(outPath, "Gating stimulated panel i R.xlsx")))
-surrface <- surrface[!is.na(surrface$Population),]
+#surrface <- as.data.frame(readxl::read_excel(fs::path(outPath, "Gating stimulated panel i R.xlsx")))
+surrface <- read.csv2(fs::path(outPath, "Gating stimulated panel i R.csv"))
+surrface <- surrface[!is.na(surrface$ï..Population),]
+surrface <- surrface[!surrface$ï..Population == "",]
 if(any(duplicated(surrface))){
   surrface <- surrface[-duplicated(surrface),]
 }
@@ -24,7 +26,7 @@ if(any(duplicated(surrface$Population))){
 }
 
 surrface <- as.data.frame(surrface)
-rownames(surrface) <- surrface$Population
+rownames(surrface) <- surrface$ï..Population
 surrface <- surrface[,!colnames(surrface) == "Population"]
 
 #
@@ -37,9 +39,22 @@ colnames(surrface)[colnames(surrface) == "CD137/4IBB"] <- "CD137"
 colnames(surrface)[colnames(surrface) == "IL12p70"] <- "IL-12p70"
 colnames(surrface)[colnames(surrface) == "MIP1b"] <- "MIP-1b"
 colnames(surrface)[colnames(surrface) == "BTLA"] <- "CD272"
-colnames(surrface)[colnames(surrface) == "Granzyme B"] <- "GranzymeB"
+colnames(surrface)[colnames(surrface) == "Granzyme.B"] <- "GranzymeB"
 colnames(surrface)[colnames(surrface) == "LAG3"] <- "CD223"
 colnames(surrface)[colnames(surrface) == "CD40L"] <- "CD154"
+colnames(surrface)[colnames(surrface) == "IL.2"] <- "IL-2"
+colnames(surrface)[colnames(surrface) == "PD.L1"] <- "PD-L1"
+colnames(surrface)[colnames(surrface) == "CD137.4IBB"] <- "CD137"
+colnames(surrface)[colnames(surrface) == "CTLA.4"] <- "CTLA-4"
+colnames(surrface)[colnames(surrface) == "PD.L2"] <- "PD-L2"
+colnames(surrface)[colnames(surrface) == "IL.17A"] <- "IL-17A"
+colnames(surrface)[colnames(surrface) == "IL.1b"] <- "IL-1b"
+colnames(surrface)[colnames(surrface) == "GM.CSF"] <- "GM-CSF"
+colnames(surrface)[colnames(surrface) == "IL.6"] <- "IL-6"
+colnames(surrface)[colnames(surrface) == "IL.10"] <- "IL-10"
+
+
+
 
 
 
