@@ -11,7 +11,8 @@ scriptPath <- fs::path("H:", "git", "cytof")
 
 source(fs::path(scriptPath, "analysis_functions.R"))
 
-surrface <- as.data.frame(readxl::read_excel(fs::path(outPath, "Gating surface i R.xlsx")))
+#surrface <- as.data.frame(readxl::read_excel(fs::path(outPath, "Gating surface i R.xlsx"))
+surrface <- read.csv2(fs::path(outPath, "Gating surface i R.csv"))
 surrface <- surrface[!is.na(surrface$Population),]
 if(any(duplicated(surrface))){
   surrface <- surrface[-duplicated(surrface),]
@@ -23,6 +24,7 @@ if(any(duplicated(surrface$Population))){
   surrface <- surrface[!duplicated(surrface),]
 }
 
+surrface <- surrface[!surrface$Population == "",]
 surrface <- as.data.frame(surrface)
 rownames(surrface) <- surrface$Population
 surrface <- surrface[,!colnames(surrface) == "Population"]
@@ -46,6 +48,10 @@ if(length(extra_col) > 0){
 if(any(rownames(surrface) == "possible combinations")){
   surrface <- surrface[-which(rownames(surrface) == "possible combinations"), ]
 }
+
+
+
+surrface <- surrface[!duplicated(surrface),]
 
 result <- matrix(NA, nrow = length(posNeg), ncol = nrow(surrface))
 rownames(result) <- posNegFileName
