@@ -2,7 +2,7 @@
 title: "Example install packages"
 author: "Anja Bråthen Kristoffersen"
 date: "14 7 2022"
-output: html_document
+output: word_document
 ---
 
 ```{r setup, include=FALSE}
