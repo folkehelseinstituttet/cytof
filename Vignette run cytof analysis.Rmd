@@ -128,7 +128,7 @@ source(fs::path(paths$script_path, "clean up gating all files.R"))
 # Read clean data 
 ###################
 
-You have now cleaned your data and the clean data can be found in the folder "...\clean_up\clean_data". You have also made three files in  "...\clean_up\clean_data_info\". "percent_kept_from_full_dataset.csv" tells you how many percent of the full dataset you have kept after each gating, "percent_kept_each_gating.csv" how many percent of the gated dataset you have kept for each gating. The last file "marker_names_included_manual_shortnames.csv" are a table with marker names. The two first column must be kept as they are the last one can be changed. The last column are the names that will be used in plots and when you in the script refere to a marker. Please update the column "markers_short_name" with the names you want to use. Make sure that all markers in the list are markers that you want to use in your analysis. If there are too many markers you could either delete the rows manually or update the file "clean up gating all files.R" that make the script. If you make any update to the file "marker_names_included_manual_shortnames.csv" remember that this is produced again each time you run "marker_names_included_manual_shortnames.csv", so you might also want to save a copy with your changes. 
+You have now cleaned your data and the clean data can be found in the folder "...\clean_up\clean_data". You have also made three files in  "...\clean_up\clean_data_info\". "percent_kept_from_full_dataset.csv" tells you how many percent of the full dataset you have kept after each gating, "percent_kept_each_gating.csv" how many percent of the gated dataset you have kept for each gating. The last file "marker_names_included_manual_shortnames.csv" are a table with marker names. The two first column must be kept as they are the last one can be changed. The last column are the names that will be used in plots and when you in the script refere to a marker. Please update the column "marker_short_name" with the names you want to use. Make sure that all markers in the list are markers that you want to use in your analysis. If there are too many markers you could either delete the rows manually or update the file "clean up gating all files.R" that make the script. If you make any update to the file "marker_names_included_manual_shortnames.csv" remember that this is produced again each time you run "marker_names_included_manual_shortnames.csv", so you might also want to save a copy with your changes. 
 
 
 
@@ -181,56 +181,100 @@ This produce a list of matrices saved in "...\clean_up\marker_gating\resultsposN
 # Run FlowSOM 
 ###################
 
+To do a flowSOM analyse, and make some plots associated to this analysis run the function run_flowSOM(). This function takes many parameters:
+
+ * fcs_data: list of matrices of clean data, not transformed, as already made earlier in this script
+ * file_names:  vector of the file_names in fcs_data in same order as the data, as already made earlier in this script
+ * included_files: default "all", could be changed to only some files, if not included alle files are used
+ * n_per_file: number of events to include per file, I here used 15000
+ * included_markers: default "all", could manually be changed with a list of markers to use in analysis. The function  get_marker_name_from_marker_short_name() might be used to uptain proper marker_name
+ * transformation: default "arc_sinh", by now only option. 
+ * scaling_flowSOM: default TRUE,  scaling is recommanded, but will mean that all markers count as much regardless of signal size
+ * k_s: number of clusters, k_s has to be a number or a vector of numbers.
+ * xdim:  default 10, xdim * ydim gives the number of nodes that FlowSOM will combined to k_s clusters. With many clusters 10 might be too small (should have atleast 4 times as many nodes as clusters)
+ * ydim: default 10, preferably equal to xdim
+ * resultpath: recomanded paths$clean_data_flowSOM_results_path or if many different analyses are done folder within this folder
+ * seed: random number that ensure that when the same seed is used the same events are chosen, and hence the same result are uptained next time the exactly same analysis are done
+ * selectedEvents: default "all", if not "all" has to be the same name as a coloum-name in the matrices in posNeg, see example below
+ * posNeg default NULL, since posNeg only are needed if selectedEvents are less than all events
+ * make_heatmap default TRUE, need library ComplexHeatmap to make a heatmap. 
+ * heatmap_cluster_column default FALSE, if FALSE the column (file_names) are not clustered and will end up in the same order as file_names are entered.
+
+
 ```{r, eval = F}
-run_flowSOM(fcs_data = fcs_data, # clean data, not transformed
-            file_names = file_names, # file_names in fcs_data in same order as the data
-            included_files = file_names, # could be changed to only some files
-            n_per_file = 15000, # number of events to include per file
-            included_markers = marker_info$markers_name, # use all markers, can be manually changed with a list of markers to use in analysis.
-            transformation = "arc_sinh", # by now only option. 
-            scaling_flowSOM = TRUE, # scaling is recommanded, but will mean that all markers count as much regardless of size
-            k_s = c(10, 15, 20), # number of clusters, k_s has to be a number or a vector of numbers.
-            xdim = 10, # xdim * ydim gives the number of nodes that FlowSOM will combined to k_s clusters.
+run_flowSOM(fcs_data = fcs_data, 
+            file_names = file_names,
+            included_files = "all", 
+            n_per_file = 15000, 
+            included_markers = "all", 
+            transformation = "arc_sinh", 
+            scaling_flowSOM = TRUE, 
+            k_s = c(10, 15, 20), 
+            xdim = 10, 
             ydim = 10, 
-            resultpath = paths$clean_data_flowSOM_results_path,  # can be changed if new folder is wanted a new for different analysis, the folder have to exists before running function. recommand one folder per selected event analysis.
-            seed = 1234, # the seed ensure that the same events are chosen, and hence the same result are uptained next time the exactly same analysis are done
-            selectedEvents = "all", # if not "all" has to be the same name as a coloum-name in the matrices in posNeg
-            posNeg = NULL, # has to have same structure as fcs_data, creat by....
-            make_heatmap = TRUE, # need library ComplexHeatmap to make a heatmap. 
-            heatmap_cluster_column = FALSE # if FALSE the column are not clusters and will appear in the same order.
+            resultpath = paths$clean_data_flowSOM_results_path,  
+            seed = 1234, 
+            selectedEvents = "all", 
+            posNeg = NULL, 
+            make_heatmap = TRUE, 
+            heatmap_cluster_column = FALSE 
             )
 ```
 
-this should be repeated for different seeds, and if wanted different selected events (e.g. only CD3, Cd45, CD8 positive)
+this should be repeated for different seeds.
 
 ###################
 # Run FlowSOM  for selected events 
 ###################
 
-To do this marker gating has to be performed and a posNeg.rds produced 
+To do this marker gating has to be performed and a posNeg.rds produced (see earlier in document).
+
+ * read the posNeg file from  "...\clean_up\marker_gating\results"
 
 ```{r, eval = F}
 posNeg <- readRDS( fs::path(paths$marker_gating_results_path, "posNeg.rds"))
+```
 
-posNeg <- extra_column_posneg(posNeg = posNeg, column_name ="CD45CD3CD8", markers = c("CD45", "CD3", "CD8"), markers_values = c(1,1,12)) 
+ * the function extra_column_posneg() will make an extra column to all matrices in the list posNeg. This column will in the example below get the name "CD45CD3CD8" which is the value of the parameter column_name. The markers in the matrices in posNeg that are used to make this new column are given as a vector in the parameter markers, here c("CD45", "CD3", "CD8"), in the end markers_value indicate which values this markers should have, since the order is essential here the vector c(1,1,12) is assigned to markers_values, which indicate that we want the events where CD45 = 1, CD3 = 1 and CD8 = either 1 or 2. In the gating done previously CD45 and CD3 are only 0 (negative) or 1 (positive) while CD8 is chosen to be gated as 0 (negative), 1 (low positive), 2 (high positive). Other combinations of markers and markers_value would give you other column, you could forinstance want to gate on only CD3 negative files
+
+```{r, eval = F}
+posNeg <- extra_column_posneg(posNeg = posNeg, column_name ="CD45CD3CD8", markers = c("CD45", "CD3", "CD8"), markers_values = c(1,1,12))
+```
+
+ * Other combinations of markers and markers_value would give you other column, you could forinstance want to gate on only CD3 negative files. The syntac would then be
+ 
+```{r, eval = F}
+posNeg <- extra_column_posneg(posNeg = posNeg, column_name ="CD3neg", markers = c("CD3"), markers_values = c(0))
+```
 
 
-run_flowSOM(fcs_data = fcs_data, # clean data, not transformed
-            file_names = file_names, # file_names in fcs_data in same order as the data
-            included_files = file_names, # could be changed to only some files
-            n_per_file = 5000, # number of events to include per file
-            included_markers = marker_info$markers_name, # use all markers, can be manually changed with a list of markers to use in analysis.
-            transformation = "arc_sinh", # by now only option. 
-            scaling_flowSOM = TRUE, # scaling is recommanded, but will mean that all markers count as much regardless of size
-            k_s = c(10, 15, 20), # number of clusters, k_s has to be a number or a vector of numbers.
-            xdim = 10, # xdim * ydim gives the number of nodes that FlowSOM will combined to k_s clusters.
+We are then ready to run flowSOM on only those events that are positive for CD45, CD3 and CD8. This is done by calling run_flowSOM with the same parameters as above, except the parameter posNeg has to be equal posNeg and the parameter selectedEvents equal to the new column name in posNeg, here "CD45CD3CD8". You may also have to change n_per_file so that you in all (or atleast most) of the files have enough events to randomly choose n_per_file evenst from. It is also recomanded to save this to another folder.
+
+The function number_of_positive_events() gives you the number of events that are positive for marker i (either 1 or 2)
+
+
+```{r, eval = F}
+number_of_positive_events(posNeg = posNeg, marker = "CD45CD3CD8")
+```
+
+
+```{r, eval = F}
+run_flowSOM(fcs_data = fcs_data,
+            file_names = file_names,
+            included_files = file_names, 
+            n_per_file = 5000,
+            included_markers = marker_info$marker_name,
+            transformation = "arc_sinh",
+            scaling_flowSOM = TRUE, 
+            k_s = c(10, 15, 20), 
+            xdim = 10,
             ydim = 10, 
-            resultpath = fs::path(paths$clean_data_flowSOM_results_path,  "CD45CD3CD8"),   # this folder must be generated before analysis
-            seed = 2134, # the seed ensure that the same events are chosen, and hence the same result are uptained next time the exactly same analysis are done
-            selectedEvents = "CD45CD3CD8", # if not "all" has to be the same name as a coloum-name in the matrices in posNeg
-            posNeg = posNeg, # has to have same structure as fcs_data, creat by marker gating....
-            make_heatmap = TRUE, # need library ComplexHeatmap to make a heatmap. 
-            heatmap_cluster_column = FALSE # if FALSE the column are not clusters and will appear in the same order.
+            resultpath = fs::path(paths$clean_data_flowSOM_results_path,  "CD45CD3CD8"),  
+            seed = 2134, 
+            selectedEvents = "CD45CD3CD8", 
+            posNeg = posNeg, 
+            make_heatmap = TRUE, 
+            heatmap_cluster_column = FALSE 
 )
 ```
 
@@ -250,7 +294,7 @@ k <- 10
 seed <- 1234
 selectedEvents <- "all"
 highlight_cluster <- 4
-order_marker_shortname <- marker_info$markers_short_name
+order_marker_shortname <- marker_info$marker_short_name
 gates <- NULL
 
 tiff(fs::path(resultpath, paste0("markerplot_k_", k,"_seed", seed, selectedEvents, ".tiff")), width = 1150, height = 900)
@@ -270,7 +314,7 @@ k <- 15
 seed <- 1234
 selectedEvents <- "all"
 highlight_cluster <- NA
-order_marker_shortname <- marker_info$markers_short_name
+order_marker_shortname <- marker_info$marker_short_name
 gates <- NULL
 tiff(fs::path(resultpath, paste0("markerplot_k_", k,"_seed", seed, selectedEvents, ".tiff")), width = 1150, height = 900)
 marker_plot(path = resultpath, 
@@ -288,7 +332,7 @@ k <- 20
 seed <- 1234
 selectedEvents <- "all"
 highlight_cluster <- 1:20
-order_marker_shortname <- marker_info$markers_short_name
+order_marker_shortname <- marker_info$marker_short_name
 gates <- NULL
 tiff(fs::path(resultpath, paste0("markerplot_k_", k,"_seed", seed, selectedEvents, ".tiff")), width = 1150, height = 900)
 marker_plot(path = resultpath, 
@@ -297,7 +341,7 @@ marker_plot(path = resultpath,
             selectedEvents = selectedEvents, 
             highlight_cluster = highlight_cluster, 
             gates = gates, 
-            order_marker_shortname = rker_info$markers_short_name)
+            order_marker_shortname = rker_info$marker_short_name)
 dev.off()
 
 
@@ -306,7 +350,7 @@ k <- 10
 seed <- 2134
 selectedEvents <- "CD45CD3CD8"
 highlight_cluster <- 4
-order_marker_shortname <- marker_info$markers_short_name
+order_marker_shortname <- marker_info$marker_short_name
 gates <- read.csv2(fs::path(paths$marker_gating_results_path, "mean_gates.csv"))
 resultpath <- fs::path(paths$clean_data_flowSOM_results_path,  "CD45CD3CD8")
 
