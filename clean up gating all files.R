@@ -469,7 +469,7 @@ print("number of markers included:")
 print(length(markers_name))
 
 d <- cbind( as.character(markers_name),  as.character(markers),  as.character(markers))
-colnames(d) <- c("markers_name", "marker", "markers_short_name")
+colnames(d) <- c("marker_name", "marker", "marker_short_name")
 
 for(i in 1:nrow(d)){
   if(grepl("_", as.character(d[i,3]))){
