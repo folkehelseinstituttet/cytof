@@ -105,7 +105,7 @@ marker_info <- read.csv2(fs::path(paths$clean_data_info_path, "marker_names_incl
 ###################
 # Marker gating ----
 ###################
-# this section can be skiped if manual gates for the markers are of interest. 
+# this section can be skiped if manual gates for the markers are not of interest. 
 # but is needed for some markers if selected events should be used in further analysis. 
 # this is not necessary to rerun. Hence the if sentence. If you still want to rerun just run the line within the if sentence. 
 # this example only include gating for CD3, CD4, CD8 and CD45.
@@ -177,7 +177,7 @@ resultpath <- paths$clean_data_flowSOM_results_path  # path to where the q5, q10
 # if gates included in markerplots the csv file has to be made, colnames "X"	"low"	"high"
 # X has to be equal column marker_short_name in ...clean_up\clean_data_info\marker_names_included_manual_shortnames.csv
 # low is first gate, high second gate, both can be NA
-# gater <- read.csv2(fs::path(paths$clean_data_posNeg_path, "gater.csv"), stringsAsFactors = FALSE)
+# gates <- read.csv2(fs::path(paths$clean_data_posNeg_path, "mean_gates.csv"), stringsAsFactors = FALSE)
 
 k <- 10
 seed <- 1234
