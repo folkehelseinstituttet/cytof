@@ -105,7 +105,7 @@ marker_info <- read.csv2(fs::path(paths$clean_data_info_path, "marker_names_incl
 ###################
 # Marker gating ----
 ###################
-# this section can be skiped if manual gates for the markers are not of interest. 
+# this section can be skipped if manual gates for the markers are not of interest. 
 # but is needed for some markers if selected events should be used in further analysis. 
 # this is not necessary to rerun. Hence the if sentence. If you still want to rerun just run the line within the if sentence. 
 # this example only include gating for CD3, CD4, CD8 and CD45.
