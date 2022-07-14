@@ -1,0 +1,44 @@
+---
+title: "Example install packages"
+author: "Anja Bråthen Kristoffersen"
+date: "14 7 2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+If you want to get access to packages that haven't been released on CRAN, you have to edit your .Rprofile. To do this run 
+ 
+```{r}
+usethis::edit_r_profile()
+```
+
+
+To use packgaes from FHI write:
+
+options(repos=structure(c(
+  FHI="https://folkehelseinstituttet.github.io/drat/",
+  CRAN="https://cran.rstudio.com"
+)))
+
+in the .Rprofile file.
+
+NB make sure that " is written correctly. Might change when you copy.
+
+Then write install.packages("LIBRARY NAME"), see an example with som packages you will need to use below:
+
+```{r}
+
+
+list.of.packages <- c("org", "fs", "data.table", "ggplot2", "gridExtra", "grid", "flowCore", "flowSOM", "betareg", "ComplexHeatmap")
+new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
+if(length(new.packages)) {
+  install.packages(new.packages)
+}
+
+
+```
+
+
