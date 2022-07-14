@@ -121,14 +121,11 @@ if(nrow(file.info(list.files(paths$marker_gating_results_path)) ) == 0){
 # Run FlowSOM ----
 ###################
 
-
-
-
 run_flowSOM(fcs_data = fcs_data, # clean data, not transformed
             file_names = file_names, # file_names in fcs_data in same order as the data
             included_files = file_names, # could be changed to only some files
             n_per_file = 15000, # number of events to include per file
-            included_markers = marker_info$markers_name, # use all markers, can be manually changed with a list of markers to use in analysis.
+            included_markers = marker_info$marker_name, # use all markers, can be manually changed with a list of markers to use in analysis.
             transformation = "arc_sinh", # by now only option. 
             scaling_flowSOM = TRUE, # scaling is recommanded, but will mean that all markers count as much regardless of size
             k_s = c(10, 15, 20), # number of clusters, k_s has to be a number or a vector of numbers.
@@ -150,18 +147,19 @@ posNeg <- readRDS( fs::path(paths$marker_gating_results_path, "posNeg.rds"))
 
 posNeg <- extra_column_posneg(posNeg = posNeg, column_name ="CD45CD3CD8", markers = c("CD45", "CD3", "CD8"), markers_values = c(1,1,12)) 
 
+number_of_positive_events(posNeg = posNeg, marker = "CD45CD3CD8")
 
 run_flowSOM(fcs_data = fcs_data, # clean data, not transformed
             file_names = file_names, # file_names in fcs_data in same order as the data
-            included_files = file_names, # could be changed to only some files
+            included_files = "all", # could be changed to only some files
             n_per_file = 5000, # number of events to include per file
-            included_markers = marker_info$markers_name, # use all markers, can be manually changed with a list of markers to use in analysis.
+            included_markers = "all", # use all markers, can be manually changed with a list of markers to use in analysis.
             transformation = "arc_sinh", # by now only option. 
             scaling_flowSOM = TRUE, # scaling is recommanded, but will mean that all markers count as much regardless of size
             k_s = c(10, 15, 20), # number of clusters, k_s has to be a number or a vector of numbers.
             xdim = 10, # xdim * ydim gives the number of nodes that FlowSOM will combined to k_s clusters.
             ydim = 10, 
-            resultpath = fs::path(paths$clean_data_flowSOM_results_path,  "CD45CD3CD8"),   # this folder must be generated before analysis
+            resultpath = fs::path(paths$clean_data_flowSOM_results_path,  "CD45CD3CD8"),   
             seed = 2134, # the seed ensure that the same events are chosen, and hence the same result are uptained next time the exactly same analysis are done
             selectedEvents = "CD45CD3CD8", # if not "all" has to be the same name as a coloum-name in the matrices in posNeg
             posNeg = posNeg, # has to have same structure as fcs_data, creat by marker gating....
@@ -183,7 +181,7 @@ k <- 10
 seed <- 1234
 selectedEvents <- "all"
 highlight_cluster <- 4
-order_marker_shortname <- marker_info$markers_short_name
+order_marker_shortname <- marker_info$marker_short_name
 gates <- NULL
 
 tiff(fs::path(resultpath, paste0("markerplot_k_", k,"_seed", seed, selectedEvents, ".tiff")), width = 1150, height = 900)
@@ -203,7 +201,7 @@ k <- 15
 seed <- 1234
 selectedEvents <- "all"
 highlight_cluster <- NA
-order_marker_shortname <- marker_info$markers_short_name
+order_marker_shortname <- marker_info$marker_short_name
 gates <- NULL
 tiff(fs::path(resultpath, paste0("markerplot_k_", k,"_seed", seed, selectedEvents, ".tiff")), width = 1150, height = 900)
 marker_plot(path = resultpath, 
@@ -221,7 +219,7 @@ k <- 20
 seed <- 1234
 selectedEvents <- "all"
 highlight_cluster <- 1:20
-order_marker_shortname <- marker_info$markers_short_name
+order_marker_shortname <- marker_info$marker_short_name
 gates <- NULL
 tiff(fs::path(resultpath, paste0("markerplot_k_", k,"_seed", seed, selectedEvents, ".tiff")), width = 1150, height = 900)
 marker_plot(path = resultpath, 
@@ -230,7 +228,7 @@ marker_plot(path = resultpath,
             selectedEvents = selectedEvents, 
             highlight_cluster = highlight_cluster, 
             gates = gates, 
-            order_marker_shortname = rker_info$markers_short_name)
+            order_marker_shortname = rker_info$marker_short_name)
 dev.off()
 
 
@@ -239,7 +237,7 @@ k <- 10
 seed <- 2134
 selectedEvents <- "CD45CD3CD8"
 highlight_cluster <- 4
-order_marker_shortname <- marker_info$markers_short_name
+order_marker_shortname <- marker_info$marker_short_name
 gates <- read.csv2(fs::path(paths$marker_gating_results_path, "mean_gates.csv"))
 resultpath <- fs::path(paths$clean_data_flowSOM_results_path,  "CD45CD3CD8")
 
@@ -260,20 +258,20 @@ dev.off()
 # 
 # 
 # #calculate percentage based on cluster markers for all events. Can also be used to manually set lower and upper limites. lower or upper limites equal to NA is allowed.
-# data <-  transform_selected_markers(fcs_data, markers = markers_name, method = "arc_sinh") 
+# data <-  transform_selected_markers(fcs_data, markers = marker_name, method = "arc_sinh") 
 # 
 # 
-# markers_info <- read.csv2(fs::path(paths$clean_data_info_path, "marker_names_included_manual_shortnames.csv"))
+# marker_info <- read.csv2(fs::path(paths$clean_data_info_path, "marker_names_included_manual_shortnames.csv"))
 # k <- 15
 # seed <- 1234
 # cluster <- 8
 # temp <- t(read.csv2(fs::path(resultpath, paste0("q5_per_cluster_k_", k, "_seed", seed, selectedEvents, ".csv")))[cluster, -1])
 # lower <- data.frame(marker_name = rownames(temp), lower = temp)
-# colnames(lower) <- c("markers_name", "lower")
+# colnames(lower) <- c("marker_name", "lower")
 # temp <- t(read.csv2(fs::path(resultpath, paste0("q95_per_cluster_k_", k, "_seed", seed, selectedEvents, ".csv")))[cluster, -1])
 # upper <- data.frame(marker_name = rownames(temp), upper = temp)
-# colnames(upper) <- c("markers_name", "upper")
-# temp <- merge(markers_info, lower)
+# colnames(upper) <- c("marker_name", "upper")
+# temp <- merge(marker_info, lower)
 # lower_upper_limites <- merge(temp, upper)
 # files_to_open <- "all"
 # selected_markers = "all"
