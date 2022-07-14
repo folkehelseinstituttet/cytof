@@ -1,0 +1,329 @@
+---
+title: "Vignette run cytof analysis"
+author: "Anja Bråthen Kristoffersen"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+last updated
+
+```{r}
+date()
+```
+
+# To get started
+ 
+  This explains the lines in the script "run.R". This is only an explanation of what these lines does. 
+  
+  * First R has to be told which librarys to use. If you have not installed the packages, see "Example-install-packages-in-R.docx".
+
+
+```{r, eval = F}
+library(ComplexHeatmap)
+library(gridExtra)
+library(ggplot2)
+library(grid)
+library(flowCore)
+library(FlowSOM)
+library(org)
+library(data.table)
+library(fs)
+library(betareg)
+```
+
+
+
+
+  * make a folder where you want to save the result from you analysis. In this example I have called it 
+
+```{r, include=TRUE, message= FALSE, comment= FALSE}
+path0 <- fs::path("C:", "Cytof data", "test")  
+path0
+```
+
+ * make a folder "script" inside this folder, and copy all files from GitHub in here
+ * then source the file "function.R
+
+```{r, include=TRUE, message= FALSE, comment= FALSE}
+source(fs::path(path0, "script", "functions.R"))
+```
+
+ * and run the next line which will make a vector of folder names that also are created in path0. 
+
+```{r, include=TRUE, message= FALSE, comment= FALSE}
+paths <- make_project_folders(path0)
+rm(path0)
+```
+
+The function make_project_folders() use the packages org form FHI. If you have problems runing this you could rather make the folder structure as below. This structure is needed for the rest of the script to run properly.  
+
+```{r}
+paths
+```
+
+ * place all your raw data in the folder "raw data".
+ 
+ * then before the analysis can be started the function plotSignal() has to be updated. Here I have made an example with 15 files (and one commented away with 66 files), change this function so that it takes as many files as your dataset have. 
+
+
+```{r, include=FALSE, message= FALSE, comment= FALSE}
+#THIS HAS TO BE CHANGED ACCORDING TO NUMBER OF FILES IN YOUR DATASET.
+#the plot_list have to include as many memberes as there are files in your dataset, also remember to update ncol and nrow.
+plotSignal <- function(plot_list){
+  g <- gridExtra::grid.arrange(plot_list[[1]], plot_list[[2]],
+                               plot_list[[3]], plot_list[[4]], plot_list[[5]],
+                               plot_list[[6]],  plot_list[[7]], plot_list[[8]],
+                               plot_list[[9]], plot_list[[10]], plot_list[[11]],
+                               plot_list[[12]], plot_list[[13]], plot_list[[14]],
+                               plot_list[[15]], #plot_list[[16]], plot_list[[17]],
+                               # plot_list[[18]], plot_list[[19]], plot_list[[20]],
+                               # plot_list[[21]], plot_list[[22]], plot_list[[23]],
+                               # plot_list[[24]], plot_list[[25]], plot_list[[26]],
+                               # plot_list[[27]], plot_list[[28]], plot_list[[29]],
+                               # plot_list[[30]], plot_list[[31]], plot_list[[32]],
+                               # plot_list[[33]], plot_list[[34]], plot_list[[35]],
+                               # plot_list[[36]], plot_list[[37]], plot_list[[38]],
+                               # plot_list[[39]], plot_list[[40]], plot_list[[41]],
+                               # plot_list[[42]], plot_list[[43]], plot_list[[44]],
+                               # plot_list[[45]], plot_list[[46]], plot_list[[47]],
+                               # plot_list[[48]], plot_list[[49]], plot_list[[50]],
+                               # plot_list[[51]], plot_list[[52]], plot_list[[53]],
+                               # plot_list[[54]], plot_list[[55]], plot_list[[56]],
+                               # plot_list[[57]], plot_list[[58]], plot_list[[59]],
+                               # plot_list[[60]], plot_list[[61]], plot_list[[62]],
+                               # plot_list[[63]], plot_list[[64]], plot_list[[65]],
+                               # plot_list[[66]],  ncol = 11, nrow = 6)
+                               ncol = 5,nrow = 3)
+  return(g)
+}
+```
+
+###################
+# CLEAN Up 
+###################
+
+You are now ready to start the clean up of your data. Run the lines below to get a first cleanup version. 
+
+When you are happy with your cleanup you only have to run it once, that is why I have written it within a if sentence. 
+
+
+```{r, eval = F}
+if(nrow(file.info(list.files(paths$clean_data_path))) == 0){
+  source(fs::path(paths$script_path, "clean up gating all files.R"))
+}
+
+#
+```
+
+Check the gates produced in both density plots and time-signal-plots which you find in "...\clean_up\clean_data_fig_density" and "...\clean_up\clean_data_fig_signal". If something has to be changed, and most likely it will, you have to update "clean up gating all files.R". How to do this you fine in "Vignette clean up gating.docx". And rerun by writing
+
+```{r, eval = F}
+source(fs::path(paths$script_path, "clean up gating all files.R"))
+```
+
+###################
+# Read clean data 
+###################
+
+You have now cleaned your data and the clean data can be found in the folder "...\clean_up\clean_data". You have also made three files in  "...\clean_up\clean_data_info\". "percent_kept_from_full_dataset.csv" tells you how many percent of the full dataset you have kept after each gating, "percent_kept_each_gating.csv" how many percent of the gated dataset you have kept for each gating. The last file "marker_names_included_manual_shortnames.csv" are a table with marker names. The two first column must be kept as they are the last one can be changed. The last column are the names that will be used in plots and when you in the script refere to a marker. Please update the column "markers_short_name" with the names you want to use. Make sure that all markers in the list are markers that you want to use in your analysis. If there are to many markers you could either delete the rows manually or update the file "clean up gating all files.R" that make the script. If you make any update to the "marker_names_included_manual_shortnames.csv" file remember that this is produced again each time you run "marker_names_included_manual_shortnames.csv", so you might also want to save a copy with your changes. 
+
+
+
+```{r, eval = F}
+files_to_open <- "all" 
+```
+
+This will include all files in the clean data folder. If you want to do the analysis with only some files this can be changed to a vector of filenames to use.
+
+```{r, eval = F}
+rownames(file.info(list.files(paths$clean_data_path)))
+```
+
+give you a list of all files in the clean data folder, only .fcs files are read
+ 
+ * to read the data and the updated file with marker short names write:
+ 
+```{r, eval = F}
+fcs_data_with_info <- read_data_from_folder(data_path = paths$clean_data_path, 
+                                            files_to_open = files_to_open)
+fcs_data <- fcs_data_with_info$fcs_data
+file_names <- fcs_data_with_info$file_names
+rm(fcs_data_with_info)
+
+params_fcs <- get_params_fcs_data(fcs_data[[1]])
+
+marker_info <- read.csv2(fs::path(paths$clean_data_info_path, "marker_names_included_manual_shortnames.csv"), stringsAsFactors = FALSE)
+```
+
+The variable fcs_data now contains a list of matrixes with your data,  while file_names are a vector of names in the same order as the data are stored in fcs_data. 
+
+###################
+# Marker gating 
+###################
+
+This section can be skiped if manual gates for the markers are not of interest, but it is needed for some markers if selected events should be used in further analysis. Once the manual gating is as you like it it is not necessary to rerun. Hence the if sentence. If you still want to rerun just run the line within the if sentence.
+
+The example only include gating for CD3, CD4, CD8 and CD45, all gates should be adjusted inside the file "marker gating all files.R" see "Vignette marker gating.docx" for explanation on how to make changes in the file. You might also change the gates to be equal for all files. 
+
+```{r, eval = F}
+if(nrow(file.info(list.files(paths$marker_gating_results_path)) ) == 0){
+  source(fs::path(paths$script_path, "marker gating all files.R"))
+}
+```
+
+This produce a list of matrices saved in "...\clean_up\marker_gating\resultsposNeg.rds" that are in the same size as fcs_data but which contains 0 (negative), 1 (positive or low positive) and 2 (high positive) for each event and each marker. The same folder also contains "mean_gates.csv" which is a table of the mean gates for those markers gated, the other markers have gotten the gate NA.  
+
+
+###################
+# Run FlowSOM 
+###################
+
+```{r, eval = F}
+run_flowSOM(fcs_data = fcs_data, # clean data, not transformed
+            file_names = file_names, # file_names in fcs_data in same order as the data
+            included_files = file_names, # could be changed to only some files
+            n_per_file = 15000, # number of events to include per file
+            included_markers = marker_info$markers_name, # use all markers, can be manually changed with a list of markers to use in analysis.
+            transformation = "arc_sinh", # by now only option. 
+            scaling_flowSOM = TRUE, # scaling is recommanded, but will mean that all markers count as much regardless of size
+            k_s = c(10, 15, 20), # number of clusters, k_s has to be a number or a vector of numbers.
+            xdim = 10, # xdim * ydim gives the number of nodes that FlowSOM will combined to k_s clusters.
+            ydim = 10, 
+            resultpath = paths$clean_data_flowSOM_results_path,  # can be changed if new folder is wanted a new for different analysis, the folder have to exists before running function. recommand one folder per selected event analysis.
+            seed = 1234, # the seed ensure that the same events are chosen, and hence the same result are uptained next time the exactly same analysis are done
+            selectedEvents = "all", # if not "all" has to be the same name as a coloum-name in the matrices in posNeg
+            posNeg = NULL, # has to have same structure as fcs_data, creat by....
+            make_heatmap = TRUE, # need library ComplexHeatmap to make a heatmap. 
+            heatmap_cluster_column = FALSE # if FALSE the column are not clusters and will appear in the same order.
+            )
+```
+
+this should be repeated for different seeds, and if wanted different selectedEvents (e.g. only CD3, Cd45, CD8 positive)
+
+###################
+# Run FlowSOM  for selected events 
+###################
+
+To do this marker gating has to be performed and a posNeg.rds produced 
+
+```{r, eval = F}
+posNeg <- readRDS( fs::path(paths$marker_gating_results_path, "posNeg.rds"))
+
+posNeg <- extra_column_posneg(posNeg = posNeg, column_name ="CD45CD3CD8", markers = c("CD45", "CD3", "CD8"), markers_values = c(1,1,12)) 
+
+
+run_flowSOM(fcs_data = fcs_data, # clean data, not transformed
+            file_names = file_names, # file_names in fcs_data in same order as the data
+            included_files = file_names, # could be changed to only some files
+            n_per_file = 5000, # number of events to include per file
+            included_markers = marker_info$markers_name, # use all markers, can be manually changed with a list of markers to use in analysis.
+            transformation = "arc_sinh", # by now only option. 
+            scaling_flowSOM = TRUE, # scaling is recommanded, but will mean that all markers count as much regardless of size
+            k_s = c(10, 15, 20), # number of clusters, k_s has to be a number or a vector of numbers.
+            xdim = 10, # xdim * ydim gives the number of nodes that FlowSOM will combined to k_s clusters.
+            ydim = 10, 
+            resultpath = fs::path(paths$clean_data_flowSOM_results_path,  "CD45CD3CD8"),   # this folder must be generated before analysis
+            seed = 2134, # the seed ensure that the same events are chosen, and hence the same result are uptained next time the exactly same analysis are done
+            selectedEvents = "CD45CD3CD8", # if not "all" has to be the same name as a coloum-name in the matrices in posNeg
+            posNeg = posNeg, # has to have same structure as fcs_data, creat by marker gating....
+            make_heatmap = TRUE, # need library ComplexHeatmap to make a heatmap. 
+            heatmap_cluster_column = FALSE # if FALSE the column are not clusters and will appear in the same order.
+)
+```
+
+###################
+# Markerplot 
+###################
+
+```{r, eval = F}
+
+resultpath <- paths$clean_data_flowSOM_results_path  # path to where the q5, q10, ... files from run_flowSOM is saved.
+# if gates included in markerplots the csv file has to be made, colnames "X"	"low"	"high"
+# X has to be equal column marker_short_name in ...clean_up\clean_data_info\marker_names_included_manual_shortnames.csv
+# low is first gate, high second gate, both can be NA
+# gates <- read.csv2(fs::path(paths$clean_data_posNeg_path, "mean_gates.csv"), stringsAsFactors = FALSE)
+
+k <- 10
+seed <- 1234
+selectedEvents <- "all"
+highlight_cluster <- 4
+order_marker_shortname <- marker_info$markers_short_name
+gates <- NULL
+
+tiff(fs::path(resultpath, paste0("markerplot_k_", k,"_seed", seed, selectedEvents, ".tiff")), width = 1150, height = 900)
+marker_plot(path = resultpath, 
+            k = k, 
+            seed = seed, 
+            selectedEvents = selectedEvents, 
+            highlight_cluster = highlight_cluster, 
+            gates = gates, 
+            order_marker_shortname = order_marker_shortname)
+dev.off()
+
+
+
+
+k <- 15
+seed <- 1234
+selectedEvents <- "all"
+highlight_cluster <- NA
+order_marker_shortname <- marker_info$markers_short_name
+gates <- NULL
+tiff(fs::path(resultpath, paste0("markerplot_k_", k,"_seed", seed, selectedEvents, ".tiff")), width = 1150, height = 900)
+marker_plot(path = resultpath, 
+            k = k, 
+            seed = seed, 
+            selectedEvents = selectedEvents, 
+            highlight_cluster = highlight_cluster, 
+            gates = gates, 
+            order_marker_shortname = order_marker_shortname)
+dev.off()
+
+
+
+k <- 20
+seed <- 1234
+selectedEvents <- "all"
+highlight_cluster <- 1:20
+order_marker_shortname <- marker_info$markers_short_name
+gates <- NULL
+tiff(fs::path(resultpath, paste0("markerplot_k_", k,"_seed", seed, selectedEvents, ".tiff")), width = 1150, height = 900)
+marker_plot(path = resultpath, 
+            k = k, 
+            seed = seed, 
+            selectedEvents = selectedEvents, 
+            highlight_cluster = highlight_cluster, 
+            gates = gates, 
+            order_marker_shortname = rker_info$markers_short_name)
+dev.off()
+
+
+#
+k <- 10
+seed <- 2134
+selectedEvents <- "CD45CD3CD8"
+highlight_cluster <- 4
+order_marker_shortname <- marker_info$markers_short_name
+gates <- read.csv2(fs::path(paths$marker_gating_results_path, "mean_gates.csv"))
+resultpath <- fs::path(paths$clean_data_flowSOM_results_path,  "CD45CD3CD8")
+
+tiff(fs::path(resultpath, paste0("markerplot_k_", k,"_seed", seed, selectedEvents, ".tiff")), width = 1150, height = 900)
+marker_plot(path = resultpath, 
+            k = k, 
+            seed = seed, 
+            selectedEvents = selectedEvents, 
+            highlight_cluster = highlight_cluster, 
+            gates = gates, 
+            order_marker_shortname = order_marker_shortname)
+dev.off()
+
+
+
+
+
+```
+
+
