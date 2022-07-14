@@ -121,7 +121,18 @@ prosent_senario <- function(posneg, markers, values, atleast_one_of = NA, value_
 }
 
 
-
+#' number_of_positive_events
+#' @param posNeg, result per marker from gating 
+#' @param marker, which marker to calculate number of events for 
+#' @return vector with number of events per file
+number_of_positive_events <- function(posNeg, marker){
+  number_of_events <- rep(NA, lenght(posNeg))
+  for(i in 1:length(posNeg)){
+    tab <- table(posNeg[[i]][,marker])
+    number_of_events[i] <- max(tab["TRUE"], tab["1"], tab["1"] + tab["2"], 0, na.rm = T)
+  }
+  return(number_of_events)
+}
 
 #' prosent_per_marker, calculate the percentages of cells that follows each of the selected markers for each sample.
 #' @param posneg, result per marker from gating 
@@ -2178,24 +2189,24 @@ marker_plot <- function(path, k, seed, highlight_cluster = NULL, selectedEvents 
   d <-merge(d, q75long)
   d <- merge(d, q90long)
   d <- merge(d, q95long)
-  d <- merge(d, names, by.x= "variable", by.y = "markers_name")
+  d <- merge(d, names, by.x= "variable", by.y = "marker_name")
   if(!is.null(gates)){
-    d <- merge(d, gates, by.x = "markers_short_name", by.y = "X")
+    d <- merge(d, gates, by.x = "marker_short_name", by.y = "X")
   }
   d$X <- NULL
   
   if(!is.null(order_marker_shortname[1])){
     if(!is.na(order_marker_shortname[1])){
-      if(all(d$markers_short_name %in%  order_marker_shortname )){
-        d$markers_short_name <- factor(d$markers_short_name, levels = order_marker_shortname)
+      if(all(d$marker_short_name %in%  order_marker_shortname )){
+        d$marker_short_name <- factor(d$marker_short_name, levels = order_marker_shortname)
       } else {
         print("could not change order of markers in plot due to some markers not included in list (or misspelled)")
       }
     } else {
-      d$markers_short_name <- factor(d$markers_short_name)
+      d$marker_short_name <- factor(d$marker_short_name)
     }
   } else {
-    d$markers_short_name <- factor(d$markers_short_name)
+    d$marker_short_name <- factor(d$marker_short_name)
   }
 
   d$col <- "0"
@@ -2219,7 +2230,7 @@ marker_plot <- function(path, k, seed, highlight_cluster = NULL, selectedEvents 
     geom_errorbar() +
     geom_errorbar(data = d, aes(x = q50, y = Cluster, xmin = q5, xmax = q95, col = col))+ 
     geom_errorbar(data = d, aes(x = q50, y = Cluster, xmin = q25, xmax = q75, col = col))+ 
-    facet_wrap(vars(markers_short_name), ncol = 11, scale = "free_x") + 
+    facet_wrap(vars(marker_short_name), ncol = 11, scale = "free_x") + 
     scale_color_manual(values = used_colors)
  
   if(!is.null(gates)){ 
@@ -2240,12 +2251,12 @@ marker_plot <- function(path, k, seed, highlight_cluster = NULL, selectedEvents 
 get_cluster_from_quantiles <- function(lower_upper_limites, data, selected_markers  = "all"){
  # browser()
   if(selected_markers [1] == "all"){
-    markers <- lower_upper_limites$markers_short_name 
+    markers <- lower_upper_limites$marker_short_name 
   } else {
     markers <- selected_markers 
   }
   
-  lower_upper_limites <- lower_upper_limites[lower_upper_limites$markers_short_name %in% markers,]
+  lower_upper_limites <- lower_upper_limites[lower_upper_limites$marker_short_name %in% markers,]
   temp <- lower_upper_limites[,c("lower", "upper")]
   both_NA <- apply(is.na(temp), 1, sum) == 2
   lower_upper_limites <-lower_upper_limites[!both_NA,]
@@ -2254,14 +2265,14 @@ get_cluster_from_quantiles <- function(lower_upper_limites, data, selected_marke
   result <- list()
   for(j in 1:length(data)){
     mat <-  as.data.frame(matrix(NA, ncol = nrow(lower_upper_limites), nrow =  nrow(data[[j]])))
-    colnames(mat) <- lower_upper_limites$markers_short_name
+    colnames(mat) <- lower_upper_limites$marker_short_name
     result[[j]] <- mat
   }
   
-  for(marker_i in as.character(lower_upper_limites$markers_short_name)){
-    marker_name_i <- as.character(lower_upper_limites[lower_upper_limites$markers_short_name == marker_i, "markers_name"]) 
-    lower_i <- lower_upper_limites[lower_upper_limites$markers_short_name == marker_i, "lower"]
-    upper_i <- lower_upper_limites[lower_upper_limites$markers_short_name == marker_i, "upper"]
+  for(marker_i in as.character(lower_upper_limites$marker_short_name)){
+    marker_name_i <- as.character(lower_upper_limites[lower_upper_limites$marker_short_name == marker_i, "marker_name"]) 
+    lower_i <- lower_upper_limites[lower_upper_limites$marker_short_name == marker_i, "lower"]
+    upper_i <- lower_upper_limites[lower_upper_limites$marker_short_name == marker_i, "upper"]
     for(j in 1:length(data)){
       if(!is.na(lower_i) & !is.na(upper_i)){
         result[[j]][,marker_i] <- data[[j]][, marker_name_i] >= lower_i & data[[j]][, marker_name_i] <= upper_i
@@ -2293,28 +2304,47 @@ get_cluster_from_quantiles <- function(lower_upper_limites, data, selected_marke
 }
 
 
+
+
+#' get_marker_name_from_marker_short_name
+#' @param marker_info tabel with both marker_name and marker_short name, can be found in ..\clean_up\clean_data_info
+#' @param marker_short_name shorter marker name
+#' @return makes lots of files in the result folder
+get_marker_name_from_marker_short_name <- function(marker_info, marker_short_name){
+  marker_name <- rep(NA, length(marker_short_name))
+  for(i in 1:length(marker_short_name)){
+    marker_name[i] <- marker_info$marker_name[marker_info$marker_short_name == marker_short_name[i]]
+  }
+  return(marker_name)
+}
+
+
+
 #' run_flowSOM
 #' @param path path to where the result files from flowSOM analysis is
 #' @param k which k to make plot for
 #' @param seed which seed to make plot for
-#' @param highlight_cluster, 
-#' @return value of gating for the given marker in each subdataset.
-# included_files <- file_names # this will include all files in the clean data folder, can be changed to a vector of filenames to use.  
-# k_s <- c(10, 15, 20) # number of clusters, k_s has to be a number or a vector of numbers.
-# n_per_file <- 15000  # events to include per file
-# xdim <- 10           # xdim * ydim gives the number of nodes that FlowSOM will combined to k_s clusters.
-# ydim <- 10
-# resultpath <- paths$clean_data_flowSOM_results_path  # can be changed if new folder is wanted for different analysis
-# seed <- 1234 # the seed ensure that the same events are chosen, and hence the same result are uptained next time the exactly same analysis are done
-# selectedEvents <- "all"
-# heatmap_cluster_column <- FALSE
-# included_markers <- marker_info$markers_name # use ale markers, can be manually changed with a list of markers to use in analysis.
-# transfomation <-"arc_sinh" # by now only option. 
-# scaling_flowSOM <- TRUE  
-# make_heatmap <- TRUE # need library ComplexHeatmap to make a heatmap. 
+#' @param included_files = file_names, # this will include all files in the clean data folder, can be changed to a vector of filenames to use.  
+#' @param n_per_file number of events to include per file
+#' @param included_markers, use marker_name, might use function get_marker_name_from_marker_short_name(marker_info, marker_short_name) 
+#' @param transformation = "arc_sinh"
+#' @param scaling_flowSOM = TRUE
+#' @param k_s number of clusters, k_s has to be a number or a vector of numbers.
+#' @param xdim xdim * ydim gives the number of nodes that FlowSOM will combined to k_s clusters.
+#' @param ydim
+#' @param resultpath paths$clean_data_flowSOM_results_path, can be changed if new folder is wanted for different analysis
+#' @param seed the seed ensure that the same events are chosen, and hence the same result are uptained next time the exactly same analysis are done
+#' @param selectedEvents
+#' @param posNeg
+#' @param make_heatmap = TRUE
+#' @param heatmap_cluster_column = FALSE
+#' @return makes lots of files in the result folder
 
-run_flowSOM <- function(fcs_data, file_names, included_files = file_names, n_per_file, included_markers, transformation = "arc_sinh", scaling_flowSOM = TRUE, k_s, xdim, ydim, resultpath, seed, selectedEvents, posNeg, make_heatmap = TRUE, heatmap_cluster_column = FALSE){
-    set.seed(seed)
+run_flowSOM <- function(fcs_data, file_names, included_files = "all", n_per_file, included_markers = "all", transformation = "arc_sinh", scaling_flowSOM = TRUE, k_s, xdim = 10, ydim = 10, resultpath, seed, selectedEvents = "all", posNeg = NULL, make_heatmap = TRUE, heatmap_cluster_column = FALSE){
+  if(!file.exists(resultpath)){
+    dir.create(file.path(resultpath))
+  }
+  set.seed(seed)
   if(is.null(selectedEvents)){
     number_of_events_data <-  number_of_events(data = fcs_data, file_names = file_names)
     random_events_data <- random_events(number_of_events_data, n = n_per_file)
@@ -2338,6 +2368,12 @@ run_flowSOM <- function(fcs_data, file_names, included_files = file_names, n_per
     print("the data analysis will  be done on arc sinh transformeddata.")
   }
   
+  if(included_markers[1] == "all"){
+    included_markers <- colnames(fcs_data[[1]])
+  }
+  
+
+  
   arcSindataMatrix <- list_to_matrix_selected_events(data = fcs_data, 
                                                      kept_events = random_events_data, 
                                                      file_names = file_names, 
@@ -2348,6 +2384,11 @@ run_flowSOM <- function(fcs_data, file_names, included_files = file_names, n_per
   )
   
   colnames(arcSindataMatrix)[1:length(included_markers)] <- included_markers
+  
+  
+  if(included_files[1] == "all"){
+    included_files <- file_names
+  }
   
   data_to_analyse <- arcSindataMatrix[arcSindataMatrix$dataset %in% included_files, ]
   
