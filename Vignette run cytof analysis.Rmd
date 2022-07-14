@@ -58,7 +58,7 @@ paths <- make_project_folders(path0)
 rm(path0)
 ```
 
-The function make_project_folders() use the packages org form FHI. If you have problems runing this you could rather make the folder structure as below. This structure is needed for the rest of the script to run properly.  
+The function make_project_folders() use the packages org form FHI. If you have problems running this, you could rather make the folder structure as below. This structure is needed for the rest of the script to run properly.  
 
 ```{r}
 paths
@@ -107,7 +107,7 @@ plotSignal <- function(plot_list){
 
 You are now ready to start the clean up of your data. Run the lines below to get a first cleanup version. 
 
-When you are happy with your cleanup you only have to run it once, that is why I have written it within a if sentence. 
+When you are happy with your cleanup you only have to run it once, that is why I have written it within an if-sentence. 
 
 
 ```{r, eval = F}
@@ -118,7 +118,7 @@ if(nrow(file.info(list.files(paths$clean_data_path))) == 0){
 #
 ```
 
-Check the gates produced in both density plots and time-signal-plots which you find in "...\clean_up\clean_data_fig_density" and "...\clean_up\clean_data_fig_signal". If something has to be changed, and most likely it will, you have to update "clean up gating all files.R". How to do this you fine in "Vignette clean up gating.docx". And rerun by writing
+Check the gates produced in both density plots and time-signal-plots which you find in "...\clean_up\clean_data_fig_density" and "...\clean_up\clean_data_fig_signal". If something has to be changed, and most likely it will, you have to update  "clean up gating all files.R". How to do this you fine in "Vignette clean up gating.docx". And rerun by writing
 
 ```{r, eval = F}
 source(fs::path(paths$script_path, "clean up gating all files.R"))
@@ -128,7 +128,7 @@ source(fs::path(paths$script_path, "clean up gating all files.R"))
 # Read clean data 
 ###################
 
-You have now cleaned your data and the clean data can be found in the folder "...\clean_up\clean_data". You have also made three files in  "...\clean_up\clean_data_info\". "percent_kept_from_full_dataset.csv" tells you how many percent of the full dataset you have kept after each gating, "percent_kept_each_gating.csv" how many percent of the gated dataset you have kept for each gating. The last file "marker_names_included_manual_shortnames.csv" are a table with marker names. The two first column must be kept as they are the last one can be changed. The last column are the names that will be used in plots and when you in the script refere to a marker. Please update the column "markers_short_name" with the names you want to use. Make sure that all markers in the list are markers that you want to use in your analysis. If there are to many markers you could either delete the rows manually or update the file "clean up gating all files.R" that make the script. If you make any update to the "marker_names_included_manual_shortnames.csv" file remember that this is produced again each time you run "marker_names_included_manual_shortnames.csv", so you might also want to save a copy with your changes. 
+You have now cleaned your data and the clean data can be found in the folder "...\clean_up\clean_data". You have also made three files in  "...\clean_up\clean_data_info\". "percent_kept_from_full_dataset.csv" tells you how many percent of the full dataset you have kept after each gating, "percent_kept_each_gating.csv" how many percent of the gated dataset you have kept for each gating. The last file "marker_names_included_manual_shortnames.csv" are a table with marker names. The two first column must be kept as they are the last one can be changed. The last column are the names that will be used in plots and when you in the script refere to a marker. Please update the column "markers_short_name" with the names you want to use. Make sure that all markers in the list are markers that you want to use in your analysis. If there are too many markers you could either delete the rows manually or update the file "clean up gating all files.R" that make the script. If you make any update to the file "marker_names_included_manual_shortnames.csv" remember that this is produced again each time you run "marker_names_included_manual_shortnames.csv", so you might also want to save a copy with your changes. 
 
 
 
@@ -164,7 +164,7 @@ The variable fcs_data now contains a list of matrixes with your data,  while fil
 # Marker gating 
 ###################
 
-This section can be skiped if manual gates for the markers are not of interest, but it is needed for some markers if selected events should be used in further analysis. Once the manual gating is as you like it it is not necessary to rerun. Hence the if sentence. If you still want to rerun just run the line within the if sentence.
+This section can be skipped if manual gates for the markers are not of interest, but it is needed for some markers if selected events should be used in further analysis. Once the manual gating is as you like it, it is not necessary to rerun. Hence the if sentence. If you still want to rerun just run the line within the if sentence.
 
 The example only include gating for CD3, CD4, CD8 and CD45, all gates should be adjusted inside the file "marker gating all files.R" see "Vignette marker gating.docx" for explanation on how to make changes in the file. You might also change the gates to be equal for all files. 
 
@@ -201,7 +201,7 @@ run_flowSOM(fcs_data = fcs_data, # clean data, not transformed
             )
 ```
 
-this should be repeated for different seeds, and if wanted different selectedEvents (e.g. only CD3, Cd45, CD8 positive)
+this should be repeated for different seeds, and if wanted different selected events (e.g. only CD3, Cd45, CD8 positive)
 
 ###################
 # Run FlowSOM  for selected events 
