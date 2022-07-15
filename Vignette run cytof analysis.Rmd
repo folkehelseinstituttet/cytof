@@ -282,6 +282,12 @@ run_flowSOM(fcs_data = fcs_data,
 # Markerplot 
 ###################
 
+Markerplot, i.e. plot of interval where the signal for each marker are per cluster, here 5, 10, 25, 75, 90 and 95 percent tiles are shown as | while median is show as dot for each marker and each cluster. The marker plot can be grey for all clusters or some cluster might be highlighted.
+
+ * resultpath, k, seed, selectedEvents are all parameters that are needed to read the correct files with quantiles from cluster.
+ * highlight_cluster is optional, when given a number or a vector of numbers these clusters will be highlighted with another color then grey.
+ * order_marker_shortname is optional, it should include all marker_shortnames but will ensure that the 
+
 ```{r, eval = F}
 
 resultpath <- paths$clean_data_flowSOM_results_path  # path to where the q5, q10, ... files from run_flowSOM is saved.
