@@ -80,6 +80,10 @@ plotSignal <- function(plot_list){
 if(nrow(file.info(list.files(paths$clean_data_path))) == 0){
   source(fs::path(paths$script_path, "clean up gating all files.R"))
 }
+# when running line 114 you get many comments from R:
+#Coordinate system already present. Adding new coordinate system, which will replace the existing one.
+# Sabin: I have not understood how to not get this comments. Please feal free to think about it. 
+
 
 # marker names are not "nice" in R, manually change to shorter names in ...\clean_up\clean_data_info\marker_names_included_manual_shortnames.csv. (save also with different name if you want to rerun cleanup)
 # make sure that only markers are left, if not something has to be done in the end of the file "clean up gating all files.R"
@@ -114,6 +118,9 @@ if(nrow(file.info(list.files(paths$marker_gating_results_path)) ) == 0){
   source(fs::path(paths$script_path, "marker gating all files.R"))
 }
 
+# when running line 114 you get many comments from R:
+#Coordinate system already present. Adding new coordinate system, which will replace the existing one.
+# Sabin: I have not understood how to not get this comments. Please feal free to think about it. 
 
 
 
@@ -250,6 +257,11 @@ marker_plot(path = resultpath,
             gates = gates, 
             order_marker_shortname = order_marker_shortname)
 dev.off()
+
+
+
+
+
 
 
 
