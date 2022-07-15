@@ -126,7 +126,7 @@ prosent_senario <- function(posneg, markers, values, atleast_one_of = NA, value_
 #' @param marker, which marker to calculate number of events for 
 #' @return vector with number of events per file
 number_of_positive_events <- function(posNeg, marker){
-  number_of_events <- rep(NA, lenght(posNeg))
+  number_of_events <- rep(NA, length(posNeg))
   for(i in 1:length(posNeg)){
     tab <- table(posNeg[[i]][,marker])
     number_of_events[i] <- max(tab["TRUE"], tab["1"], tab["1"] + tab["2"], 0, na.rm = T)
