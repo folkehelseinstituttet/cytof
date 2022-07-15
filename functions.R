@@ -2200,6 +2200,7 @@ marker_plot <- function(path, k, seed, highlight_cluster = NULL, selectedEvents 
       if(all(d$marker_short_name %in%  order_marker_shortname )){
         d$marker_short_name <- factor(d$marker_short_name, levels = order_marker_shortname)
       } else {
+        d$marker_short_name <- factor(d$marker_short_name)
         print("could not change order of markers in plot due to some markers not included in list (or misspelled)")
       }
     } else {

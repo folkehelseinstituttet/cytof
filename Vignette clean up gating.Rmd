@@ -1,0 +1,51 @@
+---
+title: "Vignette clean up gateing"
+author: "Anja Bråthen Kristoffersen"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+last updated
+
+```{r}
+date()
+```
+
+
+# To get started
+ 
+  This part can be done by running the first lines in the script "run.R". This is only an explanation of what these lines does. 
+
+
+  * make a folder where you want to save the result from you analysis. In this example I have called it 
+
+```{r, include=TRUE, message= FALSE, comment= FALSE}
+path0 <- fs::path("C:", "Cytof data", "test")  
+path0
+```
+
+ * make a folder "script" inside this folder, and copy all files from GitHub in here
+ * then source the file "function.R
+
+```{r, include=TRUE, message= FALSE, comment= FALSE}
+source(fs::path(path0, "script", "functions.R"))
+```
+
+ * and run the next line which will make a vector of folder names that also are created in path0. The function make_project_folders() use the packages org form fhi. See install libraries 
+
+```{r, include=TRUE, message= FALSE, comment= FALSE}
+paths <- make_project_folders(path0)
+rm(path0)
+```
+
+this is the folders you have made 
+
+```{r}
+paths
+```
+
+ * place all your raw data in the folder "raw data"
+
