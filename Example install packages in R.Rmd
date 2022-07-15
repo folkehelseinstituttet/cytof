@@ -32,7 +32,7 @@ Then write install.packages("LIBRARY NAME"), see an example with som packages yo
 ```{r}
 
 
-list.of.packages <- c("org", "fs", "data.table", "ggplot2", "gridExtra", "grid", "flowCore", "flowSOM", "betareg", "ComplexHeatmap")
+list.of.packages <- c("org", "fs", "data.table", "ggplot2", "gridExtra", "grid", "flowCore", "flowSOM", "betareg", "ComplexHeatmap", "Rmarkdown")
 new.packages <- list.of.packages[!(list.of.packages %in% installed.packages()[,"Package"])]
 if(length(new.packages)) {
   install.packages(new.packages)
