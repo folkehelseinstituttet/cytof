@@ -125,6 +125,7 @@ prosent_senario <- function(posneg, markers, values, atleast_one_of = NA, value_
 #' @param posNeg, result per marker from gating 
 #' @param marker, which marker to calculate number of events for 
 #' @return vector with number of events per file
+
 number_of_positive_events <- function(posNeg, marker){
   number_of_events <- rep(NA, length(posNeg))
   for(i in 1:length(posNeg)){
