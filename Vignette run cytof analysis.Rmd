@@ -16,9 +16,9 @@ date()
 
 # To get started
  
-  This explains the lines in the script "run.R". This is only an explanation of what these lines does. 
+  This document explains the lines in the script "run.R". 
   
-  * First R has to be told which librarys to use. If you have not installed the packages, see "Example-install-packages-in-R.docx".
+  * First R has to be told which librarys to use. If you have not installed the library-packages, see "Example-install-packages-in-R.docx".
 
 
 ```{r, eval = F}
@@ -45,7 +45,7 @@ path0
 ```
 
  * make a folder "script" inside this folder, and copy all files from GitHub in here
- * then source the file "function.R
+ * then source the file "function.R" to read all the code in "function.R" into your R memory. 
 
 ```{r, include=TRUE, message= FALSE, comment= FALSE}
 source(fs::path(path0, "script", "functions.R"))
