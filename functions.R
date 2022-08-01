@@ -2365,7 +2365,7 @@ run_flowSOM <- function(fcs_data, file_names, included_files = "all", n_per_file
   }
   
   
-  if(transfomation != "arc_sinh"){
+  if(transformation != "arc_sinh"){
     print("the data analysis will  be done on arc sinh transformeddata.")
   }
   
