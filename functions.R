@@ -1134,20 +1134,24 @@ read_data_from_folder <- function(data_path, files_to_open = NULL){
     fcs_files <- fcs_files[grepl(".fcs", fcs_files)]
     files_to_open <- basename(fcs_files)
   } else {
-     if(files_to_open == "all"){
+     if(files_to_open[1] == "all"){
         fcs_files <- fs::path(data_path, rownames(file.info(list.files(data_path))))
         fcs_files <- fcs_files[grepl(".fcs", fcs_files)]
         files_to_open <- basename(fcs_files)
      } else {
-       files_to_open <- files_to_open[grepl(".fcs", files_to_open)]
-       setwd(dirname(fcs_files[1]))
-       file_names <- gsub(".fcs", "", files_to_open)
+       if(grepl(".fcs", files_to_open[1])){
+         file_names <- gsub(".fcs", "", files_to_open)
+       } else {
+         file_names <- files_to_open
+         files_to_open <- paste0(files_to_open, ".fcs")
+       }
+       
      }
   }
   # Read the files into a flowset
   fcs_data <- flowCore::read.flowSet(files_to_open, transformation = FALSE,
                                      truncate_max_range = FALSE)
-  return(list(fcs_data = fcs_data, file_names = file_names))
+  return(list(fcs_data = fcs_data, file_names = files_to_open))
 }
 
 
