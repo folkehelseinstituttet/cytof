@@ -503,7 +503,7 @@ time_signal_plot <- function(data, random_events, marker,  plot_title,
                              lower_gate = NA, upper_gate = NA, time_div = 60 * 1000, ylim = NA){
   marker <- ggplot2::sym(marker)
   plot_list <- list()
-  for (i in 1:length(plot_title)){
+  for (i in 1:length(data)){
     max_time <- max(data[[i]][random_events[[i]],"Time"]/time_div)
     gg <- ggplot2::ggplot(data[[i]][random_events[[i]],], ggplot2::aes(x=Time/time_div, y=!!marker)) +
       #scale on x axis 
@@ -1211,7 +1211,7 @@ transform_selected_markers <- function(fcs_data, markers, method = "arc_sinh", c
 #' @params markers, transforms only those markers listed
 max_marker <- function(data, marker){
   marker_max <- max(data[[1]][,marker])
-  for(i in 1:n_files){
+  for(i in 1:length(data)){
     marker_max <- max(marker_max, max(data[[i]][,marker]))
   }
   return(marker_max)
@@ -1224,7 +1224,7 @@ max_marker <- function(data, marker){
 #' @params markers, transforms only those markers listed
 min_marker <- function(data, marker){
   marker_min <- min(data[[1]][,marker])
-  for(i in 1:n_files){
+  for(i in 1:length(data)){
     marker_min <- min(marker_min, min(data[[i]][,marker]))
   }
   return(marker_min)
