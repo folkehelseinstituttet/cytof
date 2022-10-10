@@ -106,7 +106,7 @@ prosent_senario <- function(posneg, markers, values, atleast_one_of = NA, value_
       xx <- x & xx
     }
     
-    if(!is.na(atleast_one_of)){
+    if(!is.na(atleast_one_of)[1]){
       columns <-  which(colnames(posneg[[i]]) %in% atleast_one_of)
       x <- apply(posneg[[i]][, columns], 1, any_value, value = value_atleast_one_of)
       xx <- x & xx
