@@ -174,6 +174,30 @@ run_flowSOM(fcs_data = fcs_data, # clean data, not transformed
             heatmap_cluster_column = FALSE # if FALSE the column are not clusters and will appear in the same order.
 )
 
+
+
+
+#### regression # this has
+
+
+params <- list()
+params$panel <- "Panel 2"
+params$seed <- 2234 #nb må endres vil man vil gjøre et annet uttrekk
+params$ks <- c(10, 20, 30 ,40, 50, 60)
+params$n_per_file <- 25000
+params$ext_name <- "All"
+params$utSti <- fs::path(scriptPath_UnsupAnalysis, paste0(params$panel, " uten CD4"), params$ext_name, paste("seed", params$seed))
+params$adj_p <- 0.05
+params$adj_p_methods <- "fdr" #"bonferroni" # "fdr" # see help(p.adjust) for other methods
+params$tidspunkt <- TRUE
+params$posNeg_path <- fs::path("F:", "Forskningsprosjekter", "PDB 2794 - Immune responses aga_", "Forskningsfiler", "JOBO", "CyTOF", "Analyse i R OUS", "CleanUpGatingMarch2022", paste0("gating_results_Panel", gsub("Panel ", "", params$panel),"_mars2022"), "posNeg", "Data")
+params$nivaa <- c("Severe T1", "Moderate T1", "Severe T2", "Moderate T2", "Control" )
+rmarkdown::render(fs:::path(scriptPath_UnsupAnalysis , "resultater_Regression_negbin_fraFlowSOM.Rmd"), output_file = fs::path(params$utSti, paste0("Result_", params$seed, "ST1motMT1.docx")))
+
+
+
+
+
 ###################
 # Markerplot ----
 ###################
