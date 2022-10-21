@@ -172,9 +172,7 @@ q95_all <- t(q95_trans)
 
 
 
-h <- heatmap(as.matrix(klustre[,-1]))
-
-temp0 <- cor(klustre[,-1][,h$colInd])
+temp0 <- cor(klustre[,-1])
 temp <- temp0
 
 like <- list()
