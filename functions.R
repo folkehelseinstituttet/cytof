@@ -2405,11 +2405,17 @@ run_flowSOM <- function(fcs_data, file_names, included_files = "all", n_per_file
   out <- FlowSOM::BuildMST(out)
   cluster_FlowSOM_pre <- out$map$mapping[, 1]
   
+  cluster_from_FlowSOM <- matrix(NA, nrow = nrow(params$data), ncol <- length(params$ks) )
+  colnames(cluster_from_FlowSOM) <- paste("cluster", params$ks)
+  
+  
   for(k in k_s){
     set.seed(seed)
     out_k <- FlowSOM::metaClustering_consensus(out$map$codes, k = k, seed = seed)
     cluster_FlowSOM_k <- out_k[cluster_FlowSOM_pre]
+    cluster_from_FlowSOM[,i] <- cluster_FlowSOM_k
     cluster_FlowSOM_k_factor <- factor(cluster_FlowSOM_k, levels = 1:k)
+    
     q5_k <- q_per_cluster_marker(data = data_to_analyse[,included_markers], cluster = cluster_FlowSOM_k, probs = 0.05)
     write.csv2(q5_k, fs::path(resultpath, paste0("q5_per_cluster_k_", k, "_seed", seed, ext_name, ".csv")))
     q10_k <- q_per_cluster_marker(data = data_to_analyse[,included_markers], cluster = cluster_FlowSOM_k, probs = 0.1)
@@ -2427,7 +2433,7 @@ run_flowSOM <- function(fcs_data, file_names, included_files = "all", n_per_file
     
     if(make_heatmap == TRUE){
       tiff(fs::path(resultpath, paste0("heatmap_median_k_", k, "_cluster_seed", seed, ext_name, ".tiff")), width = 1000, height = 800)
-      print(Heatmap(as.matrix(medians_k[,included_markers], cluster_columns = heatmap_cluster_column)))
+      print(heatmap(as.matrix(medians_k[,included_markers], cluster_columns = heatmap_cluster_column)))
       dev.off()
     }
     
@@ -2443,4 +2449,9 @@ run_flowSOM <- function(fcs_data, file_names, included_files = "all", n_per_file
     write.csv2(perSample, fs::path(resultpath, paste0("number_of_events_per_cluster_and_file_k_", k, "_seed", seed, ext_name, ".csv")))
     
   }
+  
+  dataUsed <- cbind(data_to_analyse[,included_markers], cluster_from_FlowSOM)
+  
+  saveRDS(dataUsed, fs::path(resultpath, paste0("data", params$seed, ".RDS")))
+  
 }
