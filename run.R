@@ -198,188 +198,188 @@ rmarkdown::render(fs:::path(scriptPath_UnsupAnalysis , "resultater_Regression_ne
 
 ## find whidh clusteres that are similar between seeds.
 
-source(fs:::path(scriptPath_UnsupAnalysis , "similar_significant_clusters.R")
-
-
-
-
-
-###################
-# Markerplot ----
-###################
-
-resultpath <- paths$clean_data_flowSOM_results_path  # path to where the q5, q10, ... files from run_flowSOM is saved.
-# if gates included in markerplots the csv file has to be made, colnames "X"	"low"	"high"
-# X has to be equal column marker_short_name in ...clean_up\clean_data_info\marker_names_included_manual_shortnames.csv
-# low is first gate, high second gate, both can be NA
-# gates <- read.csv2(fs::path(paths$clean_data_posNeg_path, "mean_gates.csv"), stringsAsFactors = FALSE)
-
-k <- 10
-seed <- 1234
-selectedEvents <- "all"
-highlight_cluster <- 4
-order_marker_shortname <- marker_info$marker_short_name
-gates <- NULL
-
-tiff(fs::path(resultpath, paste0("markerplot_k_", k,"_seed", seed, selectedEvents, ".tiff")), width = 1150, height = 900)
-marker_plot(path = resultpath, 
-            k = k, 
-            seed = seed, 
-            selectedEvents = selectedEvents, 
-            highlight_cluster = highlight_cluster, 
-            gates = gates, 
-            order_marker_shortname = order_marker_shortname)
-dev.off()
-
-
-
-
-k <- 15
-seed <- 1234
-selectedEvents <- "all"
-highlight_cluster <- NA
-order_marker_shortname <- marker_info$marker_short_name
-gates <- NULL
-tiff(fs::path(resultpath, paste0("markerplot_k_", k,"_seed", seed, selectedEvents, ".tiff")), width = 1150, height = 900)
-marker_plot(path = resultpath, 
-            k = k, 
-            seed = seed, 
-            selectedEvents = selectedEvents, 
-            highlight_cluster = highlight_cluster, 
-            gates = gates, 
-            order_marker_shortname = order_marker_shortname)
-dev.off()
-
-
-
-k <- 20
-seed <- 1234
-selectedEvents <- "all"
-highlight_cluster <- 1:20
-order_marker_shortname <- marker_info$marker_short_name
-gates <- NULL
-tiff(fs::path(resultpath, paste0("markerplot_k_", k,"_seed", seed, selectedEvents, ".tiff")), width = 1150, height = 900)
-marker_plot(path = resultpath, 
-            k = k, 
-            seed = seed, 
-            selectedEvents = selectedEvents, 
-            highlight_cluster = highlight_cluster, 
-            gates = gates, 
-            order_marker_shortname = rker_info$marker_short_name)
-dev.off()
-
-
-#
-k <- 10
-seed <- 2134
-selectedEvents <- "CD45CD3CD8"
-highlight_cluster <- 4
-order_marker_shortname <- marker_info$marker_short_name
-gates <- read.csv2(fs::path(paths$marker_gating_results_path, "mean_gates.csv"))
-resultpath <- fs::path(paths$clean_data_flowSOM_results_path,  "CD45CD3CD8")
-
-tiff(fs::path(resultpath, paste0("markerplot_k_", k,"_seed", seed, selectedEvents, ".tiff")), width = 1150, height = 900)
-marker_plot(path = resultpath, 
-            k = k, 
-            seed = seed, 
-            selectedEvents = selectedEvents, 
-            highlight_cluster = highlight_cluster, 
-            gates = gates, 
-            order_marker_shortname = order_marker_shortname)
-dev.off()
-
-
-
-
-
-
-
+source(fs:::path(scriptPath_UnsupAnalysis , "similar_significant_clusters.R"))
 
 
 
 # 
+# #old, should be deleted (I think...)
+# ###################
+# # Markerplot ----
+# ###################
 # 
-# #calculate percentage based on cluster markers for all events. Can also be used to manually set lower and upper limites. lower or upper limites equal to NA is allowed.
-# data <-  transform_selected_markers(fcs_data, markers = marker_name, method = "arc_sinh") 
+# resultpath <- paths$clean_data_flowSOM_results_path  # path to where the q5, q10, ... files from run_flowSOM is saved.
+# # if gates included in markerplots the csv file has to be made, colnames "X"	"low"	"high"
+# # X has to be equal column marker_short_name in ...clean_up\clean_data_info\marker_names_included_manual_shortnames.csv
+# # low is first gate, high second gate, both can be NA
+# # gates <- read.csv2(fs::path(paths$clean_data_posNeg_path, "mean_gates.csv"), stringsAsFactors = FALSE)
+# 
+# k <- 10
+# seed <- 1234
+# selectedEvents <- "all"
+# highlight_cluster <- 4
+# order_marker_shortname <- marker_info$marker_short_name
+# gates <- NULL
+# 
+# tiff(fs::path(resultpath, paste0("markerplot_k_", k,"_seed", seed, selectedEvents, ".tiff")), width = 1150, height = 900)
+# marker_plot(path = resultpath, 
+#             k = k, 
+#             seed = seed, 
+#             selectedEvents = selectedEvents, 
+#             highlight_cluster = highlight_cluster, 
+#             gates = gates, 
+#             order_marker_shortname = order_marker_shortname)
+# dev.off()
 # 
 # 
-# marker_info <- read.csv2(fs::path(paths$clean_data_info_path, "marker_names_included_manual_shortnames.csv"))
+# 
+# 
 # k <- 15
 # seed <- 1234
-# cluster <- 8
-# temp <- t(read.csv2(fs::path(resultpath, paste0("q5_per_cluster_k_", k, "_seed", seed, selectedEvents, ".csv")))[cluster, -1])
-# lower <- data.frame(marker_name = rownames(temp), lower = temp)
-# colnames(lower) <- c("marker_name", "lower")
-# temp <- t(read.csv2(fs::path(resultpath, paste0("q95_per_cluster_k_", k, "_seed", seed, selectedEvents, ".csv")))[cluster, -1])
-# upper <- data.frame(marker_name = rownames(temp), upper = temp)
-# colnames(upper) <- c("marker_name", "upper")
-# temp <- merge(marker_info, lower)
-# lower_upper_limites <- merge(temp, upper)
-# files_to_open <- "all"
-# selected_markers = "all"
-# 
-# temp <- get_cluster_from_quantiles(lower_upper_limites = lower_upper_limites, data = data, selected_markers = selected_markers)
-# temp
-# 
-# 
-# temp <- get_cluster_from_quantiles(lower_upper_limites = lower_upper_limites, data = data, selected_markers = temp$high_cor_markers, files= files_to_open, correlation = 0.05)
-# temp
-# 
-# #examples on analysing proportion data
-# #if testing differences between two groups use wilcox.test (t-test assume normal distribution which proportion data is not)
-# 
-# #regression use beta regression.
-# 
-# #if metadata consist of 2 factors: x_Factor1 and x_Factor2 and one continues variable x_continiuos
-# set.seed(100)
-# y <- temp$res_prop
-# x_continiuos <- runif(n = length(y), min = 15, max = 79)
-# x_factor1 <- sample(c("F", "M"), length(y), replace = T)
-# x_factor1 <- factor(x_factor1, levels = c("F", "M"))
-# x_factor2 <- rep("low", length(y))
-# x_factor2[y > mean(y)] <- "high"
-# x_factor2 <- factor(x_factor2, levels = c("low", "high"))
-# d <- data.frame(y = y, x_continiuos = x_continiuos, x_factor1 = x_factor1, x_factor2 = x_factor2)
-# 
-# fit0 <- betareg(y ~ 1, data = d)
-# fit1 <- betareg(y ~ x_factor1, data = d)
-# fit2 <- betareg(y ~ x_factor2, data = d)
-# fit3 <- betareg(y ~ x_continiuos, data = d)
-# fit4 <- betareg(y ~ x_factor1 + x_factor2, data = d)
-# fit5 <- betareg(y ~ x_factor1 + x_continiuos, data = d)
-# fit6 <- betareg(y ~ x_factor2 + x_continiuos, data = d)
-# fit7 <- betareg(y ~ x_factor1 + x_factor2 + x_continiuos, data = d)
-# AIC(fit0, fit1, fit2, fit3, fit4, fit5, fit6, fit7)
+# selectedEvents <- "all"
+# highlight_cluster <- NA
+# order_marker_shortname <- marker_info$marker_short_name
+# gates <- NULL
+# tiff(fs::path(resultpath, paste0("markerplot_k_", k,"_seed", seed, selectedEvents, ".tiff")), width = 1150, height = 900)
+# marker_plot(path = resultpath, 
+#             k = k, 
+#             seed = seed, 
+#             selectedEvents = selectedEvents, 
+#             highlight_cluster = highlight_cluster, 
+#             gates = gates, 
+#             order_marker_shortname = order_marker_shortname)
+# dev.off()
 # 
 # 
-# fit <- fit2 # enkleste modell med AIC < minste(AIC) + 2
-# res <- summary(fit)
-# print(res)
-# #predData <- expand.grid(x_continiuos= min(d$x_continiuos):max(d$x_continiuos), x_factor1 = levels(d$x_factor1), x_factor2 = levels(d$x_factor2))
-# predData <- expand.grid(x_factor2 = levels(d$x_factor2))
 # 
-# # ONLY INCLUDE DATA WHERE YOU HAVE DATA...
-# # for(n in levels(d$x_factor2)){
-# #   min_n <- min(d$x_continiuos[d$x_factor2 == n])
-# #   max_n <- max(d$x_continiuos[d$x_factor2 == n])
-# #   predData$x_continiuos[predData$x_factor2 == n & predData$x_continiuos > max_n] <- NA
-# #   predData$x_continiuos[predData$x_factor2 == n & predData$x_continiuos < min_n] <- NA
+# k <- 20
+# seed <- 1234
+# selectedEvents <- "all"
+# highlight_cluster <- 1:20
+# order_marker_shortname <- marker_info$marker_short_name
+# gates <- NULL
+# tiff(fs::path(resultpath, paste0("markerplot_k_", k,"_seed", seed, selectedEvents, ".tiff")), width = 1150, height = 900)
+# marker_plot(path = resultpath, 
+#             k = k, 
+#             seed = seed, 
+#             selectedEvents = selectedEvents, 
+#             highlight_cluster = highlight_cluster, 
+#             gates = gates, 
+#             order_marker_shortname = rker_info$marker_short_name)
+# dev.off()
+# 
+# 
+# #
+# k <- 10
+# seed <- 2134
+# selectedEvents <- "CD45CD3CD8"
+# highlight_cluster <- 4
+# order_marker_shortname <- marker_info$marker_short_name
+# gates <- read.csv2(fs::path(paths$marker_gating_results_path, "mean_gates.csv"))
+# resultpath <- fs::path(paths$clean_data_flowSOM_results_path,  "CD45CD3CD8")
+# 
+# tiff(fs::path(resultpath, paste0("markerplot_k_", k,"_seed", seed, selectedEvents, ".tiff")), width = 1150, height = 900)
+# marker_plot(path = resultpath, 
+#             k = k, 
+#             seed = seed, 
+#             selectedEvents = selectedEvents, 
+#             highlight_cluster = highlight_cluster, 
+#             gates = gates, 
+#             order_marker_shortname = order_marker_shortname)
+# dev.off()
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# 
+# # 
+# # 
+# # #calculate percentage based on cluster markers for all events. Can also be used to manually set lower and upper limites. lower or upper limites equal to NA is allowed.
+# # data <-  transform_selected_markers(fcs_data, markers = marker_name, method = "arc_sinh") 
+# # 
+# # 
+# # marker_info <- read.csv2(fs::path(paths$clean_data_info_path, "marker_names_included_manual_shortnames.csv"))
+# # k <- 15
+# # seed <- 1234
+# # cluster <- 8
+# # temp <- t(read.csv2(fs::path(resultpath, paste0("q5_per_cluster_k_", k, "_seed", seed, selectedEvents, ".csv")))[cluster, -1])
+# # lower <- data.frame(marker_name = rownames(temp), lower = temp)
+# # colnames(lower) <- c("marker_name", "lower")
+# # temp <- t(read.csv2(fs::path(resultpath, paste0("q95_per_cluster_k_", k, "_seed", seed, selectedEvents, ".csv")))[cluster, -1])
+# # upper <- data.frame(marker_name = rownames(temp), upper = temp)
+# # colnames(upper) <- c("marker_name", "upper")
+# # temp <- merge(marker_info, lower)
+# # lower_upper_limites <- merge(temp, upper)
+# # files_to_open <- "all"
+# # selected_markers = "all"
+# # 
+# # temp <- get_cluster_from_quantiles(lower_upper_limites = lower_upper_limites, data = data, selected_markers = selected_markers)
+# # temp
+# # 
+# # 
+# # temp <- get_cluster_from_quantiles(lower_upper_limites = lower_upper_limites, data = data, selected_markers = temp$high_cor_markers, files= files_to_open, correlation = 0.05)
+# # temp
+# # 
+# # #examples on analysing proportion data
+# # #if testing differences between two groups use wilcox.test (t-test assume normal distribution which proportion data is not)
+# # 
+# # #regression use beta regression.
+# # 
+# # #if metadata consist of 2 factors: x_Factor1 and x_Factor2 and one continues variable x_continiuos
+# # set.seed(100)
+# # y <- temp$res_prop
+# # x_continiuos <- runif(n = length(y), min = 15, max = 79)
+# # x_factor1 <- sample(c("F", "M"), length(y), replace = T)
+# # x_factor1 <- factor(x_factor1, levels = c("F", "M"))
+# # x_factor2 <- rep("low", length(y))
+# # x_factor2[y > mean(y)] <- "high"
+# # x_factor2 <- factor(x_factor2, levels = c("low", "high"))
+# # d <- data.frame(y = y, x_continiuos = x_continiuos, x_factor1 = x_factor1, x_factor2 = x_factor2)
+# # 
+# # fit0 <- betareg(y ~ 1, data = d)
+# # fit1 <- betareg(y ~ x_factor1, data = d)
+# # fit2 <- betareg(y ~ x_factor2, data = d)
+# # fit3 <- betareg(y ~ x_continiuos, data = d)
+# # fit4 <- betareg(y ~ x_factor1 + x_factor2, data = d)
+# # fit5 <- betareg(y ~ x_factor1 + x_continiuos, data = d)
+# # fit6 <- betareg(y ~ x_factor2 + x_continiuos, data = d)
+# # fit7 <- betareg(y ~ x_factor1 + x_factor2 + x_continiuos, data = d)
+# # AIC(fit0, fit1, fit2, fit3, fit4, fit5, fit6, fit7)
+# # 
+# # 
+# # fit <- fit2 # enkleste modell med AIC < minste(AIC) + 2
+# # res <- summary(fit)
+# # print(res)
+# # #predData <- expand.grid(x_continiuos= min(d$x_continiuos):max(d$x_continiuos), x_factor1 = levels(d$x_factor1), x_factor2 = levels(d$x_factor2))
+# # predData <- expand.grid(x_factor2 = levels(d$x_factor2))
+# # 
+# # # ONLY INCLUDE DATA WHERE YOU HAVE DATA...
+# # # for(n in levels(d$x_factor2)){
+# # #   min_n <- min(d$x_continiuos[d$x_factor2 == n])
+# # #   max_n <- max(d$x_continiuos[d$x_factor2 == n])
+# # #   predData$x_continiuos[predData$x_factor2 == n & predData$x_continiuos > max_n] <- NA
+# # #   predData$x_continiuos[predData$x_factor2 == n & predData$x_continiuos < min_n] <- NA
+# # # }
+# # pred_intervall <- 50
+# # nedre <- ((100 - pred_intervall)/2)/100
+# # ovre <- 1 - nedre
+# # 
+# # 
+# # predData$predict <- predict(fit, newdata = predData) #usikker på hvordan jeg får konfidensintervall. Vent til det skal brukes
+# # predData$navn <- predData$predict
+# # predData$pred_lower <- predict(fit, newdata = predData, type = "quantile", at = nedre)
+# # predData$pred_upper <- predict(fit, newdata = predData, type = "quantile", at = ovre)
+# # predData <- data.frame(predData)
+# # #i_x_continiuos <- which(colnames(d) == "x_continiuos")
+# # i_x_factor2 <- which(colnames(d) == "x_factor2")
+# # g <- ggplot(data = d, aes(x = x_continiuos, y = navn, col= x_factor2)) +
+# #   geom_point(size = 2) + 
+# #   geom_line(data = predData, aes(x=x_continiuos, y = navn, col = x_factor2), size = 2) +
+# #   geom_ribbon(data = predData, aes(ymin = pred_lower, ymax = pred_upper, fill = x_factor2, color = NULL), alpha = 0.1)
 # # }
-# pred_intervall <- 50
-# nedre <- ((100 - pred_intervall)/2)/100
-# ovre <- 1 - nedre
-# 
-# 
-# predData$predict <- predict(fit, newdata = predData) #usikker på hvordan jeg får konfidensintervall. Vent til det skal brukes
-# predData$navn <- predData$predict
-# predData$pred_lower <- predict(fit, newdata = predData, type = "quantile", at = nedre)
-# predData$pred_upper <- predict(fit, newdata = predData, type = "quantile", at = ovre)
-# predData <- data.frame(predData)
-# #i_x_continiuos <- which(colnames(d) == "x_continiuos")
-# i_x_factor2 <- which(colnames(d) == "x_factor2")
-# g <- ggplot(data = d, aes(x = x_continiuos, y = navn, col= x_factor2)) +
-#   geom_point(size = 2) + 
-#   geom_line(data = predData, aes(x=x_continiuos, y = navn, col = x_factor2), size = 2) +
-#   geom_ribbon(data = predData, aes(ymin = pred_lower, ymax = pred_upper, fill = x_factor2, color = NULL), alpha = 0.1)
-# }
-# 
+# # 
