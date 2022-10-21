@@ -131,7 +131,7 @@ if(nrow(file.info(list.files(paths$marker_gating_results_path)) ) == 0){
 run_flowSOM(fcs_data = fcs_data, # clean data, not transformed
             file_names = file_names, # file_names in fcs_data in same order as the data
             included_files = file_names, # could be changed to only some files
-            n_per_file = 15000, # number of events to include per file
+            n_per_file = 25000, # number of events to include per file
             included_markers = marker_info$markers_name, # use all markers, can be manually changed with a list of markers to use in analysis.
             transformation = "arc_sinh", # by now only option. 
             scaling_flowSOM = TRUE, # scaling is recommanded, but will mean that all markers count as much regardless of size
