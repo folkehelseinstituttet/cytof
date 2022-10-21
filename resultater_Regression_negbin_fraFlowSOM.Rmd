@@ -1,0 +1,395 @@
+---
+title: "utvalgte klustre, uten ekstreme verdier"
+author: "Anja Bråthen Kristoffersen"
+date: '2022-08-16'
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+
+This script has to be written so that it analyse the meta data. This is only an example
+
+
+This script was run:
+
+```{r, echo = F}
+date()
+
+
+```
+
+
+```{r,include = F, comment= FALSE, message= FALSE}
+
+convert <- function(adj){
+  res <- ""
+  if(adj < params$adj_p){
+    res <- "."
+  }
+  if(adj < 0.05){
+    res <- "*"
+  }
+  if(adj < 0.01){
+    res <- "**"
+  }
+  if(adj < 0.001){
+    res <- "***"
+  }
+  return(res)
+}
+
+coeff_and_p <- function(adj, coef){
+  res <- rep(NA, length(adj))
+  for(i in 1:length(res)){
+    res[i] <- paste(coef[i], convert(adj[i]))
+  }
+  return(res)
+} 
+
+
+library(ggplot2)
+library(MASS)
+library(ggsignif)
+
+colorlegend <- c("Severe T1" = "red", "Moderate T1" = "blue", "Severe T2" = "pink", "Moderate T2" = "light blue", "Control" = "light green")
+sexShape <- c("M" = 15, "F" = 16)
+
+
+d <- read.csv2(fs::path(params$utSti,  paste0("antallPerClusterOgPat_k_", params$ks[1], "_seed", params$seed, params$ext_name, ".csv")))
+colnames(d)[2:ncol(d)] <- paste0("seed_", params$seed, "_k_", params$ks[1], "_", colnames(d)[2:ncol(d)])
+
+antallTot <- apply(d[,-1], 1, sum)
+
+# find clusters that are less than 0.99% similar to another already saved cluster
+
+for(i in 2:length(params$ks)){
+  temp <- read.csv2(fs::path(params$utSti,  paste0("antallPerClusterOgPat_k_", params$ks[i], "_seed", params$seed, params$ext_name, ".csv")))
+  temp <- temp[,-1]
+  colnames(temp)[1:ncol(temp)] <- paste0("seed_", params$seed, "_k_", params$ks[i], "_", colnames(temp)[1:ncol(temp)])
+  x <- apply(cor(d[2:ncol(d)], temp), 2, max)
+  nytt_kluster <- colnames(temp)[x < 0.99]
+  d <- cbind(d, temp[,nytt_kluster])
+}
+
+
+#truncate extream values.
+
+for(i in 2:ncol(d)){
+  x <- d[,i]/antallTot
+  max_value <- mean(x) + 2*sd(x)
+  d[x > max_value, i] <- round(max_value * antallTot[x > max_value])
+}
+
+
+
+
+
+kortFilNavn <- read.csv2(fs::path(params$posNeg_path, "kortFilNavn.csv"))
+rownames(kortFilNavn) <-  kortFilNavn$filnavn
+
+
+dInfo <- kortFilNavn
+
+dInfo$statusTid <- dInfo$status
+dInfo$status <- gsub(" T1", "", dInfo$status)
+dInfo$status <- gsub(" T2", "", dInfo$status)
+
+dInfo$tid <- "Control"
+dInfo$tid[grep("T1", dInfo$kort_filnavn)] <- "T1"
+dInfo$tid[grep("T2", dInfo$kort_filnavn)] <- "T2"
+dInfo$tid[grep("Ref", dInfo$kort_filnavn)] <- "Ref"
+
+
+
+
+d2 <- merge(d, dInfo, by.x = "X", by.y = "filnavn")
+d2$sex <- factor(d2$sex)
+d2$Tid <- "Control"
+d2$Tid[grep("T1", d2$Pasientnr)] <- "T1"
+d2$Tid[grep("T2", d2$Pasientnr)] <- "T2"
+
+d2$statusTid <- factor(d2$statusTid, levels = params$nivaa)
+
+d2$antall_cells_totalt <- antallTot
+ 
+d <- d2
+# d$statusTidsex <- paste(d$statusTid, d$sex)
+# d$statusTidsex <- factor(d$statusTidsex, levels = c( "Severe, T1 M", "Severe, T1 F", "Moderate, T1 M",  "Moderate, T1 F",  "Severe, T2 M",    "Moderate, T2 M", "Moderate, T2 F",  "Control M"  , "Control F"))
+
+write.csv2(d, fs::path(params$utSti, paste0("unike_klustre", params$seed, ".csv")))
+
+```
+
+
+
+```{r, echo = F, comment= FALSE, message= FALSE, warning= FALSE, fig.width= 15, fig.height=8}
+
+
+clusters <- colnames(d)[grepl("kluster", colnames(d))]
+
+p <- rep(NA, length(clusters))
+names(p) <- clusters
+
+for(ii in 1:length(clusters)){
+  i <- which(colnames(d) == clusters[ii])
+
+  fit1 <- glm.nb((d[,i] ) ~ offset(log(antall_cells_totalt))  + statusTid + age + sex , data = d)
+  fit2 <- glm.nb((d[,i] ) ~ offset(log(antall_cells_totalt))  + statusTid + age  , data = d)
+  fit3 <- glm.nb((d[,i] ) ~ offset(log(antall_cells_totalt))  + statusTid  + sex , data = d)
+  fit4 <- glm.nb((d[,i] ) ~ offset(log(antall_cells_totalt))  + statusTid   , data = d)
+  
+ p[clusters[ii]] <- min(summary(fit1)$coeff[2,4], summary(fit2)$coeff[2,4], summary(fit3)$coeff[2,4], summary(fit4)$coeff[2,4])
+}
+
+
+adj.p <- p.adjust(p, params$adj_p_methods)
+
+colorlegend <- c("Severe T1" = "red", "Moderate T1" = "blue", "Severe T2" = "pink", "Moderate T2" = "light blue", "Control" = "light green")
+
+mulige <- clusters[adj.p < params$adj_p]
+
+max_p <- max(p[adj.p < params$adj_p])
+
+sign_klustre <- NULL
+
+  g <- NA
+  if(length(mulige) > 0){
+  for(ii in 1:length(mulige)){
+   i <- which(colnames(d) == mulige[ii])
+      d$proportion <- d[,i]/d$antall_cells_totalt
+ 
+    if(exists("g")){
+     rm(g)
+     
+   }
+   print("###")
+   print("###")
+   fit0 <- glm.nb((d[,i] ) ~ offset(log(antall_cells_totalt)), data = d)
+   fit_statusTid <- glm.nb((d[,i] ) ~ offset(log(antall_cells_totalt)) + statusTid, data = d)
+   fit_sex_statusTid <- glm.nb((d[,i] ) ~ offset(log(antall_cells_totalt)) + statusTid + sex, data = d)
+   fit_age_statusTid <- glm.nb((d[,i] ) ~ offset(log(antall_cells_totalt))  + statusTid + age, data = d)
+   fit_age_sex_statusTid <- glm.nb((d[,i] ) ~ offset(log(antall_cells_totalt))  + statusTid + age + sex , data = d)
+
+   aic_values <- AIC(fit0,  fit_statusTid, fit_sex_statusTid, fit_age_sex_statusTid, fit_age_statusTid)
+   min_aic_values <- min(aic_values$AIC)
+
+
+   if(!aic_values["fit0","AIC"] < (min_aic_values+2)) {    
+   if(any(aic_values[grepl("status", rownames(aic_values)), "AIC"] < (min_aic_values+2))){
+     if(aic_values["fit_statusTid", "AIC"] < (min_aic_values+2)){
+       fit <- fit_statusTid
+       if(summary(fit)$coeff[2,4] < max_p){
+              # predData <- expand.grid(statusTid = levels(d$statusTid))
+       # predData$antall_cells_totalt <- max(d$antall_cells_totalt)
+       # pred <- predict(fit, newdata = predData, type = "response", se.fit = TRUE)
+       # predData$predict <- pred$fit/max(d$antall_cells_totalt)
+       #     predData$pred_lower <- (pred$fit - 1.96*pred$se.fit)/max(d$antall_cells_totalt)
+       #     predData$pred_upper <- (pred$fit + 1.96*pred$se.fit)/max(d$antall_cells_totalt)
+       #     predData$pred_lower[predData$pred_lower < 0] <- 0
+       #     predData$pred_upper[predData$pred_upper > 1] <- 1
+       #     predData$Proportion <- predData$predict
+       #    
+         # predData <- data.frame(predData)
+         i_statusTid <- which(colnames(d) == "statusTid")
+         i_proportion <- which(colnames(d) == "proportion")
+         d2 <- d[,c(i_proportion, i_statusTid)] 
+         colnames(d2) <- c("Proportion", "statusTid")
+         
+          g <- ggplot(d2 , aes(x = statusTid, y = Proportion, fill = statusTid)) +
+              geom_boxplot(outlier.shape = NA) +
+              geom_jitter(size = 2, alpha=1, position=position_jitter(0.2), shape = 16) + #, aes(col = Sex)) 
+              # geom_signif(comparisons = list(c("Severe T1", "Moderate T1")), map_signif_level=TRUE, annotations="***",
+              #             y_position = 0.095, textsize = 8) +
+              # geom_signif(comparisons = list(c("Severe T2", "Moderate T2")), map_signif_level=TRUE, annotations="**",
+              #             y_position = 0.09, textsize = 8) + 
+              #    xlab("") + ylim(0,max(d$proportion))+
+              # 
+              ylab(paste("Proportion", mulige[ii])) +
+             # geom_vline(xintercept = 4.5) + 
+              #theme(text = element_text(size = 20))  + 
+              labs(fill = "") +  
+              theme_classic(base_size = 20) +
+              scale_fill_manual(values = colorlegend)
+                     
+     }      
+         
+          
+     } else {
+       if(aic_values["fit_sex_statusTid", "AIC"] < (min_aic_values+2)){
+         fit <- fit_sex_statusTid
+         if(summary(fit)$coeff[2,4] < max_p){
+
+        #  predData <- expand.grid(statusTid = levels(d$statusTid), sex = levels(d$sex))
+        # predData$antall_cells_totalt <- antall_cells_totalt[ii]
+        # predData$sex <- "M"
+        #  predData$sex[grep("F", predData$statusTidsex)] <- "F"
+        # 
+        #  pred <- predict(fit, newdata = predData, type = "response", se.fit = TRUE)
+        #    predData$predict <- pred$fit/antall_cells_totalt[ii]
+        #    predData$pred_lower <- (pred$fit - 1.96*pred$se.fit)/antall_cells_totalt[ii]
+        #    predData$pred_upper <- (pred$fit + 1.96*pred$se.fit)/antall_cells_totalt[ii]
+        #    predData$pred_lower[predData$pred_lower < 0] <- 0
+        #    predData$pred_upper[predData$pred_upper > 1] <- 1
+        #    predData$Proportion <- predData$predict
+        #    predData <- data.frame(predData)
+        #    
+         i_statusTid <- which(colnames(d) == "statusTid")
+         i_sex <- which(colnames(d) == "sex")
+         i_proportion <- which(colnames(d) == "proportion")
+         d2 <- d[,c(i_proportion, i_statusTid, i_sex)]  
+         colnames(d2) <- c("Proportion", "statusTid", "sex")
+         
+         g <- ggplot(d2 , aes(x = statusTid, y = Proportion, fill = statusTid, shape = sex)) +
+              geom_boxplot(outlier.shape = NA) +
+              geom_jitter(size = 2, alpha=1, position=position_jitter(0.2)) + #, aes(col = Sex)) 
+              # geom_signif(comparisons = list(c("Severe T1", "Moderate T1")), map_signif_level=TRUE, annotations="***",
+              #             y_position = 0.095, textsize = 8) +
+              # geom_signif(comparisons = list(c("Severe T2", "Moderate T2")), map_signif_level=TRUE, annotations="**",
+              #             y_position = 0.09, textsize = 8) + 
+              #    xlab("") + ylim(0,max(d$proportion))+
+              # 
+              ylab(paste("Proportion", mulige[ii])) +
+             # geom_vline(xintercept = 4.5) + 
+              #theme(text = element_text(size = 20))  + 
+              labs(fill = "") +  
+              theme_classic(base_size = 20) +
+              scale_fill_manual(values = colorlegend)
+         
+       }
+          
+       }  else {
+         if(aic_values["fit_age_statusTid", "AIC"] < (min_aic_values+2)){
+           fit <- fit_age_statusTid
+           if(summary(fit)$coeff[2,4] < max_p){
+   predData <- expand.grid(age= min(d$age):max(d$age), statusTid = levels(d$statusTid))
+       predData$antall_cells_totalt <- max(d$antall_cells_totalt)
+           for(n in levels(d$statusTid)){
+              min_n <- min(d$age[d$statusTid == n])
+              max_n <- max(d$age[d$statusTid == n])
+              predData$age[predData$statusTid == n & predData$age > max_n] <- NA
+              predData$age[predData$statusTid == n & predData$age < min_n] <- NA
+           }
+           predData <- predData[!is.na(predData$age),]
+
+           pred <- predict(fit, newdata = predData, type = "response", se.fit = TRUE)
+           predData$predict <- pred$fit/max(d$antall_cells_totalt)
+           predData$pred_lower <- (pred$fit - 1.96*pred$se.fit)/max(d$antall_cells_totalt)
+           predData$pred_upper <- (pred$fit + 1.96*pred$se.fit)/max(d$antall_cells_totalt)
+           predData$pred_lower[predData$pred_lower < 0] <- 0
+           predData$pred_upper[predData$pred_upper > 1] <- 1
+           predData$Proportion <- predData$predict
+           predData <- data.frame(predData)
+           predData$Age <- predData$age
+           i_age <- which(colnames(d) == "age")
+           i_statusTid <- which(colnames(d) == "statusTid")
+           i_proportion = which(colnames(d) == "proportion")
+           d2 <- d[,c(i_proportion, i_age, i_statusTid)]  
+           colnames(d2) <- c("Proportion", "Age", "statusTid")
+           g <- ggplot(data = d2, aes(x = Age, y = Proportion, col= statusTid)) +
+              geom_line(data = predData, aes(x=Age, y = Proportion, col = statusTid), size = 2) + 
+             geom_ribbon(data = predData, aes(ymin = pred_lower, ymax = pred_upper, fill = statusTid, color = NULL), alpha = 0.3) +
+             geom_point(size = 2) + 
+            ylab(paste("Proportion", mulige[ii])) +
+             # geom_vline(xintercept = 4.5) + 
+              #theme(text = element_text(size = 20))  + 
+              labs(fill = "", col = "") +  
+              theme_classic(base_size = 20) +
+              scale_fill_manual(values = colorlegend) + 
+              scale_color_manual(values = colorlegend)
+          }
+         
+          }  else {
+           if(aic_values["fit_sex_statusTid", "AIC"] < (min_aic_values+2)){
+             fit <- fit_age_sex_statusTid
+              if(summary(fit)$coeff[2,4] < max_p){
+                      
+                      
+                      
+             predData <- expand.grid(age= min(d$age):max(d$age), statusTid = levels(d$statusTid), sex = levels(d$sex))
+
+              predData$antall_cells_totalt <- max(d$antall_cells_totalt)
+           for(n in levels(d$statusTidsex)){
+              min_n <- min(d$age[d$statusTidsex == n])
+              max_n <- max(d$age[d$statusTidsex == n])
+              predData$age[predData$statusTidsex == n & predData$age > max_n] <- NA
+              predData$age[predData$statusTidsex == n & predData$age < min_n] <- NA
+           }
+           predData <- predData[!is.na(predData$age),]
+
+           pred <- predict(fit, newdata = predData, type = "response", se.fit = TRUE)
+           predData$predict <- pred$fit/max(d$antall_cells_totalt)
+           predData$pred_lower <- (pred$fit - 1.96*pred$se.fit)/max(d$antall_cells_totalt)
+           predData$pred_upper <- (pred$fit + 1.96*pred$se.fit)/max(d$antall_cells_totalt)
+           predData$pred_lower[predData$pred_lower < 0] <- 0
+           predData$pred_upper[predData$pred_upper > 1] <- 1
+           predData$Proportion <- predData$predict
+           predData <- data.frame(predData)
+           predData$Age <- predData$age
+           i_age <- which(colnames(d) == "age")
+           i_sex <- which(colnames(d) == "sex")
+           i_statusTid <- which(colnames(d) == "statusTid")
+           i_proportion <- which(colnames(d) == "proportion")
+           d2 <- d[,c(i_proportion, i_age, i_statusTid, i_sex)]  
+           colnames(d2) <- c("Proportion", "Age", "statusTid", "sex")
+            g <- ggplot(data = d2, aes(x = Age, y = Proportion, col= statusTid, shape = sex)) +
+              geom_line(data = predData, aes(x=Age, y = Proportion, col = statusTid), size = 2) + 
+             geom_ribbon(data = predData, aes(ymin = pred_lower, ymax = pred_upper, fill = statusTid, color = NULL), alpha = 0.3) + geom_point(size = 2) + 
+            ylab(paste("Proportion", mulige[ii])) +
+             # geom_vline(xintercept = 4.5) + 
+              #theme(text = element_text(size = 20))  + 
+              labs(fill = "", col = "") +  
+              theme_classic(base_size = 20) +
+              scale_fill_manual(values = colorlegend) + 
+              scale_color_manual(values = colorlegend)
+         
+                    }
+           }
+         }
+       }
+     }
+   } else {
+     fit <- NULL
+     g <- NULL
+   }
+  
+   if(exists("g")){
+   if(!is.null(g)){
+        
+        if(summary(fit)$coeff[2,4] < max_p){
+
+     print("########")
+    print(colnames(d)[i])
+    
+  #  print(paste0("adj p value kun forskjell til moderat: ", adj_p_val[i]))
+    print(summary(fit))
+    
+    est <- cbind(Estimate = coef(fit), confint(fit))
+    print("incident rate ratio")
+    print(exp(est))
+ 
+    g <- g + theme(axis.text = element_text(size = 14), axis.title = element_text(size = 20), title  = element_text(size = 20)) + 
+    ylab("proportion") 
+    g <- g + ggtitle(paste0(colnames(d)[i] #, "antall i kluster = ", as.numeric(antallPerKluster[i]) #, ": antall i andelster = ", antallPerandelster[i]
+    ))
+    print(g)
+    d_resid <- data.frame(fitted = fitted(fit), residuals = residuals(fit), statusTid = d$statusTid[!is.na(d[,i])]) 
+    
+    g_resid <- ggplot(d_resid, aes(x = fitted, y = residuals, col = statusTid)) +
+      geom_point() + ggtitle("residual plot") + geom_abline(slope = 0, intercept = 0) + theme(axis.text = element_text(size = 14), axis.title = element_text(size = 20), title  = element_text(size = 20))
+    print(g_resid)
+    
+    sign_klustre <- c(sign_klustre, mulige[ii])
+    
+        }
+   }
+   }
+  }
+  }
+  }
+write.csv2(sign_klustre, fs::path(params$utSti, paste0("sign_klustre_", params$seed, ".csv")))
+
+
+```
