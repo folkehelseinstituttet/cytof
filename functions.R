@@ -1050,7 +1050,8 @@ density_plot_per_cluster <- function(data, cluster_per_cell, rand_events = NA, p
   }
   
   n_cluster_per_cell <- length(unique_cluster_per_cell)
-  
+  gg <- list()  
+ # browser()
   for(i in 1:n_cluster_per_cell){
     d2 <- as.data.frame(cbind(data, cluster_per_cell %in% unique_cluster_per_cell[i]))
     colnames(d2) <- c(colnames(data),  "cluster")
@@ -1069,10 +1070,12 @@ density_plot_per_cluster <- function(data, cluster_per_cell, rand_events = NA, p
                      legend.text=ggplot2::element_text(size = legend_text_size),
                      legend.title = ggplot2::element_blank()) +
       ggplot2::guides(color = ggplot2::guide_legend(ncol = 1)) #+
-    print(paste("cluster", unique_cluster_per_cell[i]))
-    print(g)
-  }
-  
+  #   print(paste("cluster", unique_cluster_per_cell[i]))
+  #   print(g)
+    gg[[i]] <- g
+     
+   }
+  return(gg)
 }
 
 
