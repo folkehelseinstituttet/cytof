@@ -1183,14 +1183,15 @@ get_params_fcs_data <- function(x = fcs_data[[1]]){
 
 transform_selected_markers <- function(fcs_data, markers, method = "arc_sinh", cofactor = 5, scale = F,  scaling = c(-5, 12000)){
   new_data <- NULL 
+  #browser()
   number_of_files <- length(fcs_data)
   
   for (i in 1:number_of_files){
     if(method == "arc_sinh"){
-      new_data[[i]] <- as.data.frame(asinh(flowCore::exprs(fcs_data[[i]][,markers])/cofactor))
+      new_data[[i]] <- as.data.frame(asinh(flowCore::exprs(fcs_data[[i]])[,markers]/cofactor))
     } else {
       if(method == "log"){
-        new_data[[i]] <- as.data.frame(log(flowCore::exprs(fcs_data[[i]][,markers]) + 1))
+        new_data[[i]] <- as.data.frame(log(flowCore::exprs(fcs_data[[i]])[,markers] + 1))
       } else {
         print("method must be given as either arc_sinh or log")
       }
@@ -1203,7 +1204,7 @@ transform_selected_markers <- function(fcs_data, markers, method = "arc_sinh", c
   }
   # Add Time
   for (i in 1:number_of_files){
-    new_data[[i]]$Time <- flowCore::exprs(fcs_data[[i]][,"Time"])
+    new_data[[i]]$Time <- flowCore::exprs(fcs_data[[i]])[,"Time"]
   }
   return(new_data)
 }
