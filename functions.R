@@ -572,10 +572,14 @@ time_signal_plot <- function(data, random_events, marker,  plot_title,
 #' @param lower_gate, vector with values for lower gate or NA (no lower gating)
 #' @param upper_gate,  vector with values for uppe gate or NA (no upper gating)
 #' @param xlim, xlim default NA.
+#' @param main_title, default no title, ""
+#' @param included_files default NA (ALL)
+#' @param max_event_used default 10000
+#' @param minimum_signal default NA
 #' @return density plots
 
-density_plot <- function(data, marker, plot_title = NA, lower_gate = NA, upper_gate = NA, xlim = NA, main_title = "", included_files = NA, max_event_used = NA, minimum_signal = NA){
-  #browser()
+density_plot <- function(data, marker, plot_title = NA, lower_gate = NA, upper_gate = NA, xlim = NA, main_title = "", included_files = NA, max_event_used = 10000, minimum_signal = NA){
+ # browser()
   number_of_files <- length(data)  
   possible_i <- 1:number_of_files 
   
