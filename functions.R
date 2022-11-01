@@ -1041,7 +1041,7 @@ signal_signal_plot_selected_cells <- function(data, number_random_events = 10000
 
 
 
-density_plot_per_cluster <- function(data, cluster_per_cell, rand_events = NA, plot_cluster = NA, nrow_plot = 4, strip_text_size = 10, legend_text_size = 10, axis_text_size = 8){
+density_plot_per_cluster <- function(data, cluster_per_cell, rand_events = NA, plot_cluster = NA, nrow_plot = 4, strip_text_size = 10, legend_text_size = 10, axis_text_size = 8, quantile_xlim = 1){
   if(!is.na(rand_events[1])){
     data <- data[rand_events,]
     cluster_per_cell <- cluster_per_cell[rand_events]
@@ -1064,7 +1064,7 @@ density_plot_per_cluster <- function(data, cluster_per_cell, rand_events = NA, p
     d3$cluster[d3$cluster == TRUE] <- paste("cluster", unique_cluster_per_cell[i])
     d3$cluster[d3$cluster == FALSE] <- "the rest"
     g <- ggplot2::ggplot(d3, ggplot2::aes(x = value, color = cluster)) + 
-      ggplot2::geom_density(size = 2) +
+      ggplot2::geom_density(size = 1.5) +
       
       ggplot2::facet_wrap(~ variable, nrow = nrow_plot, scales = "free") +
       ggplot2::theme_bw() +
@@ -1076,6 +1076,13 @@ density_plot_per_cluster <- function(data, cluster_per_cell, rand_events = NA, p
       ggplot2::guides(color = ggplot2::guide_legend(ncol = 1)) #+
   #   print(paste("cluster", unique_cluster_per_cell[i]))
   #   print(g)
+    
+    if(quantile_xlim < 1){
+      minx <- quantile(d3$value, 1 - quantile_xlim)
+      maxx <- quantile(d3$value, quantile_xlim)
+      g <- g + ggplot2::xlim(minx, maxx)
+    }
+    
     gg[[i]] <- g
      
    }
